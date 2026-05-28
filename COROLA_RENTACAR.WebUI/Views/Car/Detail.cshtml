@@ -1,0 +1,155 @@
+﻿@using COROLA_RENTACAR.EntityLayer.Entities
+@model COROLA_RENTACAR.EntityLayer.Entities.Car
+
+@{
+    ViewData["Title"] = $"{Model.Brand?.BrandName} {Model.Model}";
+    Layout = "~/Views/Shared/_UILayout.cshtml";
+
+    var images = ViewBag.CarImages as List<CarImage> ?? new List<CarImage>();
+    var coverImage = images.FirstOrDefault(x => x.IsCoverImage)?.ImageUrl ?? Model.ImageUrl;
+}
+
+<section class="page-title centred" style="background-image: url(/carola/assets/images/background/page-title.jpg);">
+    <div class="container">
+        <div class="content-box">
+            <h1>@Model.Brand?.BrandName @Model.Model</h1>
+            <ul class="bread-crumb clearfix">
+                <li><a href="/">Home</a></li>
+                <li><a href="/Car">Cars</a></li>
+                <li>@Model.Model</li>
+            </ul>
+        </div>
+    </div>
+</section>
+
+<section class="car-details-section pt_120 pb_120">
+    <div class="container">
+        <div class="row">
+
+            <div class="col-xl-8 col-lg-8 col-md-12">
+                <div style="background:#fff;border-radius:18px;overflow:hidden;box-shadow:0 15px 35px rgba(0,0,0,.06);margin-bottom:30px;">
+                    <img src="@coverImage"
+                         alt="@Model.Brand?.BrandName @Model.Model"
+                         style="width:100%;height:460px;object-fit:cover;"
+                         onerror="this.src='/carola/assets/images/popular-car/popular-car-1.jpg';" />
+                </div>
+
+                @if (images.Any())
+                {
+                    <div class="row">
+                        @foreach (var image in images)
+                        {
+                            <div class="col-lg-3 col-md-4 col-sm-6">
+                                <div style="border-radius:12px;overflow:hidden;margin-bottom:16px;border:1px solid #eee;">
+                                    <img src="@image.ImageUrl"
+                                         alt="Car image"
+                                         style="width:100%;height:120px;object-fit:cover;"
+                                         onerror="this.style.display='none';" />
+                                </div>
+                            </div>
+                        }
+                    </div>
+                }
+
+                <div style="background:#fff;border:1px solid #eee;border-radius:18px;padding:30px;margin-top:20px;">
+                    <h3>Vehicle Description</h3>
+                    <p style="color:#777;line-height:1.8;">
+                        @Model.Brand?.BrandName @Model.Model is available for rental with clear daily pricing,
+                        verified reservation flow and professional rental management.
+                    </p>
+
+                    <div class="row" style="margin-top:25px;">
+                        <div class="col-md-4">
+                            <strong>Fuel Type</strong>
+                            <p>@Model.FuelType</p>
+                        </div>
+
+                        <div class="col-md-4">
+                            <strong>Transmission</strong>
+                            <p>@Model.TransmissionType</p>
+                        </div>
+
+                        <div class="col-md-4">
+                            <strong>Category</strong>
+                            <p>@Model.Category?.CategoryName</p>
+                        </div>
+
+                        <div class="col-md-4">
+                            <strong>Model Year</strong>
+                            <p>@Model.ModelYear</p>
+                        </div>
+
+                        <div class="col-md-4">
+                            <strong>Seat Count</strong>
+                            <p>@Model.SeatCount</p>
+                        </div>
+
+                        <div class="col-md-4">
+                            <strong>Luggage Capacity</strong>
+                            <p>@Model.LuggageCapacity</p>
+                        </div>
+
+                        <div class="col-md-4">
+                            <strong>Mileage</strong>
+                            <p>@Model.Mileage.ToString("N0") km</p>
+                        </div>
+
+                        <div class="col-md-4">
+                            <strong>Plate Number</strong>
+                            <p>@Model.PlateNumber</p>
+                        </div>
+
+                        <div class="col-md-4">
+                            <strong>Status</strong>
+                            <p>@(Model.IsAvailable ? "Available" : "Unavailable")</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-xl-4 col-lg-4 col-md-12">
+                <div style="background:#fff;border:1px solid #eee;border-radius:18px;padding:30px;box-shadow:0 15px 35px rgba(0,0,0,.06);position:sticky;top:110px;">
+                    <span style="color:#ff3131;font-weight:800;font-size:13px;">RENTAL PRICE</span>
+
+                    <h2 style="margin:8px 0 20px;">
+                        @Model.DailyPrice.ToString("N0") ₺
+                        <span style="font-size:16px;color:#777;font-weight:500;">/ day</span>
+                    </h2>
+
+                    <ul style="list-style:none;padding:0;margin:0 0 25px;">
+                        <li style="padding:10px 0;border-bottom:1px solid #eee;">
+                            <strong>Brand:</strong> @Model.Brand?.BrandName
+                        </li>
+                        <li style="padding:10px 0;border-bottom:1px solid #eee;">
+                            <strong>Model:</strong> @Model.Model
+                        </li>
+                        <li style="padding:10px 0;border-bottom:1px solid #eee;">
+                            <strong>Fuel:</strong> @Model.FuelType
+                        </li>
+                        <li style="padding:10px 0;border-bottom:1px solid #eee;">
+                            <strong>Transmission:</strong> @Model.TransmissionType
+                        </li>
+                    </ul>
+
+                    @if (Model.IsAvailable)
+                    {
+                        <a href="/Reservation/Create?carId=@Model.CarId" class="btn-style-one" style="width:100%;text-align:center;">
+                            Rent This Car <i class="icon-13"></i>
+                        </a>
+                    }
+                    else
+                    {
+                        <button class="btn-style-three" style="width:100%;cursor:not-allowed;" disabled>
+                            Currently Unavailable
+                        </button>
+                    }
+
+                    <a href="/Car" class="btn-style-three" style="width:100%;text-align:center;margin-top:12px;">
+                        Back to Cars
+                    </a>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</section>

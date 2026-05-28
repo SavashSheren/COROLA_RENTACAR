@@ -1,0 +1,1736 @@
+﻿@{
+    Layout = null;
+}
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>RentPro — Admin Panel</title>
+
+    <!-- Bootstrap 5 -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" />
+    <!-- Bootstrap Icons -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet" />
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet" />
+
+    <style>
+        /* ============================================================
+                   CSS CUSTOM PROPERTIES — Design Tokens
+                ============================================================ */
+        :root {
+            --sidebar-w: 260px;
+            --sidebar-collapsed-w: 72px;
+            --navbar-h: 64px;
+            /* Palette */
+            --bg-dark: #0d0f14;
+            --bg-dark2: #13161e;
+            --bg-dark3: #1a1e2a;
+            --accent: #e8ff47;
+            --accent-dim: rgba(232,255,71,.12);
+            --accent2: #4f8dff;
+            --accent2-dim: rgba(79,141,255,.12);
+            --danger: #ff5259;
+            --success: #30e0a1;
+            --warning: #ffb547;
+            --muted: #6b7280;
+            --border: rgba(255,255,255,.07);
+            --text: #e2e8f0;
+            --text-muted: #7a8499;
+            --radius: 12px;
+            --radius-lg: 18px;
+            --shadow: 0 4px 24px rgba(0,0,0,.45);
+            --transition: .22s cubic-bezier(.4,0,.2,1);
+        }
+
+        *, *::before, *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'DM Sans', sans-serif;
+            background: var(--bg-dark);
+            color: var(--text);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        ::-webkit-scrollbar {
+            width: 5px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: var(--bg-dark3);
+            border-radius: 99px;
+        }
+
+        #shell {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        #sidebar {
+            width: var(--sidebar-w);
+            min-height: 100vh;
+            background: var(--bg-dark2);
+            border-right: 1px solid var(--border);
+            display: flex;
+            flex-direction: column;
+            position: fixed;
+            top: 0;
+            left: 0;
+            z-index: 1000;
+            transition: width var(--transition);
+            overflow: hidden;
+        }
+
+            #sidebar.collapsed {
+                width: var(--sidebar-collapsed-w);
+            }
+
+                #sidebar.collapsed .nav-label,
+                #sidebar.collapsed .brand-name,
+                #sidebar.collapsed .submenu-arrow,
+                #sidebar.collapsed .sub-menu {
+                    display: none !important;
+                }
+
+                #sidebar.collapsed .nav-item > a {
+                    justify-content: center;
+                    padding: 12px 0;
+                }
+
+                #sidebar.collapsed .brand {
+                    justify-content: center;
+                    padding: 0;
+                }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 0 20px;
+            height: var(--navbar-h);
+            border-bottom: 1px solid var(--border);
+            flex-shrink: 0;
+        }
+
+        .brand-icon {
+            width: 36px;
+            height: 36px;
+            background: var(--accent);
+            border-radius: 10px;
+            display: grid;
+            place-items: center;
+            flex-shrink: 0;
+        }
+
+            .brand-icon i {
+                color: var(--bg-dark);
+                font-size: 18px;
+            }
+
+        .brand-name {
+            font-family: 'Syne', sans-serif;
+            font-weight: 800;
+            font-size: 18px;
+            color: var(--text);
+            letter-spacing: -.3px;
+            white-space: nowrap;
+        }
+
+            .brand-name span {
+                color: var(--accent);
+            }
+
+        .sidebar-nav {
+            padding: 14px 0;
+            flex: 1;
+            overflow-y: auto;
+            overflow-x: hidden;
+        }
+
+        .nav-section-label {
+            font-size: 10px;
+            text-transform: uppercase;
+            letter-spacing: 1.2px;
+            color: var(--text-muted);
+            padding: 16px 22px 6px;
+            font-weight: 600;
+            white-space: nowrap;
+        }
+
+        .nav-item {
+            list-style: none;
+            padding: 2px 10px;
+        }
+
+            .nav-item > a {
+                display: flex;
+                align-items: center;
+                gap: 12px;
+                padding: 10px 14px;
+                border-radius: var(--radius);
+                color: var(--text-muted);
+                text-decoration: none;
+                font-size: 14px;
+                font-weight: 500;
+                transition: background var(--transition), color var(--transition);
+                white-space: nowrap;
+                cursor: pointer;
+            }
+
+                .nav-item > a i {
+                    font-size: 17px;
+                    flex-shrink: 0;
+                }
+
+                .nav-item > a:hover {
+                    background: var(--bg-dark3);
+                    color: var(--text);
+                }
+
+                .nav-item > a.active {
+                    background: var(--accent-dim);
+                    color: var(--accent);
+                }
+
+                    .nav-item > a.active i {
+                        color: var(--accent);
+                    }
+
+        .submenu-arrow {
+            margin-left: auto;
+            font-size: 12px;
+            transition: transform var(--transition);
+        }
+
+        .nav-item.open > a .submenu-arrow {
+            transform: rotate(90deg);
+        }
+
+        .sub-menu {
+            list-style: none;
+            padding: 4px 0 4px 42px;
+            overflow: hidden;
+            max-height: 0;
+            transition: max-height .3s ease;
+        }
+
+        .nav-item.open .sub-menu {
+            max-height: 200px;
+        }
+
+        .sub-menu li a {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 7px 12px;
+            border-radius: 8px;
+            color: var(--text-muted);
+            text-decoration: none;
+            font-size: 13px;
+            transition: color var(--transition), background var(--transition);
+        }
+
+            .sub-menu li a::before {
+                content: '';
+                width: 5px;
+                height: 5px;
+                border-radius: 50%;
+                background: var(--text-muted);
+                flex-shrink: 0;
+                transition: background var(--transition);
+            }
+
+            .sub-menu li a:hover {
+                color: var(--text);
+                background: var(--bg-dark3);
+            }
+
+                .sub-menu li a:hover::before {
+                    background: var(--accent);
+                }
+
+            .sub-menu li a.active {
+                color: var(--accent);
+            }
+
+                .sub-menu li a.active::before {
+                    background: var(--accent);
+                }
+
+        .sidebar-footer {
+            padding: 14px 10px;
+            border-top: 1px solid var(--border);
+        }
+
+            .sidebar-footer a {
+                display: flex;
+                align-items: center;
+                gap: 12px;
+                padding: 10px 14px;
+                border-radius: var(--radius);
+                color: var(--danger);
+                text-decoration: none;
+                font-size: 14px;
+                font-weight: 500;
+                transition: background var(--transition);
+                white-space: nowrap;
+            }
+
+                .sidebar-footer a:hover {
+                    background: rgba(255,82,89,.08);
+                }
+
+        #main-wrapper {
+            margin-left: var(--sidebar-w);
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+            transition: margin-left var(--transition);
+        }
+
+            #main-wrapper.expanded {
+                margin-left: var(--sidebar-collapsed-w);
+            }
+
+        #navbar {
+            height: var(--navbar-h);
+            background: var(--bg-dark2);
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            padding: 0 24px;
+            gap: 16px;
+            position: sticky;
+            top: 0;
+            z-index: 999;
+            box-shadow: 0 1px 0 var(--border);
+        }
+
+        #toggleSidebar {
+            width: 38px;
+            height: 38px;
+            border: none;
+            background: var(--bg-dark3);
+            border-radius: 10px;
+            color: var(--text-muted);
+            display: grid;
+            place-items: center;
+            cursor: pointer;
+            transition: background var(--transition), color var(--transition);
+            flex-shrink: 0;
+        }
+
+            #toggleSidebar:hover {
+                background: var(--accent-dim);
+                color: var(--accent);
+            }
+
+        .nav-breadcrumb {
+            font-size: 13px;
+            color: var(--text-muted);
+        }
+
+            .nav-breadcrumb span {
+                color: var(--text);
+                font-weight: 500;
+            }
+
+        .nav-search {
+            flex: 1;
+            max-width: 320px;
+            position: relative;
+            margin: 0 auto 0 16px;
+        }
+
+            .nav-search i {
+                position: absolute;
+                left: 12px;
+                top: 50%;
+                transform: translateY(-50%);
+                color: var(--text-muted);
+                font-size: 15px;
+            }
+
+            .nav-search input {
+                width: 100%;
+                background: var(--bg-dark3);
+                border: 1px solid var(--border);
+                border-radius: 10px;
+                color: var(--text);
+                padding: 8px 12px 8px 36px;
+                font-size: 13px;
+                font-family: inherit;
+                transition: border var(--transition), box-shadow var(--transition);
+                outline: none;
+            }
+
+                .nav-search input::placeholder {
+                    color: var(--text-muted);
+                }
+
+                .nav-search input:focus {
+                    border-color: var(--accent);
+                    box-shadow: 0 0 0 3px var(--accent-dim);
+                }
+
+        .nav-actions {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-left: auto;
+        }
+
+        .nav-btn {
+            width: 38px;
+            height: 38px;
+            border: none;
+            background: var(--bg-dark3);
+            border-radius: 10px;
+            color: var(--text-muted);
+            display: grid;
+            place-items: center;
+            cursor: pointer;
+            position: relative;
+            transition: background var(--transition), color var(--transition);
+        }
+
+            .nav-btn:hover {
+                background: var(--bg-dark3);
+                color: var(--text);
+            }
+
+            .nav-btn .badge-dot {
+                position: absolute;
+                top: 7px;
+                right: 7px;
+                width: 8px;
+                height: 8px;
+                background: var(--danger);
+                border-radius: 50%;
+                border: 2px solid var(--bg-dark2);
+            }
+
+        .profile-btn {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            background: var(--bg-dark3);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 6px 12px 6px 6px;
+            cursor: pointer;
+            transition: background var(--transition), border var(--transition);
+        }
+
+            .profile-btn:hover {
+                border-color: rgba(255,255,255,.15);
+            }
+
+        .profile-avatar {
+            width: 28px;
+            height: 28px;
+            border-radius: 8px;
+            background: linear-gradient(135deg, var(--accent2), var(--accent));
+            display: grid;
+            place-items: center;
+            font-size: 12px;
+            font-weight: 700;
+            color: var(--bg-dark);
+            flex-shrink: 0;
+        }
+
+        .profile-name {
+            font-size: 13px;
+            font-weight: 500;
+            white-space: nowrap;
+        }
+
+        .profile-role {
+            font-size: 11px;
+            color: var(--text-muted);
+            line-height: 1;
+        }
+
+        .dropdown-menu {
+            background: var(--bg-dark2) !important;
+            border: 1px solid var(--border) !important;
+            border-radius: var(--radius) !important;
+            box-shadow: var(--shadow) !important;
+            padding: 6px !important;
+            min-width: 220px;
+        }
+
+        .dropdown-item {
+            color: var(--text-muted) !important;
+            font-size: 13px !important;
+            border-radius: 8px !important;
+            padding: 9px 12px !important;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            transition: background var(--transition), color var(--transition) !important;
+        }
+
+            .dropdown-item:hover {
+                background: var(--bg-dark3) !important;
+                color: var(--text) !important;
+            }
+
+            .dropdown-item.text-danger {
+                color: var(--danger) !important;
+            }
+
+                .dropdown-item.text-danger:hover {
+                    background: rgba(255,82,89,.08) !important;
+                }
+
+        .dropdown-divider {
+            border-color: var(--border) !important;
+            margin: 4px 0 !important;
+        }
+
+        .dropdown-header {
+            color: var(--text-muted) !important;
+            font-size: 11px !important;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            padding: 8px 12px 4px !important;
+        }
+
+        .notif-item {
+            padding: 10px 12px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background var(--transition);
+        }
+
+            .notif-item:hover {
+                background: var(--bg-dark3);
+            }
+
+            .notif-item .notif-title {
+                font-size: 13px;
+                font-weight: 500;
+                color: var(--text);
+            }
+
+            .notif-item .notif-time {
+                font-size: 11px;
+                color: var(--text-muted);
+            }
+
+        #content {
+            flex: 1;
+            padding: 28px 28px 40px;
+            background: var(--bg-dark);
+        }
+
+        .page-header {
+            display: flex;
+            align-items: flex-end;
+            justify-content: space-between;
+            gap: 16px;
+            margin-bottom: 28px;
+            flex-wrap: wrap;
+        }
+
+        .page-title {
+            font-family: 'Syne', sans-serif;
+            font-size: 26px;
+            font-weight: 700;
+            color: var(--text);
+            line-height: 1;
+        }
+
+        .page-subtitle {
+            font-size: 13px;
+            color: var(--text-muted);
+            margin-top: 5px;
+        }
+
+        .stats-row {
+            margin-bottom: 28px;
+        }
+
+        .stat-card {
+            background: var(--bg-dark2);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-lg);
+            padding: 20px 22px;
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            transition: border-color var(--transition), transform var(--transition);
+        }
+
+            .stat-card:hover {
+                border-color: rgba(255,255,255,.14);
+                transform: translateY(-2px);
+            }
+
+        .stat-icon {
+            width: 46px;
+            height: 46px;
+            border-radius: 12px;
+            display: grid;
+            place-items: center;
+            font-size: 20px;
+            flex-shrink: 0;
+        }
+
+            .stat-icon.yellow {
+                background: var(--accent-dim);
+                color: var(--accent);
+            }
+
+            .stat-icon.blue {
+                background: var(--accent2-dim);
+                color: var(--accent2);
+            }
+
+            .stat-icon.green {
+                background: rgba(48,224,161,.1);
+                color: var(--success);
+            }
+
+            .stat-icon.red {
+                background: rgba(255,82,89,.1);
+                color: var(--danger);
+            }
+
+        .stat-value {
+            font-family: 'Syne', sans-serif;
+            font-size: 24px;
+            font-weight: 700;
+            line-height: 1;
+        }
+
+        .stat-label {
+            font-size: 12px;
+            color: var(--text-muted);
+            margin-top: 3px;
+        }
+
+        .stat-badge {
+            margin-left: auto;
+            font-size: 11px;
+            font-weight: 600;
+            padding: 3px 8px;
+            border-radius: 6px;
+        }
+
+            .stat-badge.up {
+                background: rgba(48,224,161,.12);
+                color: var(--success);
+            }
+
+            .stat-badge.down {
+                background: rgba(255,82,89,.12);
+                color: var(--danger);
+            }
+
+        .toolbar {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 22px;
+            flex-wrap: wrap;
+        }
+
+        .toolbar-search {
+            position: relative;
+            flex: 1;
+            min-width: 200px;
+            max-width: 340px;
+        }
+
+            .toolbar-search i {
+                position: absolute;
+                left: 13px;
+                top: 50%;
+                transform: translateY(-50%);
+                color: var(--text-muted);
+                font-size: 15px;
+            }
+
+            .toolbar-search input {
+                width: 100%;
+                background: var(--bg-dark2);
+                border: 1px solid var(--border);
+                border-radius: 10px;
+                color: var(--text);
+                padding: 9px 13px 9px 38px;
+                font-size: 13px;
+                font-family: inherit;
+                outline: none;
+                transition: border var(--transition), box-shadow var(--transition);
+            }
+
+                .toolbar-search input::placeholder {
+                    color: var(--text-muted);
+                }
+
+                .toolbar-search input:focus {
+                    border-color: var(--accent);
+                    box-shadow: 0 0 0 3px var(--accent-dim);
+                }
+
+        .btn-accent {
+            background: var(--accent);
+            color: var(--bg-dark);
+            border: none;
+            border-radius: 10px;
+            padding: 9px 18px;
+            font-size: 13px;
+            font-weight: 600;
+            font-family: inherit;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 7px;
+            transition: opacity var(--transition), transform var(--transition);
+            white-space: nowrap;
+        }
+
+            .btn-accent:hover {
+                opacity: .85;
+                transform: translateY(-1px);
+            }
+
+        .btn-outline {
+            background: transparent;
+            color: var(--text-muted);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 9px 18px;
+            font-size: 13px;
+            font-weight: 500;
+            font-family: inherit;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 7px;
+            transition: background var(--transition), color var(--transition), border var(--transition);
+            white-space: nowrap;
+        }
+
+            .btn-outline:hover {
+                background: var(--bg-dark2);
+                color: var(--text);
+                border-color: rgba(255,255,255,.15);
+            }
+
+        .filter-tabs {
+            display: flex;
+            gap: 6px;
+            flex-wrap: wrap;
+        }
+
+        .filter-tab {
+            border: 1px solid var(--border);
+            background: transparent;
+            color: var(--text-muted);
+            border-radius: 8px;
+            padding: 7px 14px;
+            font-size: 12px;
+            font-weight: 500;
+            font-family: inherit;
+            cursor: pointer;
+            transition: background var(--transition), color var(--transition), border var(--transition);
+        }
+
+            .filter-tab:hover {
+                background: var(--bg-dark2);
+                color: var(--text);
+            }
+
+            .filter-tab.active {
+                background: var(--accent-dim);
+                border-color: rgba(232,255,71,.25);
+                color: var(--accent);
+            }
+
+        .vehicles-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(285px, 1fr));
+            gap: 20px;
+        }
+
+        .vehicle-card {
+            background: var(--bg-dark2);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-lg);
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            transition: border-color var(--transition), transform var(--transition), box-shadow var(--transition);
+            animation: fadeUp .4s ease both;
+        }
+
+            .vehicle-card:hover {
+                border-color: rgba(255,255,255,.13);
+                transform: translateY(-4px);
+                box-shadow: 0 12px 40px rgba(0,0,0,.4);
+            }
+
+        @@keyframes fadeUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .vehicle-card:nth-child(1) {
+            animation-delay: .05s;
+        }
+
+        .vehicle-card:nth-child(2) {
+            animation-delay: .10s;
+        }
+
+        .vehicle-card:nth-child(3) {
+            animation-delay: .15s;
+        }
+
+        .vehicle-card:nth-child(4) {
+            animation-delay: .20s;
+        }
+
+        .vehicle-card:nth-child(5) {
+            animation-delay: .25s;
+        }
+
+        .vehicle-card:nth-child(6) {
+            animation-delay: .30s;
+        }
+
+        .vehicle-card:nth-child(7) {
+            animation-delay: .35s;
+        }
+
+        .vehicle-card:nth-child(8) {
+            animation-delay: .40s;
+        }
+
+        .vehicle-card:nth-child(9) {
+            animation-delay: .45s;
+        }
+
+        .vehicle-card:nth-child(10) {
+            animation-delay: .50s;
+        }
+
+        .card-img-wrap {
+            position: relative;
+            height: 170px;
+            background: var(--bg-dark3);
+            overflow: hidden;
+        }
+
+            .card-img-wrap img {
+                width: 100%;
+                height: 100%;
+                object-fit: cover;
+                transition: transform .5s ease;
+            }
+
+        .vehicle-card:hover .card-img-wrap img {
+            transform: scale(1.05);
+        }
+
+        .status-badge {
+            position: absolute;
+            top: 12px;
+            left: 12px;
+            font-size: 11px;
+            font-weight: 600;
+            padding: 4px 10px;
+            border-radius: 6px;
+            backdrop-filter: blur(8px);
+        }
+
+            .status-badge.available {
+                background: rgba(48,224,161,.18);
+                color: var(--success);
+                border: 1px solid rgba(48,224,161,.3);
+            }
+
+            .status-badge.rented {
+                background: rgba(255,181,71,.18);
+                color: var(--warning);
+                border: 1px solid rgba(255,181,71,.3);
+            }
+
+        .category-tag {
+            position: absolute;
+            top: 12px;
+            right: 12px;
+            font-size: 10px;
+            font-weight: 600;
+            padding: 3px 9px;
+            border-radius: 5px;
+            background: rgba(0,0,0,.55);
+            backdrop-filter: blur(8px);
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: .5px;
+        }
+
+        .price-strip {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            padding: 8px 14px;
+            background: linear-gradient(0deg, rgba(0,0,0,.7) 0%, transparent 100%);
+            display: flex;
+            align-items: baseline;
+            gap: 4px;
+        }
+
+        .price-amount {
+            font-family: 'Syne', sans-serif;
+            font-size: 20px;
+            font-weight: 700;
+            color: var(--accent);
+        }
+
+        .price-unit {
+            font-size: 11px;
+            color: rgba(255,255,255,.6);
+        }
+
+        .card-body-custom {
+            padding: 16px 18px;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .car-brand {
+            font-size: 11px;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: .8px;
+            font-weight: 600;
+        }
+
+        .car-model {
+            font-family: 'Syne', sans-serif;
+            font-size: 17px;
+            font-weight: 700;
+            color: var(--text);
+            margin-top: 2px;
+            line-height: 1.2;
+        }
+
+        .car-year {
+            font-size: 12px;
+            color: var(--text-muted);
+            margin-top: 2px;
+        }
+
+        .specs-row {
+            display: flex;
+            gap: 6px;
+            flex-wrap: wrap;
+            margin-top: 12px;
+        }
+
+        .spec-chip {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            background: var(--bg-dark3);
+            border: 1px solid var(--border);
+            border-radius: 7px;
+            padding: 5px 10px;
+            font-size: 11px;
+            color: var(--text-muted);
+            transition: border-color var(--transition);
+        }
+
+        .vehicle-card:hover .spec-chip {
+            border-color: rgba(255,255,255,.1);
+        }
+
+        .spec-chip i {
+            font-size: 12px;
+        }
+
+        .card-actions {
+            display: flex;
+            gap: 8px;
+            padding: 14px 18px;
+            border-top: 1px solid var(--border);
+        }
+
+        .card-btn {
+            flex: 1;
+            border: none;
+            border-radius: 9px;
+            padding: 8px;
+            font-size: 12px;
+            font-weight: 600;
+            font-family: inherit;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 5px;
+            transition: opacity var(--transition), transform var(--transition);
+        }
+
+            .card-btn:hover {
+                opacity: .8;
+                transform: translateY(-1px);
+            }
+
+            .card-btn.detail {
+                background: var(--accent2-dim);
+                color: var(--accent2);
+            }
+
+            .card-btn.edit {
+                background: var(--accent-dim);
+                color: var(--accent);
+            }
+
+            .card-btn.del {
+                background: rgba(255,82,89,.1);
+                color: var(--danger);
+                flex: 0 0 36px;
+            }
+
+        .modal-content {
+            background: var(--bg-dark2) !important;
+            border: 1px solid var(--border) !important;
+            border-radius: var(--radius-lg) !important;
+            color: var(--text) !important;
+        }
+
+        .modal-header {
+            border-bottom: 1px solid var(--border) !important;
+        }
+
+        .modal-footer {
+            border-top: 1px solid var(--border) !important;
+        }
+
+        .modal-title {
+            font-family: 'Syne', sans-serif;
+            font-size: 18px;
+        }
+
+        .btn-close {
+            filter: invert(1) opacity(.5);
+        }
+
+        .form-label {
+            font-size: 13px;
+            color: var(--text-muted);
+            margin-bottom: 5px;
+        }
+
+        .form-control, .form-select {
+            background: var(--bg-dark3) !important;
+            border: 1px solid var(--border) !important;
+            border-radius: 10px !important;
+            color: var(--text) !important;
+            font-size: 14px;
+            font-family: inherit;
+        }
+
+            .form-control:focus, .form-select:focus {
+                border-color: var(--accent) !important;
+                box-shadow: 0 0 0 3px var(--accent-dim) !important;
+            }
+
+            .form-control::placeholder {
+                color: var(--text-muted) !important;
+            }
+
+            .form-select option {
+                background: var(--bg-dark2);
+            }
+
+        .toast-container {
+            z-index: 9999;
+        }
+
+        .toast {
+            background: var(--bg-dark2) !important;
+            border: 1px solid var(--border) !important;
+            border-radius: var(--radius) !important;
+            color: var(--text) !important;
+            box-shadow: var(--shadow) !important;
+        }
+
+        .toast-header {
+            background: transparent !important;
+            border-bottom: 1px solid var(--border) !important;
+            color: var(--text) !important;
+        }
+
+            .toast-header .btn-close {
+                filter: invert(1) opacity(.5);
+            }
+
+        @@media (max-width: 768px) {
+            #sidebar {
+                transform: translateX(-100%);
+            }
+
+                #sidebar.mobile-open {
+                    transform: translateX(0);
+                }
+
+            #main-wrapper {
+                margin-left: 0 !important;
+            }
+
+            #content {
+                padding: 18px 16px 30px;
+            }
+
+            .page-header {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .vehicles-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        #overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,.6);
+            z-index: 999;
+            backdrop-filter: blur(2px);
+        }
+
+            #overlay.show {
+                display: block;
+            }
+    </style>
+</head>
+<body>
+
+    <div id="overlay" onclick="closeMobileSidebar()"></div>
+
+    <div id="shell">
+        <aside id="sidebar">
+            <div class="brand">
+                <div class="brand-icon"><i class="bi bi-car-front-fill"></i></div>
+                <div class="brand-name">Rent<span>Pro</span></div>
+            </div>
+
+            <nav class="sidebar-nav">
+                <ul class="list-unstyled">
+
+                    <li class="nav-item">
+                        <a href="#" onclick="return false;">
+                            <i class="bi bi-grid-1x2-fill"></i>
+                            <span class="nav-label">Dashboard</span>
+                        </a>
+                    </li>
+
+                    <div class="nav-section-label">Vehicle Management</div>
+                    <li class="nav-item open" id="menu-vehicles">
+                        <a href="#" onclick="toggleSubmenu('menu-vehicles'); return false;">
+                            <i class="bi bi-car-front"></i>
+                            <span class="nav-label">Vehicle Management</span>
+                            <i class="bi bi-chevron-right submenu-arrow"></i>
+                        </a>
+                        <ul class="sub-menu">
+                            <li><a href="#" class="active" onclick="return false;">Vehicle List</a></li>
+                            <li><a href="#" onclick="showAddModal(); return false;">Add Vehicle</a></li>
+                            <li><a href="#" onclick="return false;">Vehicle Categories</a></li>
+                        </ul>
+                    </li>
+
+                    <li class="nav-item" id="menu-reservations">
+                        <a href="#" onclick="toggleSubmenu('menu-reservations'); return false;">
+                            <i class="bi bi-calendar-check"></i>
+                            <span class="nav-label">Reservations</span>
+                            <i class="bi bi-chevron-right submenu-arrow"></i>
+                        </a>
+                        <ul class="sub-menu">
+                            <li><a href="#" onclick="return false;">Active Reservations</a></li>
+                            <li><a href="#" onclick="return false;">Completed Reservations</a></li>
+                        </ul>
+                    </li>
+
+                    <div class="nav-section-label">CRM</div>
+                    <li class="nav-item">
+                        <a href="#" onclick="return false;">
+                            <i class="bi bi-people"></i>
+                            <span class="nav-label">Customers</span>
+                        </a>
+                    </li>
+
+                    <li class="nav-item">
+                        <a href="#" onclick="return false;">
+                            <i class="bi bi-shop"></i>
+                            <span class="nav-label">Branches</span>
+                        </a>
+                    </li>
+
+                    <div class="nav-section-label">Analytics</div>
+                    <li class="nav-item">
+                        <a href="#" onclick="return false;">
+                            <i class="bi bi-bar-chart-line"></i>
+                            <span class="nav-label">Reports</span>
+                        </a>
+                    </li>
+
+                    <li class="nav-item">
+                        <a href="#" onclick="return false;">
+                            <i class="bi bi-gear"></i>
+                            <span class="nav-label">Settings</span>
+                        </a>
+                    </li>
+
+                </ul>
+            </nav>
+
+            <div class="sidebar-footer">
+                <a href="#" onclick="showToast('Logging out...', 'info'); return false;">
+                    <i class="bi bi-box-arrow-left"></i>
+                    <span class="nav-label">Log Out</span>
+                </a>
+            </div>
+        </aside>
+
+        <div id="main-wrapper">
+            <header id="navbar">
+                <button id="toggleSidebar" onclick="toggleSidebar()" title="Open/close menu">
+                    <i class="bi bi-layout-sidebar"></i>
+                </button>
+
+                <div class="nav-breadcrumb d-none d-md-block">
+                    Vehicle Management &rsaquo; <span>Vehicle List</span>
+                </div>
+
+                <div class="nav-search d-none d-lg-block">
+                    <i class="bi bi-search"></i>
+                    <input type="text" placeholder="Global search..." id="globalSearch" oninput="filterCards(this.value)" />
+                </div>
+
+                <div class="nav-actions">
+                    <div class="dropdown">
+                        <button class="nav-btn" data-bs-toggle="dropdown" aria-expanded="false">
+                            <i class="bi bi-bell"></i>
+                            <span class="badge-dot"></span>
+                        </button>
+                        <ul class="dropdown-menu dropdown-menu-end">
+                            <li><h6 class="dropdown-header">Notifications</h6></li>
+                            <li>
+                                <div class="notif-item">
+                                    <div class="notif-title">A new reservation has arrived</div>
+                                    <div class="notif-time">2 minutes ago</div>
+                                </div>
+                            </li>
+                            <li>
+                                <div class="notif-item">
+                                    <div class="notif-title">BMW 3 Series has been returned</div>
+                                    <div class="notif-time">1 hour ago</div>
+                                </div>
+                            </li>
+                            <li>
+                                <div class="notif-item">
+                                    <div class="notif-title">Maintenance reminder: Audi A4</div>
+                                    <div class="notif-time">3 hours ago</div>
+                                </div>
+                            </li>
+                            <li><hr class="dropdown-divider" /></li>
+                            <li><a class="dropdown-item justify-content-center text-center" href="#" onclick="return false;">View All</a></li>
+                        </ul>
+                    </div>
+
+                    <div class="dropdown">
+                        <button class="nav-btn" data-bs-toggle="dropdown" aria-expanded="false">
+                            <i class="bi bi-chat-dots"></i>
+                        </button>
+                        <ul class="dropdown-menu dropdown-menu-end">
+                            <li><h6 class="dropdown-header">Messages</h6></li>
+                            <li>
+                                <div class="notif-item">
+                                    <div class="notif-title">Ahmet K. — About reservation</div>
+                                    <div class="notif-time">5 minutes ago</div>
+                                </div>
+                            </li>
+                            <li>
+                                <div class="notif-item">
+                                    <div class="notif-title">Mehmet S. — Payment confirmation</div>
+                                    <div class="notif-time">30 minutes ago</div>
+                                </div>
+                            </li>
+                            <li><hr class="dropdown-divider" /></li>
+                            <li><a class="dropdown-item justify-content-center" href="#" onclick="return false;">All Messages</a></li>
+                        </ul>
+                    </div>
+
+                    <div class="dropdown">
+                        <div class="profile-btn" data-bs-toggle="dropdown" aria-expanded="false">
+                            <div class="profile-avatar">AY</div>
+                            <div class="d-none d-sm-block">
+                                <div class="profile-name">Admin Manager</div>
+                                <div class="profile-role">Super Admin</div>
+                            </div>
+                            <i class="bi bi-chevron-down ms-1" style="font-size:11px;color:var(--text-muted);"></i>
+                        </div>
+                        <ul class="dropdown-menu dropdown-menu-end">
+                            <li><h6 class="dropdown-header">Admin Manager</h6></li>
+                            <li><a class="dropdown-item" href="#" onclick="return false;"><i class="bi bi-person"></i> My Profile</a></li>
+                            <li><a class="dropdown-item" href="#" onclick="return false;"><i class="bi bi-gear"></i> Settings</a></li>
+                            <li><hr class="dropdown-divider" /></li>
+                            <li><a class="dropdown-item text-danger" href="#" onclick="showToast('Logging out...', 'danger'); return false;"><i class="bi bi-box-arrow-right"></i> Log Out</a></li>
+                        </ul>
+                    </div>
+                </div>
+            </header>
+
+       @RenderBody()
+        </div>
+    </div>
+
+    <div class="modal fade" id="addVehicleModal" tabindex="-1">
+        <div class="modal-dialog modal-lg modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title"><i class="bi bi-plus-circle me-2" style="color:var(--accent)"></i>Add New Vehicle</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body p-4">
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label class="form-label">Brand</label>
+                            <input class="form-control" type="text" placeholder="e.g. BMW" />
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Model</label>
+                            <input class="form-control" type="text" placeholder="e.g. 3 Series" />
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">Model Year</label>
+                            <input class="form-control" type="number" placeholder="2024" />
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">Fuel Type</label>
+                            <select class="form-select">
+                                <option>Gasoline</option>
+                                <option>Diesel</option>
+                                <option>Electric</option>
+                                <option>Hybrid</option>
+                            </select>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">Transmission</label>
+                            <select class="form-select">
+                                <option>Automatic</option>
+                                <option>Manual</option>
+                            </select>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">Daily Price (₺)</label>
+                            <input class="form-control" type="number" placeholder="850" />
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">Seat Count</label>
+                            <input class="form-control" type="number" placeholder="5" />
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">Luggage (L)</label>
+                            <input class="form-control" type="number" placeholder="450" />
+                        </div>
+                        <div class="col-12">
+                            <label class="form-label">Category</label>
+                            <select class="form-select">
+                                <option>Sedan</option>
+                                <option>SUV</option>
+                                <option>Hatchback</option>
+                                <option>Coupe</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn-outline" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn-accent" onclick="addVehicle()"><i class="bi bi-plus-lg"></i> Add</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="detailModal" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="detailTitle">Vehicle Details</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body p-0">
+                    <img id="detailImg" src="" alt="" style="width:100%;height:200px;object-fit:cover;" />
+                    <div class="p-4" id="detailBody"></div>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn-outline" data-bs-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="toast-container position-fixed bottom-0 end-0 p-3">
+        <div id="liveToast" class="toast align-items-center" role="alert">
+            <div class="toast-header">
+                <strong class="me-auto" id="toastTitle">Notification</strong>
+                <button type="button" class="btn-close" data-bs-dismiss="toast"></button>
+            </div>
+            <div class="toast-body" id="toastMsg"></div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
+    <script>
+        const vehicles = [
+          {
+            id: 1,
+            brand: 'BMW',
+            model: '3 Series',
+            year: 2023,
+            fuel: 'Gasoline',
+            transmission: 'Automatic',
+            price: 1850,
+            seats: 5,
+            luggage: 480,
+            category: 'sedan',
+            status: 'available',
+            img: 'https://images.unsplash.com/photo-1555215695-3004980ad54e?w=640&q=80',
+            plate: '34 BMW 320'
+          },
+          {
+            id: 2,
+            brand: 'Audi',
+            model: 'A4',
+            year: 2023,
+            fuel: 'Diesel',
+            transmission: 'Automatic',
+            price: 1950,
+            seats: 5,
+            luggage: 460,
+            category: 'sedan',
+            status: 'rented',
+            img: 'https://images.unsplash.com/photo-1606664515524-ed2f786a0bd6?w=640&q=80',
+            plate: '34 AUD 440'
+          },
+          {
+            id: 3,
+            brand: 'Mercedes',
+            model: 'C200',
+            year: 2024,
+            fuel: 'Gasoline',
+            transmission: 'Automatic',
+            price: 2200,
+            seats: 5,
+            luggage: 455,
+            category: 'sedan',
+            status: 'available',
+            img: 'https://images.unsplash.com/photo-1618843479313-40f8afb4b4d8?w=640&q=80',
+            plate: '34 MBZ 200'
+          },
+          {
+            id: 4,
+            brand: 'Toyota',
+            model: 'Corolla',
+            year: 2022,
+            fuel: 'Hybrid',
+            transmission: 'Automatic',
+            price: 950,
+            seats: 5,
+            luggage: 370,
+            category: 'sedan',
+            status: 'available',
+            img: 'https://images.unsplash.com/photo-1621007947382-bb3c3994e3fb?w=640&q=80',
+            plate: '06 TYT 180'
+          },
+          {
+            id: 5,
+            brand: 'Volkswagen',
+            model: 'Passat',
+            year: 2022,
+            fuel: 'Diesel',
+            transmission: 'Automatic',
+            price: 1100,
+            seats: 5,
+            luggage: 586,
+            category: 'sedan',
+            status: 'rented',
+            img: 'https://images.unsplash.com/photo-1533473359331-0135ef1b58bf?w=640&q=80',
+            plate: '35 VWP 200'
+          },
+          {
+            id: 6,
+            brand: 'Ford',
+            model: 'Focus',
+            year: 2021,
+            fuel: 'Gasoline',
+            transmission: 'Manual',
+            price: 750,
+            seats: 5,
+            luggage: 316,
+            category: 'hatchback',
+            status: 'available',
+            img: 'https://images.unsplash.com/photo-1549317661-bd32c8ce0db2?w=640&q=80',
+            plate: '07 FRD 125'
+          },
+          {
+            id: 7,
+            brand: 'Hyundai',
+            model: 'Tucson',
+            year: 2023,
+            fuel: 'Gasoline',
+            transmission: 'Automatic',
+            price: 1450,
+            seats: 5,
+            luggage: 539,
+            category: 'suv',
+            status: 'available',
+            img: 'https://images.unsplash.com/photo-1625231337374-4e18e8e6a3eb?w=640&q=80',
+            plate: '16 HYN 200'
+          },
+          {
+            id: 8,
+            brand: 'Kia',
+            model: 'Sportage',
+            year: 2023,
+            fuel: 'Diesel',
+            transmission: 'Automatic',
+            price: 1380,
+            seats: 5,
+            luggage: 591,
+            category: 'suv',
+            status: 'rented',
+            img: 'https://images.unsplash.com/photo-1609521263047-f8f205293f24?w=640&q=80',
+            plate: '35 KIA 400'
+          },
+          {
+            id: 9,
+            brand: 'Renault',
+            model: 'Clio',
+            year: 2022,
+            fuel: 'Gasoline',
+            transmission: 'Manual',
+            price: 680,
+            seats: 5,
+            luggage: 300,
+            category: 'hatchback',
+            status: 'available',
+            img: 'https://images.unsplash.com/photo-1565043589221-1a6fd9ae45c7?w=640&q=80',
+            plate: '41 RNL 110'
+          },
+          {
+            id: 10,
+            brand: 'Peugeot',
+            model: '3008',
+            year: 2023,
+            fuel: 'Hybrid',
+            transmission: 'Automatic',
+            price: 1650,
+            seats: 5,
+            luggage: 520,
+            category: 'suv',
+            status: 'available',
+            img: 'https://images.unsplash.com/photo-1619362280286-f1f8fd5032ed?w=640&q=80',
+            plate: '34 PGT 308'
+          }
+        ];
+
+        function renderCard(v) {
+          const statusLabel = v.status === 'available' ? 'Available' : 'Rented';
+          return `
+            <div class="vehicle-card"
+                 data-status="${v.status}"
+                 data-category="${v.category}"
+                 data-search="${(v.brand + ' ' + v.model).toLowerCase()}"
+                 id="card-${v.id}">
+              <div class="card-img-wrap">
+                <img src="${v.img}" alt="${v.brand} ${v.model}" loading="lazy"/>
+                <span class="status-badge ${v.status}">${statusLabel}</span>
+                <span class="category-tag">${v.category.toUpperCase()}</span>
+                <div class="price-strip">
+                  <span class="price-amount">₺${v.price.toLocaleString('tr-TR')}</span>
+                  <span class="price-unit">/ day</span>
+                </div>
+              </div>
+              <div class="card-body-custom">
+                <div class="car-brand">${v.brand}</div>
+                <div class="car-model">${v.model}</div>
+                <div class="car-year">${v.year} • ${v.plate}</div>
+                <div class="specs-row">
+                  <span class="spec-chip"><i class="bi bi-fuel-pump"></i>${v.fuel}</span>
+                  <span class="spec-chip"><i class="bi bi-gear-wide-connected"></i>${v.transmission}</span>
+                  <span class="spec-chip"><i class="bi bi-people"></i>${v.seats} Seats</span>
+                  <span class="spec-chip"><i class="bi bi-box"></i>${v.luggage} L</span>
+                </div>
+              </div>
+              <div class="card-actions">
+                <button class="card-btn detail" onclick="showDetail(${v.id})">
+                  <i class="bi bi-eye"></i> Details
+                </button>
+                <button class="card-btn edit" onclick="showToast('${v.brand} ${v.model} is being edited...', 'success')">
+                  <i class="bi bi-pencil"></i> Edit
+                </button>
+                <button class="card-btn del" onclick="deleteCard(${v.id})" title="Delete">
+                  <i class="bi bi-trash"></i>
+                </button>
+              </div>
+            </div>
+          `;
+        }
+
+        function renderAll(list) {
+          const grid = document.getElementById('vehiclesGrid');
+          grid.innerHTML = list.length
+            ? list.map(renderCard).join('')
+            : `<div style="grid-column:1/-1;text-align:center;padding:60px 0;color:var(--text-muted);">
+                 <i class="bi bi-search" style="font-size:36px;"></i>
+                 <p style="margin-top:12px;">No vehicles found.</p>
+               </div>`;
+        }
+
+        renderAll(vehicles);
+
+        let activeFilter = 'all';
+        let searchQuery = '';
+
+        function setFilter(val, btn) {
+          activeFilter = val;
+          document.querySelectorAll('.filter-tab').forEach(b => b.classList.remove('active'));
+          btn.classList.add('active');
+          applyFilters();
+        }
+
+        function filterCards(q) {
+          searchQuery = q.toLowerCase();
+          applyFilters();
+        }
+
+        function applyFilters() {
+          const filtered = vehicles.filter(v => {
+            const matchSearch = (v.brand + ' ' + v.model).toLowerCase().includes(searchQuery);
+            const matchFilter =
+              activeFilter === 'all' ||
+              v.status === activeFilter ||
+              v.category === activeFilter;
+            return matchSearch && matchFilter;
+          });
+          renderAll(filtered);
+        }
+
+        function toggleSidebar() {
+          const sidebar = document.getElementById('sidebar');
+          const wrapper = document.getElementById('main-wrapper');
+          const isMobile = window.innerWidth <= 768;
+          if (isMobile) {
+            sidebar.classList.toggle('mobile-open');
+            document.getElementById('overlay').classList.toggle('show');
+          } else {
+            sidebar.classList.toggle('collapsed');
+            wrapper.classList.toggle('expanded');
+          }
+        }
+
+        function closeMobileSidebar() {
+          document.getElementById('sidebar').classList.remove('mobile-open');
+          document.getElementById('overlay').classList.remove('show');
+        }
+
+        function toggleSubmenu(id) {
+          const item = document.getElementById(id);
+          item.classList.toggle('open');
+        }
+
+        function showAddModal() {
+          new bootstrap.Modal(document.getElementById('addVehicleModal')).show();
+        }
+
+        function addVehicle() {
+          bootstrap.Modal.getInstance(document.getElementById('addVehicleModal')).hide();
+          showToast('Vehicle added successfully!', 'success');
+        }
+
+        function deleteCard(id) {
+          const card = document.getElementById('card-' + id);
+          if (card) {
+            card.style.transition = 'opacity .3s, transform .3s';
+            card.style.opacity = '0';
+            card.style.transform = 'scale(.95)';
+            setTimeout(() => {
+              const idx = vehicles.findIndex(v => v.id === id);
+              if (idx > -1) vehicles.splice(idx, 1);
+              applyFilters();
+              showToast('Vehicle deleted.', 'danger');
+            }, 300);
+          }
+        }
+
+        function showDetail(id) {
+          const v = vehicles.find(v => v.id === id);
+          if (!v) return;
+          document.getElementById('detailTitle').textContent = v.brand + ' ' + v.model;
+          document.getElementById('detailImg').src = v.img;
+          document.getElementById('detailBody').innerHTML = `
+            <div class="row g-2" style="font-size:14px;">
+              <div class="col-6"><span style="color:var(--text-muted);">Year:</span> ${v.year}</div>
+              <div class="col-6"><span style="color:var(--text-muted);">Plate:</span> ${v.plate}</div>
+              <div class="col-6"><span style="color:var(--text-muted);">Fuel:</span> ${v.fuel}</div>
+              <div class="col-6"><span style="color:var(--text-muted);">Transmission:</span> ${v.transmission}</div>
+              <div class="col-6"><span style="color:var(--text-muted);">Seats:</span> ${v.seats}</div>
+              <div class="col-6"><span style="color:var(--text-muted);">Luggage:</span> ${v.luggage} L</div>
+              <div class="col-6"><span style="color:var(--text-muted);">Category:</span> ${v.category.toUpperCase()}</div>
+              <div class="col-6"><span style="color:var(--text-muted);">Status:</span>
+                <span style="color:${v.status==='available'?'var(--success)':'var(--warning)'}">${v.status==='available'?'Available':'Rented'}</span>
+              </div>
+              <div class="col-12 mt-2" style="font-family:'Syne',sans-serif;font-size:22px;color:var(--accent);">
+                ₺${v.price.toLocaleString('tr-TR')} <span style="font-size:13px;color:var(--text-muted);font-family:'DM Sans',sans-serif;">/ day</span>
+              </div>
+            </div>
+          `;
+          new bootstrap.Modal(document.getElementById('detailModal')).show();
+        }
+
+        function showToast(msg, type = 'success') {
+          const colors = { success: 'var(--success)', danger: 'var(--danger)', info: 'var(--accent2)' };
+          const toastEl = document.getElementById('liveToast');
+          document.getElementById('toastMsg').textContent = msg;
+          document.getElementById('toastTitle').style.color = colors[type] || colors.success;
+          const toast = new bootstrap.Toast(toastEl, { delay: 3000 });
+          toast.show();
+        }
+    </script>
+    @RenderSection("Scripts", required: false)
+</body>
+</html>

@@ -1,0 +1,641 @@
+﻿@model List<COROLA_RENTACAR.EntityLayer.Entities.Brand>
+
+@{
+    ViewData["Title"] = "BrandList";
+    Layout = "~/Views/AdminLayout/Index.cshtml";
+
+    var totalCount   = Model.Count();
+    var activeCount  = Model.Count(b => b.Status);
+    var passiveCount = Model.Count(b => !b.Status);
+}
+
+<style>
+    :root {
+        --bg-dark:    #0d0f14;
+        --bg-dark2:   #13161e;
+        --bg-dark3:   #1a1e2a;
+        --accent:     #e8ff47;
+        --accent-dim: rgba(232,255,71,.12);
+        --accent2:    #4f8dff;
+        --accent2-dim:rgba(79,141,255,.12);
+        --danger:     #ff5259;
+        --success:    #30e0a1;
+        --border:     rgba(255,255,255,.07);
+        --text:       #e2e8f0;
+        --text-muted: #7a8499;
+        --radius:     12px;
+        --radius-lg:  18px;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    .bl-root {
+        padding: 28px;
+        font-family: 'DM Sans', 'Segoe UI', sans-serif;
+        color: var(--text);
+    }
+
+    /* ── Breadcrumb ── */
+    .bl-breadcrumb {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        font-size: 12px;
+        color: var(--text-muted);
+        margin-bottom: 6px;
+    }
+    .bl-breadcrumb span { color: var(--text); }
+
+    /* ── Page Header ── */
+    .bl-page-header {
+        display: flex;
+        align-items: flex-end;
+        justify-content: space-between;
+        gap: 16px;
+        margin-bottom: 24px;
+        flex-wrap: wrap;
+    }
+    .bl-page-title {
+        font-family: 'Syne', Georgia, sans-serif;
+        font-size: 26px;
+        font-weight: 700;
+        color: var(--text);
+        line-height: 1;
+    }
+    .bl-page-subtitle {
+        font-size: 13px;
+        color: var(--text-muted);
+        margin-top: 5px;
+    }
+
+    /* ── Buttons ── */
+    .btn-accent {
+        background: var(--accent);
+        color: #0d0f14;
+        border: none;
+        border-radius: 10px;
+        padding: 9px 18px;
+        font-size: 13px;
+        font-weight: 600;
+        font-family: inherit;
+        cursor: pointer;
+        display: inline-flex;
+        align-items: center;
+        gap: 7px;
+        text-decoration: none;
+        transition: opacity .2s;
+    }
+    .btn-accent:hover { opacity: .85; color: #0d0f14; }
+
+    .btn-edit {
+        background: var(--accent2-dim);
+        color: var(--accent2);
+        border: 1px solid rgba(79,141,255,.25);
+        border-radius: 8px;
+        padding: 6px 13px;
+        font-size: 12px;
+        font-weight: 600;
+        font-family: inherit;
+        cursor: pointer;
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+        text-decoration: none;
+        transition: background .2s;
+    }
+    .btn-edit:hover { background: rgba(79,141,255,.2); color: var(--accent2); }
+
+    .btn-danger {
+        background: rgba(255,82,89,.1);
+        color: var(--danger);
+        border: 1px solid rgba(255,82,89,.2);
+        border-radius: 8px;
+        padding: 6px 13px;
+        font-size: 12px;
+        font-weight: 600;
+        font-family: inherit;
+        cursor: pointer;
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+        text-decoration: none;
+        transition: background .2s;
+    }
+    .btn-danger:hover { background: rgba(255,82,89,.18); color: var(--danger); }
+
+    /* ── Stats Row ── */
+    .bl-stats {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 14px;
+        margin-bottom: 22px;
+    }
+    @@media (max-width: 600px) { .bl-stats { grid-template-columns: 1fr; } }
+
+    .bl-stat-card {
+        background: var(--bg-dark2);
+        border: 1px solid var(--border);
+        border-radius: var(--radius);
+        padding: 16px 18px;
+        display: flex;
+        align-items: center;
+        gap: 14px;
+    }
+    .bl-stat-icon {
+        width: 40px;
+        height: 40px;
+        border-radius: 10px;
+        display: grid;
+        place-items: center;
+        font-size: 18px;
+        flex-shrink: 0;
+    }
+    .bl-stat-icon.yellow  { background: var(--accent-dim);          color: var(--accent);  }
+    .bl-stat-icon.green   { background: rgba(48,224,161,.1);         color: var(--success); }
+    .bl-stat-icon.red     { background: rgba(255,82,89,.1);          color: var(--danger);  }
+    .bl-stat-num   { font-family: 'Syne', sans-serif; font-size: 24px; font-weight: 700; line-height: 1; }
+    .bl-stat-label { font-size: 12px; color: var(--text-muted); margin-top: 3px; }
+
+    /* ── Toolbar ── */
+    .bl-toolbar {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        margin-bottom: 18px;
+        flex-wrap: wrap;
+    }
+    .bl-search-wrap { position: relative; flex: 1; min-width: 200px; max-width: 340px; }
+    .bl-search-wrap input {
+        width: 100%;
+        background: var(--bg-dark2);
+        border: 1px solid var(--border);
+        border-radius: 10px;
+        color: var(--text);
+        padding: 9px 13px 9px 36px;
+        font-size: 13px;
+        font-family: inherit;
+        outline: none;
+        transition: border .2s, box-shadow .2s;
+    }
+    .bl-search-wrap input:focus {
+        border-color: var(--accent);
+        box-shadow: 0 0 0 3px var(--accent-dim);
+    }
+    .bl-search-wrap input::placeholder { color: var(--text-muted); }
+    .bl-search-icon {
+        position: absolute;
+        left: 12px; top: 50%;
+        transform: translateY(-50%);
+        font-size: 14px;
+        color: var(--text-muted);
+        pointer-events: none;
+    }
+    .bl-filter-tabs { display: flex; gap: 6px; }
+    .bl-filter-tab {
+        background: var(--bg-dark2);
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        padding: 7px 14px;
+        font-size: 12px;
+        font-weight: 500;
+        color: var(--text-muted);
+        cursor: pointer;
+        transition: all .2s;
+        font-family: inherit;
+    }
+    .bl-filter-tab.active {
+        background: var(--accent-dim);
+        border-color: rgba(232,255,71,.3);
+        color: var(--accent);
+    }
+    .bl-filter-tab:hover:not(.active) { background: var(--bg-dark3); color: var(--text); }
+
+    .bl-view-toggle { display: flex; gap: 4px; margin-left: auto; }
+    .bl-view-btn {
+        width: 34px; height: 34px;
+        border-radius: 8px;
+        border: 1px solid var(--border);
+        background: var(--bg-dark2);
+        color: var(--text-muted);
+        cursor: pointer;
+        display: grid;
+        place-items: center;
+        font-size: 15px;
+        transition: all .2s;
+    }
+    .bl-view-btn.active {
+        background: var(--accent-dim);
+        border-color: rgba(232,255,71,.3);
+        color: var(--accent);
+    }
+
+    /* ── Grid ── */
+    .bl-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));
+        gap: 16px;
+    }
+    .bl-grid.list-view { grid-template-columns: 1fr; }
+
+    /* ── Card ── */
+    .bl-card {
+        background: var(--bg-dark2);
+        border: 1px solid var(--border);
+        border-radius: var(--radius-lg);
+        overflow: hidden;
+        transition: border-color .2s, transform .18s, box-shadow .2s;
+        animation: blFadeUp .35s ease both;
+    }
+    .bl-card:hover {
+        border-color: rgba(255,255,255,.14);
+        transform: translateY(-2px);
+        box-shadow: 0 8px 32px rgba(0,0,0,.35);
+    }
+    @@keyframes blFadeUp {
+        from { opacity: 0; transform: translateY(10px); }
+        to   { opacity: 1; transform: translateY(0); }
+    }
+
+    .bl-card-top {
+        position: relative;
+        height: 110px;
+        background: var(--bg-dark3);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        overflow: hidden;
+    }
+    .bl-card-top::before {
+        content: '';
+        position: absolute;
+        inset: 0;
+        background: radial-gradient(circle at 65% 35%, rgba(232,255,71,.06) 0%, transparent 70%);
+        pointer-events: none;
+    }
+    .bl-brand-logo {
+        width: 72px;
+        height: 72px;
+        object-fit: contain;
+        border-radius: 10px;
+        filter: drop-shadow(0 4px 12px rgba(0,0,0,.4));
+    }
+    .bl-logo-placeholder {
+        width: 72px;
+        height: 72px;
+        border-radius: 12px;
+        background: var(--bg-dark2);
+        border: 1px solid var(--border);
+        display: grid;
+        place-items: center;
+        font-family: 'Syne', sans-serif;
+        font-size: 28px;
+        font-weight: 700;
+        color: var(--text-muted);
+    }
+    .bl-brand-id {
+        position: absolute;
+        top: 10px; left: 10px;
+        font-size: 11px;
+        color: var(--text-muted);
+        background: rgba(0,0,0,.4);
+        border-radius: 5px;
+        padding: 2px 7px;
+    }
+    .bl-status-badge {
+        position: absolute;
+        top: 10px; right: 10px;
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+        font-size: 11px;
+        font-weight: 600;
+        padding: 3px 9px;
+        border-radius: 6px;
+    }
+    .bl-status-badge.active  { background: rgba(48,224,161,.12); color: var(--success); border: 1px solid rgba(48,224,161,.25); }
+    .bl-status-badge.passive { background: rgba(255,82,89,.1);   color: var(--danger);  border: 1px solid rgba(255,82,89,.2);  }
+    .bl-status-dot { width: 5px; height: 5px; border-radius: 50%; background: currentColor; }
+
+    .bl-card-body { padding: 14px 16px; }
+    .bl-brand-name {
+        font-family: 'Syne', sans-serif;
+        font-size: 16px;
+        font-weight: 700;
+        color: var(--text);
+        margin-bottom: 4px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+    .bl-brand-meta {
+        font-size: 12px;
+        color: var(--text-muted);
+        margin-bottom: 14px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+    .bl-card-actions { display: flex; gap: 8px; }
+
+    /* ── List View Overrides ── */
+    .bl-grid.list-view .bl-card { display: flex; align-items: stretch; }
+    .bl-grid.list-view .bl-card-top {
+        width: 90px;
+        min-height: 72px;
+        height: auto;
+        flex-shrink: 0;
+        border-radius: 0;
+    }
+    .bl-grid.list-view .bl-card-body {
+        flex: 1;
+        display: flex;
+        align-items: center;
+        gap: 16px;
+        padding: 12px 18px;
+    }
+    .bl-grid.list-view .bl-brand-meta  { margin-bottom: 0; }
+    .bl-grid.list-view .bl-card-actions { margin-left: auto; flex-shrink: 0; }
+    .bl-grid.list-view .bl-info-group  { flex: 1; min-width: 0; }
+
+    /* ── Empty State ── */
+    .bl-empty {
+        grid-column: 1 / -1;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        padding: 60px 20px;
+        gap: 12px;
+        color: var(--text-muted);
+    }
+    .bl-empty .bl-empty-icon { font-size: 42px; opacity: .45; }
+    .bl-empty p { font-size: 14px; }
+
+    /* ── Confirm Modal ── */
+    .bl-modal-backdrop {
+        display: none;
+        position: fixed;
+        inset: 0;
+        background: rgba(0,0,0,.7);
+        z-index: 200;
+        align-items: center;
+        justify-content: center;
+        backdrop-filter: blur(4px);
+    }
+    .bl-modal-backdrop.open { display: flex; }
+    .bl-modal {
+        background: var(--bg-dark2);
+        border: 1px solid var(--border);
+        border-radius: var(--radius-lg);
+        padding: 32px 28px 28px;
+        width: 100%;
+        max-width: 380px;
+        text-align: center;
+        position: relative;
+    }
+    .bl-modal-close {
+        position: absolute;
+        top: 14px; right: 16px;
+        background: none;
+        border: none;
+        color: var(--text-muted);
+        font-size: 18px;
+        cursor: pointer;
+        line-height: 1;
+    }
+    .bl-modal-icon  { font-size: 38px; margin-bottom: 10px; }
+    .bl-modal-title {
+        font-family: 'Syne', sans-serif;
+        font-size: 18px;
+        font-weight: 700;
+        margin-bottom: 10px;
+    }
+    .bl-modal-msg { font-size: 13px; color: var(--text-muted); line-height: 1.65; margin-bottom: 24px; }
+    .bl-modal-actions { display: flex; gap: 10px; justify-content: center; }
+
+    /* ── Result Counter ── */
+    .bl-result-info {
+        font-size: 12px;
+        color: var(--text-muted);
+        margin-bottom: 14px;
+    }
+    .bl-result-info strong { color: var(--text); }
+</style>
+
+<div class="bl-root">
+
+    <div class="bl-breadcrumb">
+        Vehicle Management <span>›</span> <span>Brand List</span>
+    </div>
+
+    <div class="bl-page-header">
+        <div>
+            <h1 class="bl-page-title">Brand Management</h1>
+            <p class="bl-page-subtitle">View and manage all vehicle brands in the system.</p>
+        </div>
+        <a asp-controller="Brand" asp-action="Create" class="btn-accent">
+            ＋ Add New Brand
+        </a>
+    </div>
+
+    <div class="bl-stats">
+        <div class="bl-stat-card">
+            <div class="bl-stat-icon yellow">🏷️</div>
+            <div>
+                <div class="bl-stat-num">@totalCount</div>
+                <div class="bl-stat-label">Total Brands</div>
+            </div>
+        </div>
+        <div class="bl-stat-card">
+            <div class="bl-stat-icon green">✅</div>
+            <div>
+                <div class="bl-stat-num">@activeCount</div>
+                <div class="bl-stat-label">Active Brands</div>
+            </div>
+        </div>
+        <div class="bl-stat-card">
+            <div class="bl-stat-icon red">⛔</div>
+            <div>
+                <div class="bl-stat-num">@passiveCount</div>
+                <div class="bl-stat-label">Inactive Brands</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="bl-toolbar">
+        <div class="bl-search-wrap">
+            <span class="bl-search-icon">🔍</span>
+            <input type="text" id="blSearch" placeholder="Search brand..." oninput="blRender()" />
+        </div>
+        <div class="bl-filter-tabs">
+            <button class="bl-filter-tab active" data-filter="all" onclick="blSetFilter('all',this)">All <span id="cntAll"></span></button>
+            <button class="bl-filter-tab" data-filter="active" onclick="blSetFilter('active',this)">Active</button>
+            <button class="bl-filter-tab" data-filter="passive" onclick="blSetFilter('passive',this)">Inactive</button>
+        </div>
+        <div class="bl-view-toggle">
+            <button class="bl-view-btn active" id="blGridBtn" onclick="blSetView('grid')" title="Card View">⊞</button>
+            <button class="bl-view-btn" id="blListBtn" onclick="blSetView('list')" title="List View">☰</button>
+        </div>
+    </div>
+
+    <div class="bl-result-info" id="blResultInfo"></div>
+
+    <div class="bl-grid" id="blGrid"></div>
+
+</div>
+
+<div class="bl-modal-backdrop" id="blConfirmModal">
+    <div class="bl-modal">
+        <button class="bl-modal-close" onclick="blCloseModal()">✕</button>
+        <div class="bl-modal-icon">🗑️</div>
+        <div class="bl-modal-title">Delete Brand</div>
+        <p class="bl-modal-msg" id="blConfirmMsg"></p>
+        <div class="bl-modal-actions">
+            <button class="btn-accent" onclick="blCloseModal()" style="background:var(--bg-dark3);color:var(--text);border:1px solid var(--border);">Cancel</button>
+            <form id="blDeleteForm" method="post">
+                @Html.AntiForgeryToken()
+                <button type="submit" class="btn-danger">🗑️ Yes, Delete</button>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+<script>
+    const BL_DATA = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.Select(b => new {
+        b.BrandId,
+        b.BrandName,
+        b.LogoUrl,
+        b.Status
+    })));
+
+    let blFilter = 'all';
+    let blView   = 'grid';
+
+    function blGetFiltered() {
+        const q = document.getElementById('blSearch').value.toLowerCase();
+        return BL_DATA.filter(b => {
+            const matchF = blFilter === 'all'
+                || (blFilter === 'active'  &&  b.Status)
+                || (blFilter === 'passive' && !b.Status);
+            return matchF && b.BrandName.toLowerCase().includes(q);
+        });
+    }
+
+    function blSetFilter(f, el) {
+        blFilter = f;
+        document.querySelectorAll('.bl-filter-tab').forEach(t => t.classList.remove('active'));
+        el.classList.add('active');
+        blRender();
+    }
+
+    function blSetView(v) {
+        blView = v;
+        document.getElementById('blGridBtn').classList.toggle('active', v === 'grid');
+        document.getElementById('blListBtn').classList.toggle('active', v === 'list');
+        blRender();
+    }
+
+    function blRender() {
+        const items = blGetFiltered();
+        const grid  = document.getElementById('blGrid');
+        grid.className = 'bl-grid' + (blView === 'list' ? ' list-view' : '');
+
+        document.getElementById('blResultInfo').innerHTML =
+            `<strong>${items.length}</strong> brands listed`;
+
+        if (items.length === 0) {
+            grid.innerHTML = `
+                <div class="bl-empty">
+                    <div class="bl-empty-icon">🔍</div>
+                    <p>No brands found matching your search.</p>
+                </div>`;
+            return;
+        }
+
+        grid.innerHTML = items.map((b, i) => blCardHtml(b, i)).join('');
+    }
+
+    function blCardHtml(b, i) {
+        const logoHtml = b.LogoUrl
+            ? `<img class="bl-brand-logo"
+                    src="${blEsc(b.LogoUrl)}"
+                    alt="${blEsc(b.BrandName)}"
+                    onerror="this.style.display='none';this.nextElementSibling.style.display='grid'" />
+               <div class="bl-logo-placeholder" style="display:none">${blEsc(b.BrandName.charAt(0))}</div>`
+            : `<div class="bl-logo-placeholder">${blEsc(b.BrandName.charAt(0))}</div>`;
+
+        const badge = b.Status
+            ? `<span class="bl-status-badge active"><span class="bl-status-dot"></span>Active</span>`
+            : `<span class="bl-status-badge passive"><span class="bl-status-dot"></span>Inactive</span>`;
+
+        const metaText = b.LogoUrl ? 'Logo available' : 'No logo URL provided';
+        const delay    = `animation-delay:${i * 0.04}s`;
+
+        const actions = `
+            <div class="bl-card-actions">
+                <a href="/Admin/Brand/UpdateBrand/${b.BrandId}" class="btn-edit">✏️ Edit</a>
+                <button class="btn-danger" onclick="blConfirmDelete(${b.BrandId},'${blEsc(b.BrandName)}')">🗑️ Delete</button>
+            </div>`;
+
+        if (blView === 'list') {
+            return `
+            <div class="bl-card" style="${delay}">
+                <div class="bl-card-top">
+                    <span class="bl-brand-id">#${b.BrandId}</span>
+                    ${logoHtml}
+                </div>
+                <div class="bl-card-body">
+                    <div class="bl-info-group">
+                        <div class="bl-brand-name">${blEsc(b.BrandName)}</div>
+                        <div class="bl-brand-meta">${blEsc(b.LogoUrl || 'No logo URL provided')}</div>
+                    </div>
+                    ${badge}
+                    ${actions}
+                </div>
+            </div>`;
+        }
+
+        return `
+        <div class="bl-card" style="${delay}">
+            <div class="bl-card-top">
+                <span class="bl-brand-id">#${b.BrandId}</span>
+                ${badge}
+                ${logoHtml}
+            </div>
+            <div class="bl-card-body">
+                <div class="bl-brand-name">${blEsc(b.BrandName)}</div>
+                <div class="bl-brand-meta">${metaText}</div>
+                ${actions}
+            </div>
+        </div>`;
+    }
+
+    function blConfirmDelete(id, name) {
+        document.getElementById('blConfirmMsg').innerHTML =
+            `<strong>${blEsc(name)}</strong> Are you sure you want to delete this brand?<br>This action cannot be undone.`;
+        document.getElementById('blDeleteForm').action = `/Admin/Brand/DeleteBrand/${id}`;
+        document.getElementById('blConfirmModal').classList.add('open');
+    }
+
+    function blCloseModal() {
+        document.getElementById('blConfirmModal').classList.remove('open');
+    }
+
+    document.getElementById('blConfirmModal').addEventListener('click', function(e) {
+        if (e.target === this) blCloseModal();
+    });
+
+    function blEsc(str) {
+        if (!str) return '';
+        return String(str)
+            .replace(/&/g,'&amp;')
+            .replace(/</g,'&lt;')
+            .replace(/>/g,'&gt;')
+            .replace(/"/g,'&quot;')
+            .replace(/'/g,'&#x27;');
+    }
+
+    blRender();
+</script>
+}

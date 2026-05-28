@@ -1,0 +1,18 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net9.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="FluentValidation" Version="11.12.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\CorolaDtoLayer\CorolaDtoLayer.csproj" />
+    <ProjectReference Include="..\COROLA_RENTACAR.DataAccessLayer\COROLA_RENTACAR.DataAccessLayer.csproj" />
+  </ItemGroup>
+
+</Project>

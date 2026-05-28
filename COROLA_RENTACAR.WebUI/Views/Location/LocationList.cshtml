@@ -1,0 +1,791 @@
+﻿@model List<COROLA_RENTACAR.EntityLayer.Entities.Location>
+
+@{
+    ViewData["Title"] = "LocationList";
+    Layout = "~/Views/AdminLayout/Index.cshtml";
+
+    var totalCount = Model.Count();
+    var cityCount = Model.Select(l => l.City).Distinct().Count();
+    var personCount = Model.Select(l => l.AuthorizedPerson).Distinct().Count();
+}
+
+<style>
+    :root {
+        --bg-dark:     #0d0f14;
+        --bg-dark2:    #13161e;
+        --bg-dark3:    #1a1e2a;
+        --accent:      #e8ff47;
+        --accent-dim:  rgba(232,255,71,.12);
+        --accent2:     #4f8dff;
+        --accent2-dim: rgba(79,141,255,.12);
+        --accent3:     #ff9f47;
+        --accent3-dim: rgba(255,159,71,.12);
+        --danger:      #ff5259;
+        --success:     #30e0a1;
+        --border:      rgba(255,255,255,.07);
+        --text:        #e2e8f0;
+        --text-muted:  #7a8499;
+        --radius:      12px;
+        --radius-lg:   18px;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    .ll-root {
+        padding: 28px;
+        font-family: 'DM Sans', 'Segoe UI', sans-serif;
+        color: var(--text);
+    }
+
+    .ll-breadcrumb {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        font-size: 12px;
+        color: var(--text-muted);
+        margin-bottom: 6px;
+    }
+
+    .ll-breadcrumb span { color: var(--text); }
+
+    .ll-page-header {
+        display: flex;
+        align-items: flex-end;
+        justify-content: space-between;
+        gap: 16px;
+        margin-bottom: 24px;
+        flex-wrap: wrap;
+    }
+
+    .ll-page-title {
+        font-family: 'Syne', Georgia, sans-serif;
+        font-size: 26px;
+        font-weight: 700;
+        color: var(--text);
+        line-height: 1;
+    }
+
+    .ll-page-subtitle {
+        font-size: 13px;
+        color: var(--text-muted);
+        margin-top: 5px;
+    }
+
+    .btn-accent {
+        background: var(--accent);
+        color: #0d0f14;
+        border: none;
+        border-radius: 10px;
+        padding: 9px 18px;
+        font-size: 13px;
+        font-weight: 600;
+        font-family: inherit;
+        cursor: pointer;
+        display: inline-flex;
+        align-items: center;
+        gap: 7px;
+        text-decoration: none;
+        transition: opacity .2s;
+    }
+
+    .btn-accent:hover {
+        opacity: .85;
+        color: #0d0f14;
+    }
+
+    .btn-edit {
+        background: var(--accent2-dim);
+        color: var(--accent2);
+        border: 1px solid rgba(79,141,255,.25);
+        border-radius: 8px;
+        padding: 6px 13px;
+        font-size: 12px;
+        font-weight: 600;
+        font-family: inherit;
+        cursor: pointer;
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+        text-decoration: none;
+        transition: background .2s;
+    }
+
+    .btn-edit:hover {
+        background: rgba(79,141,255,.2);
+        color: var(--accent2);
+    }
+
+    .btn-danger {
+        background: rgba(255,82,89,.1);
+        color: var(--danger);
+        border: 1px solid rgba(255,82,89,.2);
+        border-radius: 8px;
+        padding: 6px 13px;
+        font-size: 12px;
+        font-weight: 600;
+        font-family: inherit;
+        cursor: pointer;
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+        text-decoration: none;
+        transition: background .2s;
+    }
+
+    .btn-danger:hover {
+        background: rgba(255,82,89,.18);
+        color: var(--danger);
+    }
+
+    .ll-stats {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 14px;
+        margin-bottom: 22px;
+    }
+
+    @@media (max-width: 700px) {
+        .ll-stats { grid-template-columns: 1fr; }
+    }
+
+    .ll-stat-card {
+        background: var(--bg-dark2);
+        border: 1px solid var(--border);
+        border-radius: var(--radius);
+        padding: 16px 18px;
+        display: flex;
+        align-items: center;
+        gap: 14px;
+    }
+
+    .ll-stat-icon {
+        width: 40px;
+        height: 40px;
+        border-radius: 10px;
+        display: grid;
+        place-items: center;
+        font-size: 18px;
+        flex-shrink: 0;
+    }
+
+    .ll-stat-icon.yellow { background: var(--accent-dim); color: var(--accent); }
+    .ll-stat-icon.blue   { background: var(--accent2-dim); color: var(--accent2); }
+    .ll-stat-icon.orange { background: var(--accent3-dim); color: var(--accent3); }
+
+    .ll-stat-num {
+        font-family: 'Syne', sans-serif;
+        font-size: 24px;
+        font-weight: 700;
+        line-height: 1;
+    }
+
+    .ll-stat-label {
+        font-size: 12px;
+        color: var(--text-muted);
+        margin-top: 3px;
+    }
+
+    .ll-toolbar {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        margin-bottom: 18px;
+        flex-wrap: wrap;
+    }
+
+    .ll-search-wrap {
+        position: relative;
+        flex: 1;
+        min-width: 200px;
+        max-width: 340px;
+    }
+
+    .ll-search-wrap input {
+        width: 100%;
+        background: var(--bg-dark2);
+        border: 1px solid var(--border);
+        border-radius: 10px;
+        color: var(--text);
+        padding: 9px 13px 9px 36px;
+        font-size: 13px;
+        font-family: inherit;
+        outline: none;
+        transition: border .2s, box-shadow .2s;
+    }
+
+    .ll-search-wrap input:focus {
+        border-color: var(--accent);
+        box-shadow: 0 0 0 3px var(--accent-dim);
+    }
+
+    .ll-search-wrap input::placeholder { color: var(--text-muted); }
+
+    .ll-search-icon {
+        position: absolute;
+        left: 12px;
+        top: 50%;
+        transform: translateY(-50%);
+        font-size: 14px;
+        color: var(--text-muted);
+        pointer-events: none;
+    }
+
+    .ll-filter-scroll {
+        display: flex;
+        gap: 6px;
+        overflow-x: auto;
+        padding-bottom: 2px;
+    }
+
+    .ll-filter-scroll::-webkit-scrollbar { display: none; }
+
+    .ll-filter-tab {
+        background: var(--bg-dark2);
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        padding: 7px 14px;
+        font-size: 12px;
+        font-weight: 500;
+        color: var(--text-muted);
+        cursor: pointer;
+        transition: all .2s;
+        font-family: inherit;
+        white-space: nowrap;
+    }
+
+    .ll-filter-tab.active {
+        background: var(--accent-dim);
+        border-color: rgba(232,255,71,.3);
+        color: var(--accent);
+    }
+
+    .ll-filter-tab:hover:not(.active) {
+        background: var(--bg-dark3);
+        color: var(--text);
+    }
+
+    .ll-sort-select {
+        background: var(--bg-dark2);
+        border: 1px solid var(--border);
+        border-radius: 10px;
+        color: var(--text);
+        padding: 8px 12px;
+        font-size: 12px;
+        font-family: inherit;
+        outline: none;
+        cursor: pointer;
+    }
+
+    .ll-sort-select:focus { border-color: var(--accent); }
+
+    .ll-view-toggle {
+        display: flex;
+        gap: 4px;
+        margin-left: auto;
+    }
+
+    .ll-view-btn {
+        width: 34px;
+        height: 34px;
+        border-radius: 8px;
+        border: 1px solid var(--border);
+        background: var(--bg-dark2);
+        color: var(--text-muted);
+        cursor: pointer;
+        display: grid;
+        place-items: center;
+        font-size: 15px;
+        transition: all .2s;
+    }
+
+    .ll-view-btn.active {
+        background: var(--accent-dim);
+        border-color: rgba(232,255,71,.3);
+        color: var(--accent);
+    }
+
+    .ll-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+        gap: 16px;
+    }
+
+    .ll-grid.list-view { grid-template-columns: 1fr; }
+
+    .ll-card {
+        background: var(--bg-dark2);
+        border: 1px solid var(--border);
+        border-radius: var(--radius-lg);
+        overflow: hidden;
+        transition: border-color .2s, transform .18s, box-shadow .2s;
+        animation: llFadeUp .35s ease both;
+    }
+
+    .ll-card:hover {
+        border-color: rgba(255,255,255,.14);
+        transform: translateY(-2px);
+        box-shadow: 0 8px 32px rgba(0,0,0,.35);
+    }
+
+    @@keyframes llFadeUp {
+        from { opacity: 0; transform: translateY(10px); }
+        to   { opacity: 1; transform: translateY(0); }
+    }
+
+    .ll-card-header {
+        padding: 16px 18px 0;
+        display: flex;
+        align-items: flex-start;
+        justify-content: space-between;
+        gap: 10px;
+    }
+
+    .ll-loc-avatar {
+        width: 46px;
+        height: 46px;
+        border-radius: 12px;
+        background: var(--accent-dim);
+        border: 1px solid rgba(232,255,71,.2);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 20px;
+        font-weight: 700;
+        color: var(--accent);
+        font-family: 'Syne', sans-serif;
+        flex-shrink: 0;
+    }
+
+    .ll-loc-info {
+        flex: 1;
+        min-width: 0;
+    }
+
+    .ll-loc-title {
+        font-family: 'Syne', sans-serif;
+        font-size: 15px;
+        font-weight: 700;
+        color: var(--text);
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        margin-bottom: 4px;
+    }
+
+    .ll-loc-id {
+        font-size: 11px;
+        color: var(--text-muted);
+        background: var(--bg-dark3);
+        border: 1px solid var(--border);
+        border-radius: 5px;
+        padding: 2px 8px;
+        display: inline-block;
+        font-family: monospace;
+    }
+
+    .ll-city-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+        background: var(--accent2-dim);
+        border: 1px solid rgba(79,141,255,.2);
+        border-radius: 6px;
+        padding: 4px 10px;
+        font-size: 11px;
+        font-weight: 600;
+        color: var(--accent2);
+        white-space: nowrap;
+        flex-shrink: 0;
+    }
+
+    .ll-card-body { padding: 14px 18px; }
+
+    .ll-detail-row {
+        display: flex;
+        align-items: flex-start;
+        gap: 10px;
+        padding: 9px 0;
+        border-bottom: 1px solid var(--border);
+    }
+
+    .ll-detail-row:last-child { border-bottom: none; }
+
+    .ll-detail-icon {
+        width: 30px;
+        height: 30px;
+        border-radius: 8px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 14px;
+        flex-shrink: 0;
+        margin-top: 1px;
+    }
+
+    .ll-detail-icon.person { background: rgba(48,224,161,.1); }
+    .ll-detail-icon.addr   { background: var(--accent3-dim); }
+
+    .ll-detail-label {
+        font-size: 11px;
+        color: var(--text-muted);
+        margin-bottom: 2px;
+    }
+
+    .ll-detail-value {
+        font-size: 13px;
+        color: var(--text);
+        line-height: 1.4;
+    }
+
+    .ll-card-actions {
+        display: flex;
+        gap: 8px;
+        padding: 0 18px 16px;
+    }
+
+    .ll-grid.list-view .ll-card {
+        display: flex;
+        align-items: stretch;
+    }
+
+    .ll-grid.list-view .ll-card-header {
+        flex-direction: column;
+        justify-content: center;
+        padding: 16px 18px;
+        width: 220px;
+        min-width: 200px;
+        flex-shrink: 0;
+        border-right: 1px solid var(--border);
+    }
+
+    .ll-grid.list-view .ll-loc-avatar { margin-bottom: 10px; }
+
+    .ll-grid.list-view .ll-card-body {
+        flex: 1;
+        display: flex;
+        align-items: center;
+        gap: 24px;
+        flex-wrap: wrap;
+        padding: 16px 20px;
+    }
+
+    .ll-grid.list-view .ll-detail-row {
+        border-bottom: none;
+        flex-direction: column;
+        gap: 3px;
+        min-width: 160px;
+        padding: 0;
+    }
+
+    .ll-grid.list-view .ll-detail-icon { display: none; }
+
+    .ll-grid.list-view .ll-card-actions {
+        padding: 0 18px;
+        margin-left: auto;
+        align-items: center;
+        flex-shrink: 0;
+    }
+
+    .ll-empty {
+        grid-column: 1 / -1;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        padding: 60px 20px;
+        gap: 12px;
+        color: var(--text-muted);
+    }
+
+    .ll-empty .ll-empty-icon {
+        font-size: 42px;
+        opacity: .45;
+    }
+
+    .ll-empty p { font-size: 14px; }
+
+    .ll-modal-backdrop {
+        display: none;
+        position: fixed;
+        inset: 0;
+        background: rgba(0,0,0,.7);
+        z-index: 200;
+        align-items: center;
+        justify-content: center;
+        backdrop-filter: blur(4px);
+    }
+
+    .ll-modal-backdrop.open { display: flex; }
+
+    .ll-modal {
+        background: var(--bg-dark2);
+        border: 1px solid var(--border);
+        border-radius: var(--radius-lg);
+        padding: 32px 28px 28px;
+        width: 100%;
+        max-width: 380px;
+        text-align: center;
+        position: relative;
+    }
+
+    .ll-modal-close {
+        position: absolute;
+        top: 14px;
+        right: 16px;
+        background: none;
+        border: none;
+        color: var(--text-muted);
+        font-size: 18px;
+        cursor: pointer;
+        line-height: 1;
+    }
+
+    .ll-modal-icon  { font-size: 38px; margin-bottom: 10px; }
+    .ll-modal-title { font-family: 'Syne', sans-serif; font-size: 18px; font-weight: 700; margin-bottom: 10px; }
+    .ll-modal-msg   { font-size: 13px; color: var(--text-muted); line-height: 1.65; margin-bottom: 24px; }
+    .ll-modal-actions { display: flex; gap: 10px; justify-content: center; }
+
+    .ll-result-info {
+        font-size: 12px;
+        color: var(--text-muted);
+        margin-bottom: 14px;
+    }
+
+    .ll-result-info strong { color: var(--text); }
+</style>
+
+<div class="ll-root">
+
+    <div class="ll-breadcrumb">
+        Location Management <span>›</span> <span>Location List</span>
+    </div>
+
+    <div class="ll-page-header">
+        <div>
+            <h1 class="ll-page-title">Location Management</h1>
+            <p class="ll-page-subtitle">View and manage all branches and delivery points.</p>
+        </div>
+        <a asp-controller="Location" asp-action="CreateLocation" class="btn-accent">
+            ＋ Add New Location
+        </a>
+    </div>
+
+    <div class="ll-stats">
+        <div class="ll-stat-card">
+            <div class="ll-stat-icon yellow">📍</div>
+            <div>
+                <div class="ll-stat-num">@totalCount</div>
+                <div class="ll-stat-label">Total Locations</div>
+            </div>
+        </div>
+        <div class="ll-stat-card">
+            <div class="ll-stat-icon blue">🏙️</div>
+            <div>
+                <div class="ll-stat-num">@cityCount</div>
+                <div class="ll-stat-label">Cities</div>
+            </div>
+        </div>
+        <div class="ll-stat-card">
+            <div class="ll-stat-icon orange">👤</div>
+            <div>
+                <div class="ll-stat-num">@personCount</div>
+                <div class="ll-stat-label">Authorized Persons</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="ll-toolbar">
+        <div class="ll-search-wrap">
+            <span class="ll-search-icon">🔍</span>
+            <input type="text" id="llSearch" placeholder="Search location, city, person..." oninput="llRender()" />
+        </div>
+
+        <div class="ll-filter-scroll">
+            <button class="ll-filter-tab active" data-city="all" onclick="llSetFilter('all', this)">All</button>
+            @foreach (var city in Model.Select(l => l.City).Distinct().OrderBy(c => c))
+            {
+                <button class="ll-filter-tab" data-city="@city" onclick="llSetFilter('@city', this)">@city</button>
+            }
+        </div>
+
+        <select class="ll-sort-select" id="llSort" onchange="llRender()">
+            <option value="default">Sort</option>
+            <option value="name_asc">Name A→Z</option>
+            <option value="name_desc">Name Z→A</option>
+            <option value="city_asc">City A→Z</option>
+            <option value="id_asc">ID ↑</option>
+        </select>
+
+        <div class="ll-view-toggle">
+            <button class="ll-view-btn active" id="llGridBtn" onclick="llSetView('grid')" title="Card View">⊞</button>
+            <button class="ll-view-btn" id="llListBtn" onclick="llSetView('list')" title="List View">☰</button>
+        </div>
+    </div>
+
+    <div class="ll-result-info" id="llResultInfo"></div>
+    <div class="ll-grid" id="llGrid"></div>
+
+</div>
+
+<div class="ll-modal-backdrop" id="llConfirmModal">
+    <div class="ll-modal">
+        <button class="ll-modal-close" onclick="llCloseModal()">✕</button>
+        <div class="ll-modal-icon">🗑️</div>
+        <div class="ll-modal-title">Delete Location</div>
+        <p class="ll-modal-msg" id="llConfirmMsg"></p>
+        <div class="ll-modal-actions">
+            <button class="btn-accent"
+                    type="button"
+                    onclick="llCloseModal()"
+                    style="background:var(--bg-dark3);color:var(--text);border:1px solid var(--border);">
+                Cancel
+            </button>
+            <form id="llDeleteForm" method="post">
+                @Html.AntiForgeryToken()
+                <button type="submit" class="btn-danger">🗑️ Yes, Delete</button>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+    var LL_DATA = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.Select(l => new {
+        l.LocationId,
+        l.LocationName,
+        l.AuthorizedPerson,
+        l.City,
+        l.Address
+    })));
+
+    var llFilter = 'all';
+    var llView = 'grid';
+
+    function llGetFiltered() {
+        var q = document.getElementById('llSearch').value.toLowerCase();
+        var sort = document.getElementById('llSort').value;
+
+        var items = LL_DATA.filter(function (l) {
+            var matchF = llFilter === 'all' || l.City === llFilter;
+            var search = (l.LocationName + ' ' + l.City + ' ' + l.AuthorizedPerson + ' ' + l.Address).toLowerCase();
+            return matchF && search.indexOf(q) !== -1;
+        });
+
+        if (sort === 'name_asc')  items.sort(function (a, b) { return a.LocationName.localeCompare(b.LocationName, 'en'); });
+        if (sort === 'name_desc') items.sort(function (a, b) { return b.LocationName.localeCompare(a.LocationName, 'en'); });
+        if (sort === 'city_asc')  items.sort(function (a, b) { return a.City.localeCompare(b.City, 'en'); });
+        if (sort === 'id_asc')    items.sort(function (a, b) { return a.LocationId - b.LocationId; });
+
+        return items;
+    }
+
+    function llSetFilter(f, el) {
+        llFilter = f;
+        document.querySelectorAll('.ll-filter-tab').forEach(function (t) {
+            t.classList.remove('active');
+        });
+        el.classList.add('active');
+        llRender();
+    }
+
+    function llSetView(v) {
+        llView = v;
+        document.getElementById('llGridBtn').classList.toggle('active', v === 'grid');
+        document.getElementById('llListBtn').classList.toggle('active', v === 'list');
+        llRender();
+    }
+
+    function llInitial(name) {
+        if (!name) return '?';
+        return name.trim().charAt(0).toUpperCase();
+    }
+
+    function llEsc(str) {
+        if (!str && str !== 0) return '';
+        return String(str)
+            .replace(/&/g, '&amp;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;')
+            .replace(/"/g, '&quot;')
+            .replace(/'/g, '&#x27;');
+    }
+
+    function llRender() {
+        var items = llGetFiltered();
+        var grid = document.getElementById('llGrid');
+        grid.className = 'll-grid' + (llView === 'list' ? ' list-view' : '');
+
+        document.getElementById('llResultInfo').innerHTML =
+            '<strong>' + items.length + '</strong> locations listed';
+
+        if (items.length === 0) {
+            grid.innerHTML =
+                '<div class="ll-empty">' +
+                    '<div class="ll-empty-icon">&#128205;</div>' +
+                    '<p>No locations found matching your search.</p>' +
+                '</div>';
+            return;
+        }
+
+        grid.innerHTML = items.map(function (l, i) { return llCardHtml(l, i); }).join('');
+    }
+
+    function llCardHtml(l, i) {
+        var delay = 'animation-delay:' + (i * 0.04) + 's';
+        var initial = llInitial(l.LocationName);
+
+        var header =
+            '<div class="ll-card-header">' +
+                '<div style="display:flex;align-items:center;gap:12px;flex:1;min-width:0;">' +
+                    '<div class="ll-loc-avatar">' + llEsc(initial) + '</div>' +
+                    '<div class="ll-loc-info">' +
+                        '<div class="ll-loc-title">' + llEsc(l.LocationName) + '</div>' +
+                        '<div class="ll-loc-id">#' + l.LocationId + '</div>' +
+                    '</div>' +
+                '</div>' +
+                '<div class="ll-city-badge">&#127961;&#65039; ' + llEsc(l.City) + '</div>' +
+            '</div>';
+
+        var body =
+            '<div class="ll-card-body">' +
+                '<div class="ll-detail-row">' +
+                    '<div class="ll-detail-icon person">&#128100;</div>' +
+                    '<div>' +
+                        '<div class="ll-detail-label">Authorized Person</div>' +
+                        '<div class="ll-detail-value">' + llEsc(l.AuthorizedPerson) + '</div>' +
+                    '</div>' +
+                '</div>' +
+                '<div class="ll-detail-row">' +
+                    '<div class="ll-detail-icon addr">&#128205;</div>' +
+                    '<div>' +
+                        '<div class="ll-detail-label">Address</div>' +
+                        '<div class="ll-detail-value">' + llEsc(l.Address) + '</div>' +
+                    '</div>' +
+                '</div>' +
+            '</div>';
+
+        var actions =
+            '<div class="ll-card-actions">' +
+                '<a href="/Location/UpdateLocation/' + l.LocationId + '" class="btn-edit">&#9999; Edit</a>' +
+                '<button class="btn-danger" type="button" onclick="llConfirmDelete(' + l.LocationId + ', \'' + llEsc(l.LocationName) + '\')">&#128465; Delete</button>' +
+            '</div>';
+
+        return '<div class="ll-card" style="' + delay + '">' + header + body + actions + '</div>';
+    }
+
+    function llConfirmDelete(id, name) {
+        document.getElementById('llConfirmMsg').innerHTML =
+            '<strong>' + llEsc(name) + '</strong> Are you sure you want to delete this location?<br>This action cannot be undone.';
+        document.getElementById('llDeleteForm').action = '/Location/DeleteLocation/' + id;
+        document.getElementById('llConfirmModal').classList.add('open');
+    }
+
+    function llCloseModal() {
+        document.getElementById('llConfirmModal').classList.remove('open');
+    }
+
+    document.getElementById('llConfirmModal').addEventListener('click', function (e) {
+        if (e.target === this) llCloseModal();
+    });
+
+    llRender();
+</script>

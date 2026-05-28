@@ -1,0 +1,638 @@
+﻿@model List<CorolaDtoLayer.Dto.CostumerDto.ResultCustomerDto>
+
+@{
+    ViewData["Title"] = "MüşteriListesi";
+    Layout = "~/Views/AdminLayout/Index.cshtml";
+
+    var totalCount = Model.Count();
+    var avgAge     = Model.Any()
+        ? (int)Model.Average(c => (DateTime.Now - c.BirthDate).TotalDays / 365.25)
+        : 0;
+    var thisMonth  = Model.Count(c => c.BirthDate.Month == DateTime.Now.Month);
+}
+
+<style>
+    :root {
+        --bg-dark:     #0d0f14;
+        --bg-dark2:    #13161e;
+        --bg-dark3:    #1a1e2a;
+        --accent:      #e8ff47;
+        --accent-dim:  rgba(232,255,71,.12);
+        --accent2:     #4f8dff;
+        --accent2-dim: rgba(79,141,255,.12);
+        --accent3:     #ff9f47;
+        --accent3-dim: rgba(255,159,71,.12);
+        --danger:      #ff5259;
+        --success:     #30e0a1;
+        --border:      rgba(255,255,255,.07);
+        --text:        #e2e8f0;
+        --text-muted:  #7a8499;
+        --radius:      12px;
+        --radius-lg:   18px;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    .cu-root {
+        padding: 28px;
+        font-family: 'DM Sans', 'Segoe UI', sans-serif;
+        color: var(--text);
+    }
+
+    /* ── Breadcrumb ── */
+    .cu-breadcrumb {
+        display: flex; align-items: center; gap: 6px;
+        font-size: 12px; color: var(--text-muted); margin-bottom: 6px;
+    }
+    .cu-breadcrumb span { color: var(--text); }
+
+    /* ── Page Header ── */
+    .cu-page-header {
+        display: flex; align-items: flex-end;
+        justify-content: space-between; gap: 16px;
+        margin-bottom: 24px; flex-wrap: wrap;
+    }
+    .cu-page-title {
+        font-family: 'Syne', Georgia, sans-serif;
+        font-size: 26px; font-weight: 700; color: var(--text); line-height: 1;
+    }
+    .cu-page-subtitle { font-size: 13px; color: var(--text-muted); margin-top: 5px; }
+
+    /* ── Buttons ── */
+    .btn-accent {
+        background: var(--accent); color: #0d0f14; border: none;
+        border-radius: 10px; padding: 9px 18px; font-size: 13px;
+        font-weight: 600; font-family: inherit; cursor: pointer;
+        display: inline-flex; align-items: center; gap: 7px;
+        text-decoration: none; transition: opacity .2s;
+    }
+    .btn-accent:hover { opacity: .85; color: #0d0f14; }
+
+    .btn-edit {
+        background: var(--accent2-dim); color: var(--accent2);
+        border: 1px solid rgba(79,141,255,.25); border-radius: 7px;
+        padding: 5px 11px; font-size: 11px; font-weight: 600;
+        font-family: inherit; cursor: pointer; display: inline-flex;
+        align-items: center; gap: 4px; text-decoration: none; transition: background .2s;
+    }
+    .btn-edit:hover { background: rgba(79,141,255,.2); color: var(--accent2); }
+
+    .btn-danger {
+        background: rgba(255,82,89,.1); color: var(--danger);
+        border: 1px solid rgba(255,82,89,.2); border-radius: 7px;
+        padding: 5px 11px; font-size: 11px; font-weight: 600;
+        font-family: inherit; cursor: pointer; display: inline-flex;
+        align-items: center; gap: 4px; text-decoration: none; transition: background .2s;
+    }
+    .btn-danger:hover { background: rgba(255,82,89,.18); color: var(--danger); }
+
+    .btn-detail {
+        background: rgba(48,224,161,.08); color: var(--success);
+        border: 1px solid rgba(48,224,161,.2); border-radius: 7px;
+        padding: 5px 11px; font-size: 11px; font-weight: 600;
+        font-family: inherit; cursor: pointer; display: inline-flex;
+        align-items: center; gap: 4px; text-decoration: none; transition: background .2s;
+    }
+    .btn-detail:hover { background: rgba(48,224,161,.15); color: var(--success); }
+
+    /* ── Stats ── */
+    .cu-stats {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 14px; margin-bottom: 22px;
+    }
+    @@media (max-width: 700px) { .cu-stats { grid-template-columns: 1fr; } }
+
+    .cu-stat-card {
+        background: var(--bg-dark2); border: 1px solid var(--border);
+        border-radius: var(--radius); padding: 16px 18px;
+        display: flex; align-items: center; gap: 14px;
+    }
+    .cu-stat-icon {
+        width: 40px; height: 40px; border-radius: 10px;
+        display: grid; place-items: center; font-size: 18px; flex-shrink: 0;
+    }
+    .cu-stat-icon.yellow { background: var(--accent-dim);       color: var(--accent);  }
+    .cu-stat-icon.blue   { background: var(--accent2-dim);      color: var(--accent2); }
+    .cu-stat-icon.green  { background: rgba(48,224,161,.1);     color: var(--success); }
+    .cu-stat-num   { font-family: 'Syne', sans-serif; font-size: 24px; font-weight: 700; line-height: 1; }
+    .cu-stat-label { font-size: 12px; color: var(--text-muted); margin-top: 3px; }
+
+    /* ── Toolbar ── */
+    .cu-toolbar {
+        display: flex; align-items: center; gap: 12px;
+        margin-bottom: 16px; flex-wrap: wrap;
+    }
+    .cu-search-wrap { position: relative; flex: 1; min-width: 220px; max-width: 360px; }
+    .cu-search-wrap input {
+        width: 100%; background: var(--bg-dark2);
+        border: 1px solid var(--border); border-radius: 10px;
+        color: var(--text); padding: 9px 13px 9px 36px;
+        font-size: 13px; font-family: inherit; outline: none;
+        transition: border .2s, box-shadow .2s;
+    }
+    .cu-search-wrap input:focus {
+        border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-dim);
+    }
+    .cu-search-wrap input::placeholder { color: var(--text-muted); }
+    .cu-search-icon {
+        position: absolute; left: 12px; top: 50%;
+        transform: translateY(-50%); font-size: 14px;
+        color: var(--text-muted); pointer-events: none;
+    }
+
+    .cu-sort-select {
+        background: var(--bg-dark2); border: 1px solid var(--border);
+        border-radius: 10px; color: var(--text); padding: 8px 12px;
+        font-size: 12px; font-family: inherit; outline: none; cursor: pointer;
+    }
+    .cu-sort-select:focus { border-color: var(--accent); }
+
+    .cu-result-info { font-size: 12px; color: var(--text-muted); margin-left: auto; }
+    .cu-result-info strong { color: var(--text); }
+
+    /* ── Table Wrapper ── */
+    .cu-table-wrap {
+        background: var(--bg-dark2); border: 1px solid var(--border);
+        border-radius: var(--radius-lg); overflow: hidden;
+        animation: cuFadeUp .35s ease both;
+    }
+    @@keyframes cuFadeUp {
+        from { opacity: 0; transform: translateY(10px); }
+        to   { opacity: 1; transform: translateY(0); }
+    }
+
+    .cu-table-scroll { overflow-x: auto; }
+    .cu-table-scroll::-webkit-scrollbar { height: 4px; }
+    .cu-table-scroll::-webkit-scrollbar-track { background: var(--bg-dark3); }
+    .cu-table-scroll::-webkit-scrollbar-thumb { background: rgba(255,255,255,.1); border-radius: 2px; }
+
+    /* ── Table ── */
+    .cu-table {
+        width: 100%; border-collapse: collapse;
+        min-width: 860px;
+    }
+
+    /* Head */
+    .cu-table thead tr {
+        background: var(--bg-dark3);
+        border-bottom: 1px solid var(--border);
+    }
+    .cu-table th {
+        padding: 13px 16px;
+        font-size: 11px; font-weight: 600;
+        color: var(--text-muted); text-align: left;
+        text-transform: uppercase; letter-spacing: .05em;
+        white-space: nowrap; user-select: none;
+    }
+    .cu-table th.sortable { cursor: pointer; transition: color .2s; }
+    .cu-table th.sortable:hover { color: var(--accent); }
+    .cu-table th.sort-asc  .sort-icon::after { content: ' ↑'; color: var(--accent); }
+    .cu-table th.sort-desc .sort-icon::after { content: ' ↓'; color: var(--accent); }
+    .cu-table th:not(.sort-asc):not(.sort-desc) .sort-icon::after { content: ' ⇅'; opacity: .3; }
+
+    /* Body */
+    .cu-table tbody tr {
+        border-bottom: 1px solid var(--border);
+        transition: background .15s;
+    }
+    .cu-table tbody tr:last-child { border-bottom: none; }
+    .cu-table tbody tr:hover { background: rgba(255,255,255,.025); }
+
+    .cu-table td {
+        padding: 13px 16px; font-size: 13px; color: var(--text);
+        vertical-align: middle;
+    }
+
+    /* ── Avatar Cell ── */
+    .cu-avatar-cell { display: flex; align-items: center; gap: 10px; }
+    .cu-avatar {
+        width: 36px; height: 36px; border-radius: 10px;
+        display: flex; align-items: center; justify-content: center;
+        font-size: 13px; font-weight: 700; flex-shrink: 0;
+        font-family: 'Syne', sans-serif;
+    }
+    .cu-full-name  { font-weight: 600; font-size: 13px; color: var(--text); white-space: nowrap; }
+    .cu-id-badge   {
+        font-size: 10px; color: var(--text-muted);
+        font-family: monospace; margin-top: 1px;
+    }
+
+    /* ── Contact Cell ── */
+    .cu-contact-stack { display: flex; flex-direction: column; gap: 2px; }
+    .cu-email {
+        font-size: 12px; color: var(--accent2);
+        text-decoration: none; transition: opacity .2s;
+        white-space: nowrap;
+    }
+    .cu-email:hover { opacity: .8; }
+    .cu-phone { font-size: 12px; color: var(--text-muted); white-space: nowrap; }
+
+    /* ── License Cell ── */
+    .cu-license {
+        font-family: monospace; font-size: 12px;
+        background: var(--bg-dark3); border: 1px solid var(--border);
+        border-radius: 6px; padding: 3px 9px; letter-spacing: .06em;
+        color: var(--accent3); white-space: nowrap; display: inline-block;
+    }
+
+    /* ── Birth Date Cell ── */
+    .cu-birth-wrap { display: flex; flex-direction: column; gap: 2px; }
+    .cu-birth-date { font-size: 12px; color: var(--text); white-space: nowrap; }
+    .cu-age-badge {
+        display: inline-flex; align-items: center; gap: 3px;
+        background: var(--accent-dim); border: 1px solid rgba(232,255,71,.15);
+        border-radius: 5px; padding: 1px 7px;
+        font-size: 10px; font-weight: 600; color: var(--accent);
+        width: fit-content;
+    }
+
+    /* ── Actions Cell ── */
+    .cu-actions { display: flex; align-items: center; gap: 6px; flex-wrap: nowrap; }
+
+    /* ── Empty ── */
+    .cu-empty {
+        display: flex; flex-direction: column;
+        align-items: center; justify-content: center;
+        padding: 60px 20px; gap: 12px; color: var(--text-muted);
+    }
+    .cu-empty-icon { font-size: 40px; opacity: .4; }
+    .cu-empty p    { font-size: 14px; }
+
+    /* ── Table Footer ── */
+    .cu-table-footer {
+        display: flex; align-items: center; justify-content: space-between;
+        padding: 12px 16px; border-top: 1px solid var(--border);
+        background: var(--bg-dark3); gap: 12px; flex-wrap: wrap;
+    }
+    .cu-footer-info { font-size: 12px; color: var(--text-muted); }
+    .cu-footer-info strong { color: var(--text); }
+
+    /* Pagination */
+    .cu-pagination { display: flex; align-items: center; gap: 4px; }
+    .cu-page-btn {
+        width: 32px; height: 32px; border-radius: 8px;
+        border: 1px solid var(--border); background: var(--bg-dark2);
+        color: var(--text-muted); cursor: pointer; display: grid;
+        place-items: center; font-size: 12px; font-weight: 600;
+        font-family: inherit; transition: all .2s;
+    }
+    .cu-page-btn:hover:not(:disabled)  { background: var(--bg-dark3); color: var(--text); border-color: rgba(255,255,255,.15); }
+    .cu-page-btn.active { background: var(--accent-dim); border-color: rgba(232,255,71,.3); color: var(--accent); }
+    .cu-page-btn:disabled { opacity: .35; cursor: not-allowed; }
+
+    /* ── Delete Modal ── */
+    .cu-modal-backdrop {
+        display: none; position: fixed; inset: 0;
+        background: rgba(0,0,0,.7); z-index: 200;
+        align-items: center; justify-content: center;
+        backdrop-filter: blur(4px);
+    }
+    .cu-modal-backdrop.open { display: flex; }
+    .cu-modal {
+        background: var(--bg-dark2); border: 1px solid var(--border);
+        border-radius: var(--radius-lg); padding: 32px 28px 28px;
+        width: 100%; max-width: 380px; text-align: center; position: relative;
+    }
+    .cu-modal-close {
+        position: absolute; top: 14px; right: 16px;
+        background: none; border: none; color: var(--text-muted);
+        font-size: 18px; cursor: pointer;
+    }
+    .cu-modal-icon  { font-size: 38px; margin-bottom: 10px; }
+    .cu-modal-title { font-family: 'Syne', sans-serif; font-size: 18px; font-weight: 700; margin-bottom: 10px; }
+    .cu-modal-msg   { font-size: 13px; color: var(--text-muted); line-height: 1.65; margin-bottom: 24px; }
+    .cu-modal-actions { display: flex; gap: 10px; justify-content: center; }
+</style>
+
+<div class="cu-root">
+
+    <div class="cu-breadcrumb">
+        Customer Management <span>›</span> <span>Customer List</span>
+    </div>
+
+    <div class="cu-page-header">
+        <div>
+            <h1 class="cu-page-title">Customer Management</h1>
+            <p class="cu-page-subtitle">View and manage all registered customers.</p>
+        </div>
+        <a asp-controller="Customer" asp-action="CreateCustomer" class="btn-accent">
+            ＋ Add New Customer
+        </a>
+    </div>
+
+    <!-- Stats -->
+    <div class="cu-stats">
+        <div class="cu-stat-card">
+            <div class="cu-stat-icon yellow">👥</div>
+            <div>
+                <div class="cu-stat-num">@totalCount</div>
+                <div class="cu-stat-label">Total Customers</div>
+            </div>
+        </div>
+        <div class="cu-stat-card">
+            <div class="cu-stat-icon blue">🎂</div>
+            <div>
+                <div class="cu-stat-num">@avgAge</div>
+                <div class="cu-stat-label">Average Age</div>
+            </div>
+        </div>
+        <div class="cu-stat-card">
+            <div class="cu-stat-icon green">🗓️</div>
+            <div>
+                <div class="cu-stat-num">@thisMonth</div>
+                <div class="cu-stat-label">Born This Month</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toolbar -->
+    <div class="cu-toolbar">
+        <div class="cu-search-wrap">
+            <span class="cu-search-icon">🔍</span>
+            <input type="text" id="cuSearch" placeholder="Search name, email, phone, driver license..." oninput="cuRender()" />
+        </div>
+
+        <select class="cu-sort-select" id="cuSort" onchange="cuRender()">
+            <option value="default">Sort</option>
+            <option value="name_asc">Name A→Z</option>
+            <option value="name_desc">Name Z→A</option>
+            <option value="age_asc">Age ↑ (Younger)</option>
+            <option value="age_desc">Age ↓ (Older)</option>
+            <option value="id_asc">ID ↑</option>
+        </select>
+
+        <div class="cu-result-info" id="cuResultInfo"></div>
+    </div>
+
+    <!-- Table -->
+    <div class="cu-table-wrap">
+        <div class="cu-table-scroll">
+            <table class="cu-table">
+                <thead>
+                    <tr>
+                        <th class="sortable" data-col="name" onclick="cuSetSort('name')">
+                            <span class="sort-icon">Customer</span>
+                        </th>
+                        <th class="sortable" data-col="email" onclick="cuSetSort('email')">
+                            <span class="sort-icon">Contact</span>
+                        </th>
+                        <th>
+                            Driver License No
+                        </th>
+                        <th class="sortable" data-col="birth" onclick="cuSetSort('birth')">
+                            <span class="sort-icon">Birth Date</span>
+                        </th>
+                        <th style="text-align:right;">Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="cuTableBody"></tbody>
+            </table>
+        </div>
+
+        <!-- Footer -->
+        <div class="cu-table-footer">
+            <div class="cu-footer-info" id="cuFooterInfo"></div>
+            <div class="cu-pagination" id="cuPagination"></div>
+        </div>
+    </div>
+
+</div>
+
+<!-- Delete Modal -->
+<div class="cu-modal-backdrop" id="cuConfirmModal">
+    <div class="cu-modal">
+        <button class="cu-modal-close" onclick="cuCloseModal()">✕</button>
+        <div class="cu-modal-icon">🗑️</div>
+        <div class="cu-modal-title">Müşteriyi Sil</div>
+        <p class="cu-modal-msg" id="cuConfirmMsg"></p>
+        <div class="cu-modal-actions">
+            <button class="btn-accent"
+                    onclick="cuCloseModal()"
+                    style="background:var(--bg-dark3);color:var(--text);border:1px solid var(--border);">
+                İptal
+            </button>
+            <form id="cuDeleteForm" method="post">
+                @Html.AntiForgeryToken()
+                <button type="submit" class="btn-danger">🗑️ Evet, Sil</button>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+    var CU_DATA = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.Select(c => new {
+        c.CustomerId,
+        c.FirstName,
+        c.LastName,
+        c.Email,
+        c.Phone,
+        c.DriverLicenseNumber,
+        BirthDate = c.BirthDate.ToString("yyyy-MM-dd")
+    })));
+
+    /* ── Avatar palette ── */
+    var CU_COLORS = [
+        ['rgba(232,255,71,.15)',  '#e8ff47'],
+        ['rgba(79,141,255,.15)',  '#4f8dff'],
+        ['rgba(48,224,161,.15)', '#30e0a1'],
+        ['rgba(255,159,71,.15)', '#ff9f47'],
+        ['rgba(255,82,89,.12)',  '#ff5259'],
+        ['rgba(180,120,255,.15)','#b478ff'],
+    ];
+
+    function cuColor(id) {
+        return CU_COLORS[id % CU_COLORS.length];
+    }
+
+    function cuAge(birthStr) {
+        var b = new Date(birthStr);
+        var now = new Date();
+        var age = now.getFullYear() - b.getFullYear();
+        var m = now.getMonth() - b.getMonth();
+        if (m < 0 || (m === 0 && now.getDate() < b.getDate())) age--;
+        return age;
+    }
+
+    function cuFmtDate(birthStr) {
+        var d = new Date(birthStr);
+        return d.toLocaleDateString('tr-TR', { day:'2-digit', month:'long', year:'numeric' });
+    }
+
+    function cuEsc(str) {
+        if (!str && str !== 0) return '';
+        return String(str)
+            .replace(/&/g,'&amp;').replace(/</g,'&lt;')
+            .replace(/>/g,'&gt;').replace(/"/g,'&quot;')
+            .replace(/'/g,'&#x27;');
+    }
+
+    /* ── Sort state ── */
+    var cuSortCol = null;
+    var cuSortDir = 'asc';
+    var cuPage    = 1;
+    var cuPerPage = 10;
+
+    function cuSetSort(col) {
+        if (cuSortCol === col) {
+            cuSortDir = cuSortDir === 'asc' ? 'desc' : 'asc';
+        } else {
+            cuSortCol = col;
+            cuSortDir = 'asc';
+        }
+        /* Update header classes */
+        document.querySelectorAll('.cu-table th').forEach(function(th) {
+            th.classList.remove('sort-asc', 'sort-desc');
+        });
+        var target = document.querySelector('.cu-table th[data-col="' + col + '"]');
+        if (target) target.classList.add(cuSortDir === 'asc' ? 'sort-asc' : 'sort-desc');
+        cuPage = 1;
+        cuRender();
+    }
+
+    function cuGetFiltered() {
+        var q    = document.getElementById('cuSearch').value.toLowerCase();
+        var sort = document.getElementById('cuSort').value;
+
+        var items = CU_DATA.filter(function(c) {
+            var search = (c.FirstName + ' ' + c.LastName + ' ' + c.Email + ' ' + c.Phone + ' ' + c.DriverLicenseNumber).toLowerCase();
+            return search.indexOf(q) !== -1;
+        });
+
+        /* Toolbar sort */
+        if (sort === 'name_asc')  items.sort(function(a,b){ return (a.FirstName+a.LastName).localeCompare(b.FirstName+b.LastName,'tr'); });
+        if (sort === 'name_desc') items.sort(function(a,b){ return (b.FirstName+b.LastName).localeCompare(a.FirstName+a.LastName,'tr'); });
+        if (sort === 'age_asc')   items.sort(function(a,b){ return new Date(b.BirthDate) - new Date(a.BirthDate); });
+        if (sort === 'age_desc')  items.sort(function(a,b){ return new Date(a.BirthDate) - new Date(b.BirthDate); });
+        if (sort === 'id_asc')    items.sort(function(a,b){ return a.CustomerId - b.CustomerId; });
+
+        /* Column header sort (overrides toolbar) */
+        if (cuSortCol) {
+            items.sort(function(a, b) {
+                var av, bv;
+                if (cuSortCol === 'name')  { av = (a.FirstName+a.LastName).toLowerCase(); bv = (b.FirstName+b.LastName).toLowerCase(); }
+                if (cuSortCol === 'email') { av = a.Email.toLowerCase(); bv = b.Email.toLowerCase(); }
+                if (cuSortCol === 'birth') { av = new Date(a.BirthDate); bv = new Date(b.BirthDate); }
+                if (av < bv) return cuSortDir === 'asc' ? -1 : 1;
+                if (av > bv) return cuSortDir === 'asc' ?  1 : -1;
+                return 0;
+            });
+        }
+
+        return items;
+    }
+
+    function cuRender() {
+        var items   = cuGetFiltered();
+        var total   = items.length;
+        var pages   = Math.max(1, Math.ceil(total / cuPerPage));
+        if (cuPage > pages) cuPage = pages;
+        var start   = (cuPage - 1) * cuPerPage;
+        var pageItems = items.slice(start, start + cuPerPage);
+
+        document.getElementById('cuResultInfo').innerHTML =
+            '<strong>' + total + '</strong> müşteri listeleniyor';
+
+        var tbody = document.getElementById('cuTableBody');
+
+        if (items.length === 0) {
+            tbody.innerHTML =
+                '<tr><td colspan="5">' +
+                    '<div class="cu-empty">' +
+                        '<div class="cu-empty-icon">&#128100;</div>' +
+                        '<p>Aramanızla eşleşen müşteri bulunamadı.</p>' +
+                    '</div>' +
+                '</td></tr>';
+        } else {
+            tbody.innerHTML = pageItems.map(function(c, i) {
+                var colors  = cuColor(c.CustomerId);
+                var initial = (c.FirstName.charAt(0) + c.LastName.charAt(0)).toUpperCase();
+                var age     = cuAge(c.BirthDate);
+
+                return '<tr style="animation:cuFadeUp .25s ease ' + (i * 0.03) + 's both">' +
+                    /* Müşteri */
+                    '<td>' +
+                        '<div class="cu-avatar-cell">' +
+                            '<div class="cu-avatar" style="background:' + colors[0] + ';color:' + colors[1] + '">' + cuEsc(initial) + '</div>' +
+                            '<div>' +
+                                '<div class="cu-full-name">' + cuEsc(c.FirstName) + ' ' + cuEsc(c.LastName) + '</div>' +
+                                '<div class="cu-id-badge">#' + c.CustomerId + '</div>' +
+                            '</div>' +
+                        '</div>' +
+                    '</td>' +
+                    /* İletişim */
+                    '<td>' +
+                        '<div class="cu-contact-stack">' +
+                            '<a class="cu-email" href="mailto:' + cuEsc(c.Email) + '">' + cuEsc(c.Email) + '</a>' +
+                            '<span class="cu-phone">📞 ' + cuEsc(c.Phone) + '</span>' +
+                        '</div>' +
+                    '</td>' +
+                    /* Ehliyet */
+                    '<td><span class="cu-license">' + cuEsc(c.DriverLicenseNumber) + '</span></td>' +
+                    /* Doğum */
+                    '<td>' +
+                        '<div class="cu-birth-wrap">' +
+                            '<span class="cu-birth-date">🎂 ' + cuFmtDate(c.BirthDate) + '</span>' +
+                            '<span class="cu-age-badge">' + age + ' Age</span>' +
+                        '</div>' +
+                    '</td>' +
+                    /* İşlemler */
+                    '<td style="text-align:right">' +
+                        '<div class="cu-actions" style="justify-content:flex-end">' +
+                            '<a href="/Admin/Customer/Detail/' + c.CustomerId + '" class="btn-detail">🔍 Details</a>' +
+                            '<a href="/Admin/Customer/UpdateCustomer/' + c.CustomerId + '" class="btn-edit">✏️ Edit</a>' +
+                            '<button class="btn-danger" onclick="cuConfirmDelete(' + c.CustomerId + ',\'' + cuEsc(c.FirstName + ' ' + c.LastName) + '\')">🗑️ Delete</button>' +
+                        '</div>' +
+                    '</td>' +
+                '</tr>';
+            }).join('');
+        }
+
+        /* Footer */
+        document.getElementById('cuFooterInfo').innerHTML =
+            '<strong>' + (start + 1) + '–' + Math.min(start + cuPerPage, total) + '</strong> / ' + total + ' Recording In Progress ';
+
+        /* Pagination */
+        var pag = document.getElementById('cuPagination');
+        var html = '';
+        html += '<button class="cu-page-btn" onclick="cuGoPage(' + (cuPage-1) + ')" ' + (cuPage===1?'disabled':'') + '>‹</button>';
+        var from = Math.max(1, cuPage - 2);
+        var to   = Math.min(pages, cuPage + 2);
+        if (from > 1) html += '<button class="cu-page-btn" onclick="cuGoPage(1)">1</button>' + (from > 2 ? '<span style="color:var(--text-muted);padding:0 4px;font-size:12px">…</span>' : '');
+        for (var p = from; p <= to; p++) {
+            html += '<button class="cu-page-btn' + (p===cuPage?' active':'') + '" onclick="cuGoPage(' + p + ')">' + p + '</button>';
+        }
+        if (to < pages) html += (to < pages-1 ? '<span style="color:var(--text-muted);padding:0 4px;font-size:12px">…</span>' : '') + '<button class="cu-page-btn" onclick="cuGoPage(' + pages + ')">' + pages + '</button>';
+        html += '<button class="cu-page-btn" onclick="cuGoPage(' + (cuPage+1) + ')" ' + (cuPage===pages?'disabled':'') + '>›</button>';
+        pag.innerHTML = html;
+    }
+
+    function cuGoPage(p) {
+        var items = cuGetFiltered();
+        var pages = Math.max(1, Math.ceil(items.length / cuPerPage));
+        if (p < 1 || p > pages) return;
+        cuPage = p;
+        cuRender();
+        document.querySelector('.cu-table-wrap').scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+
+    function cuConfirmDelete(id, name) {
+        document.getElementById('cuConfirmMsg').innerHTML =
+            '<strong>' + cuEsc(name) + '</strong>Are You Sure ?<br>This Cannot Be Return.';
+        document.getElementById('cuDeleteForm').action = '/Admin/Customer/DeleteCustomer/' + id;
+        document.getElementById('cuConfirmModal').classList.add('open');
+    }
+
+    function cuCloseModal() {
+        document.getElementById('cuConfirmModal').classList.remove('open');
+    }
+
+    document.getElementById('cuConfirmModal').addEventListener('click', function(e) {
+        if (e.target === this) cuCloseModal();
+    });
+
+    cuRender();
+</script>
+
+
+

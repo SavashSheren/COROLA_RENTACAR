@@ -1,0 +1,681 @@
+﻿@model COROLA_RENTACAR.EntityLayer.Entities.Location
+
+@{
+    ViewData["Title"] = "Add New Location";
+    Layout = "~/Views/AdminLayout/Index.cshtml";
+}
+
+<style>
+    :root {
+        --bg-dark: #0d0f14;
+        --bg-dark2: #13161e;
+        --bg-dark3: #1a1e2a;
+        --accent: #e8ff47;
+        --accent-dim: rgba(232,255,71,.12);
+        --accent2: #4f8dff;
+        --accent2-dim: rgba(79,141,255,.12);
+        --accent3: #ff9f47;
+        --accent3-dim: rgba(255,159,71,.12);
+        --danger: #ff5259;
+        --success: #30e0a1;
+        --border: rgba(255,255,255,.07);
+        --border-focus: rgba(232,255,71,.5);
+        --text: #e2e8f0;
+        --text-muted: #7a8499;
+        --radius: 12px;
+        --radius-lg: 18px;
+    }
+
+    *, *::before, *::after {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+    }
+
+    .lc-root {
+        padding: 28px;
+        font-family: 'DM Sans', 'Segoe UI', sans-serif;
+        color: var(--text);
+        max-width: 780px;
+    }
+
+    .lc-breadcrumb {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        font-size: 12px;
+        color: var(--text-muted);
+        margin-bottom: 6px;
+    }
+
+        .lc-breadcrumb a {
+            color: var(--text-muted);
+            text-decoration: none;
+            transition: color .2s;
+        }
+
+            .lc-breadcrumb a:hover {
+                color: var(--accent);
+            }
+
+        .lc-breadcrumb span {
+            color: var(--text);
+        }
+
+    .lc-page-header {
+        display: flex;
+        align-items: center;
+        gap: 16px;
+        margin-bottom: 28px;
+    }
+
+    .lc-header-icon {
+        width: 52px;
+        height: 52px;
+        border-radius: 14px;
+        background: var(--accent-dim);
+        border: 1px solid rgba(232,255,71,.2);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 22px;
+        flex-shrink: 0;
+    }
+
+    .lc-page-title {
+        font-family: 'Syne', Georgia, sans-serif;
+        font-size: 24px;
+        font-weight: 700;
+        color: var(--text);
+        line-height: 1;
+    }
+
+    .lc-page-subtitle {
+        font-size: 13px;
+        color: var(--text-muted);
+        margin-top: 5px;
+    }
+
+    .lc-card {
+        background: var(--bg-dark2);
+        border: 1px solid var(--border);
+        border-radius: var(--radius-lg);
+        overflow: hidden;
+        animation: lcFadeUp .35s ease both;
+    }
+
+    @@keyframes lcFadeUp {
+        from {
+            opacity: 0;
+            transform: translateY(12px);
+        }
+
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    .lc-section-header {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 18px 24px;
+        border-bottom: 1px solid var(--border);
+        background: var(--bg-dark3);
+    }
+
+    .lc-section-icon {
+        width: 32px;
+        height: 32px;
+        border-radius: 8px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 15px;
+        flex-shrink: 0;
+    }
+
+        .lc-section-icon.yellow {
+            background: var(--accent-dim);
+        }
+
+        .lc-section-icon.blue {
+            background: var(--accent2-dim);
+        }
+
+        .lc-section-icon.orange {
+            background: var(--accent3-dim);
+        }
+
+    .lc-section-title {
+        font-family: 'Syne', sans-serif;
+        font-size: 13px;
+        font-weight: 700;
+        color: var(--text);
+    }
+
+    .lc-section-desc {
+        font-size: 11px;
+        color: var(--text-muted);
+        margin-top: 1px;
+    }
+
+    .lc-form-body {
+        padding: 24px;
+    }
+
+    .lc-field-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 18px;
+    }
+
+        .lc-field-grid.single {
+            grid-template-columns: 1fr;
+        }
+
+    @@media (max-width: 600px) {
+        .lc-field-grid {
+            grid-template-columns: 1fr;
+        }
+    }
+
+    .lc-field {
+        display: flex;
+        flex-direction: column;
+        gap: 7px;
+    }
+
+        .lc-field.full {
+            grid-column: 1 / -1;
+        }
+
+    .lc-label {
+        font-size: 12px;
+        font-weight: 600;
+        color: var(--text-muted);
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        letter-spacing: .03em;
+        text-transform: uppercase;
+    }
+
+        .lc-label .lc-required {
+            color: var(--danger);
+            font-size: 14px;
+            line-height: 1;
+        }
+
+    .lc-input,
+    .lc-textarea {
+        background: var(--bg-dark3);
+        border: 1px solid var(--border);
+        border-radius: var(--radius);
+        color: var(--text);
+        font-size: 14px;
+        font-family: inherit;
+        padding: 11px 14px;
+        outline: none;
+        transition: border-color .2s, box-shadow .2s, background .2s;
+        width: 100%;
+    }
+
+        .lc-input:hover, .lc-textarea:hover {
+            border-color: rgba(255,255,255,.15);
+            background: rgba(255,255,255,.03);
+        }
+
+        .lc-input:focus, .lc-textarea:focus {
+            border-color: var(--accent);
+            box-shadow: 0 0 0 3px var(--accent-dim);
+            background: rgba(232,255,71,.04);
+        }
+
+        .lc-input::placeholder, .lc-textarea::placeholder {
+            color: var(--text-muted);
+        }
+
+    .lc-textarea {
+        resize: vertical;
+        min-height: 90px;
+        line-height: 1.6;
+    }
+
+    .lc-input-wrap {
+        position: relative;
+    }
+
+        .lc-input-wrap .lc-input {
+            padding-left: 40px;
+        }
+
+    .lc-input-prefix {
+        position: absolute;
+        left: 13px;
+        top: 50%;
+        transform: translateY(-50%);
+        font-size: 15px;
+        pointer-events: none;
+        color: var(--text-muted);
+    }
+
+    .lc-input.input-error, .lc-textarea.input-error {
+        border-color: rgba(255,82,89,.5);
+        box-shadow: 0 0 0 3px rgba(255,82,89,.1);
+    }
+
+    .lc-val-msg {
+        font-size: 11px;
+        color: var(--danger);
+        display: flex;
+        align-items: center;
+        gap: 4px;
+    }
+
+    .lc-hint {
+        font-size: 11px;
+        color: var(--text-muted);
+        line-height: 1.5;
+    }
+
+    .lc-divider {
+        border: none;
+        border-top: 1px solid var(--border);
+        margin: 0;
+    }
+
+    .lc-preview-wrap {
+        padding: 20px 24px 24px;
+    }
+
+    .lc-preview-label {
+        font-size: 11px;
+        font-weight: 600;
+        color: var(--text-muted);
+        text-transform: uppercase;
+        letter-spacing: .04em;
+        margin-bottom: 12px;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+    }
+
+    .lc-preview-card {
+        background: var(--bg-dark3);
+        border: 1px solid var(--border);
+        border-radius: var(--radius);
+        padding: 14px 16px;
+        display: flex;
+        align-items: center;
+        gap: 14px;
+        transition: all .3s;
+    }
+
+    .lc-preview-avatar {
+        width: 44px;
+        height: 44px;
+        border-radius: 11px;
+        background: var(--accent-dim);
+        border: 1px solid rgba(232,255,71,.2);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 20px;
+        font-weight: 700;
+        color: var(--accent);
+        font-family: 'Syne', sans-serif;
+        flex-shrink: 0;
+        transition: all .3s;
+    }
+
+    .lc-preview-info {
+        flex: 1;
+        min-width: 0;
+    }
+
+    .lc-preview-name {
+        font-family: 'Syne', sans-serif;
+        font-size: 14px;
+        font-weight: 700;
+        color: var(--text);
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        transition: all .2s;
+    }
+
+    .lc-preview-meta {
+        font-size: 12px;
+        color: var(--text-muted);
+        margin-top: 3px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    .lc-preview-city {
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+        background: var(--accent2-dim);
+        border: 1px solid rgba(79,141,255,.2);
+        border-radius: 6px;
+        padding: 3px 9px;
+        font-size: 11px;
+        font-weight: 600;
+        color: var(--accent2);
+        white-space: nowrap;
+    }
+
+    .lc-actions {
+        display: flex;
+        align-items: center;
+        justify-content: flex-end;
+        gap: 10px;
+        padding: 20px 24px;
+        border-top: 1px solid var(--border);
+        background: var(--bg-dark3);
+    }
+
+    .btn-accent {
+        background: var(--accent);
+        color: #0d0f14;
+        border: none;
+        border-radius: 10px;
+        padding: 10px 22px;
+        font-size: 13px;
+        font-weight: 600;
+        font-family: inherit;
+        cursor: pointer;
+        display: inline-flex;
+        align-items: center;
+        gap: 7px;
+        text-decoration: none;
+        transition: opacity .2s;
+    }
+
+        .btn-accent:hover {
+            opacity: .85;
+        }
+
+    .btn-ghost {
+        background: transparent;
+        color: var(--text-muted);
+        border: 1px solid var(--border);
+        border-radius: 10px;
+        padding: 10px 18px;
+        font-size: 13px;
+        font-weight: 600;
+        font-family: inherit;
+        cursor: pointer;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 7px;
+        transition: all .2s;
+    }
+
+        .btn-ghost:hover {
+            background: var(--bg-dark3);
+            color: var(--text);
+            border-color: rgba(255,255,255,.15);
+        }
+
+    .lc-val-summary {
+        background: rgba(255,82,89,.08);
+        border: 1px solid rgba(255,82,89,.2);
+        border-radius: var(--radius);
+        padding: 12px 16px;
+        margin-bottom: 20px;
+        display: none;
+    }
+
+        .lc-val-summary.show {
+            display: block;
+        }
+
+    .lc-val-summary-title {
+        font-size: 13px;
+        font-weight: 600;
+        color: var(--danger);
+        margin-bottom: 6px;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+    }
+
+    .lc-val-summary ul {
+        padding-left: 16px;
+    }
+
+    .lc-val-summary li {
+        font-size: 12px;
+        color: var(--text-muted);
+        margin-top: 3px;
+    }
+</style>
+
+<div class="lc-root">
+
+    <div class="lc-breadcrumb">
+        <a asp-controller="Location" asp-action="LocationList">Location Management</a>
+        <span>›</span>
+        <span>Add New Location</span>
+    </div>
+
+    <div class="lc-page-header">
+        <div class="lc-header-icon">📍</div>
+        <div>
+            <h1 class="lc-page-title">Add New Location</h1>
+            <p class="lc-page-subtitle">Define a new branch or delivery point in the system.</p>
+        </div>
+    </div>
+
+    <form  method="post" id="lcForm" novalidate>
+        @Html.AntiForgeryToken()
+
+        <div class="lc-val-summary" id="lcValSummary">
+            <div class="lc-val-summary-title">⚠️ Please fix the following errors</div>
+            <ul id="lcValList"></ul>
+        </div>
+
+        <div class="lc-card">
+
+            <div class="lc-section-header">
+                <div class="lc-section-icon yellow">📋</div>
+                <div>
+                    <div class="lc-section-title">Basic Information</div>
+                    <div class="lc-section-desc">Location name and authorized person details</div>
+                </div>
+            </div>
+
+            <div class="lc-form-body">
+                <div class="lc-field-grid">
+
+                    <div class="lc-field full">
+                        <label class="lc-label" for="LocationName">
+                            📍 Location Name <span class="lc-required">*</span>
+                        </label>
+                        <div class="lc-input-wrap">
+                            <span class="lc-input-prefix">🏢</span>
+                            <input asp-for="LocationName"
+                                   class="lc-input"
+                                   id="LocationName"
+                                   placeholder="e.g. Airport Terminal Branch"
+                                   autocomplete="off"
+                                   oninput="lcUpdatePreview()" />
+                        </div>
+                        <span asp-validation-for="LocationName" class="lc-val-msg"></span>
+                        <span class="lc-hint">Enter the official location name customers will see.</span>
+                    </div>
+
+                    <div class="lc-field full">
+                        <label class="lc-label" for="AuthorizedPerson">
+                            👤 Authorized Person <span class="lc-required">*</span>
+                        </label>
+                        <div class="lc-input-wrap">
+                            <span class="lc-input-prefix">👤</span>
+                            <input asp-for="AuthorizedPerson"
+                                   class="lc-input"
+                                   id="AuthorizedPerson"
+                                   placeholder="e.g. John Smith"
+                                   autocomplete="off"
+                                   oninput="lcUpdatePreview()" />
+                        </div>
+                        <span asp-validation-for="AuthorizedPerson" class="lc-val-msg"></span>
+                    </div>
+
+                </div>
+            </div>
+
+            <hr class="lc-divider" />
+
+            <div class="lc-section-header">
+                <div class="lc-section-icon blue">🏙️</div>
+                <div>
+                    <div class="lc-section-title">Location Details</div>
+                    <div class="lc-section-desc">City and address information</div>
+                </div>
+            </div>
+
+            <div class="lc-form-body">
+                <div class="lc-field-grid">
+
+                    <div class="lc-field full">
+                        <label class="lc-label" for="City">
+                            🏙️ City <span class="lc-required">*</span>
+                        </label>
+                        <div class="lc-input-wrap">
+                            <span class="lc-input-prefix">🗺️</span>
+                            <input asp-for="City"
+                                   class="lc-input"
+                                   id="City"
+                                   placeholder="e.g. Istanbul"
+                                   autocomplete="off"
+                                   oninput="lcUpdatePreview()" />
+                        </div>
+                        <span asp-validation-for="City" class="lc-val-msg"></span>
+                    </div>
+
+                    <div class="lc-field full">
+                        <label class="lc-label" for="Address">
+                            📋 Address <span class="lc-required">*</span>
+                        </label>
+                        <textarea asp-for="Address"
+                                  class="lc-textarea"
+                                  id="Address"
+                                  placeholder="e.g. Terminal 1, Floor 2, Gate A, Bakirkoy"
+                                  oninput="lcUpdatePreview()"></textarea>
+                        <span asp-validation-for="Address" class="lc-val-msg"></span>
+                        <span class="lc-hint">Enter the full address including district, street and building number.</span>
+                    </div>
+
+                </div>
+            </div>
+
+            <hr class="lc-divider" />
+
+            <div class="lc-section-header">
+                <div class="lc-section-icon orange">👁️</div>
+                <div>
+                    <div class="lc-section-title">Live Preview</div>
+                    <div class="lc-section-desc">This is how the location card will appear in the list</div>
+                </div>
+            </div>
+
+            <div class="lc-preview-wrap">
+                <div class="lc-preview-card" id="lcPreviewCard">
+                    <div class="lc-preview-avatar" id="lcPreviewAvatar">?</div>
+                    <div class="lc-preview-info">
+                        <div class="lc-preview-name" id="lcPreviewName">No location name entered</div>
+                        <div class="lc-preview-meta" id="lcPreviewMeta">No authorized person entered · No address entered</div>
+                    </div>
+                    <div class="lc-preview-city" id="lcPreviewCity">🏙️ —</div>
+                </div>
+            </div>
+
+            <div class="lc-actions">
+                <a asp-controller="Location" asp-action="LocationList" class="btn-ghost">
+                    ✕ Cancel
+                </a>
+                <button type="submit" class="btn-accent" id="lcSubmitBtn">
+                    ＋ Save Location
+                </button>
+            </div>
+
+        </div>
+    </form>
+
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+
+    <script>
+        function lcUpdatePreview() {
+            var name = document.getElementById('LocationName').value.trim();
+            var person = document.getElementById('AuthorizedPerson').value.trim();
+            var city = document.getElementById('City').value.trim();
+            var address = document.getElementById('Address').value.trim();
+
+            var initial = name ? name.charAt(0).toUpperCase() : '?';
+            document.getElementById('lcPreviewAvatar').textContent = initial;
+
+            document.getElementById('lcPreviewName').textContent =
+                name || 'No location name entered';
+
+            var meta = [];
+            if (person) meta.push(person);
+            if (address) meta.push(address);
+            document.getElementById('lcPreviewMeta').textContent =
+                meta.length ? meta.join(' · ') : 'No authorized person entered · No address entered';
+
+            document.getElementById('lcPreviewCity').textContent =
+                '🏙️ ' + (city || '—');
+        }
+
+        document.getElementById('lcForm').addEventListener('submit', function(e) {
+            var errors = [];
+            var fields = [
+                { id: 'LocationName', label: 'Location Name' },
+                { id: 'AuthorizedPerson', label: 'Authorized Person' },
+                { id: 'City', label: 'City' },
+                { id: 'Address', label: 'Address' }
+            ];
+
+            fields.forEach(function(f) {
+                var el = document.getElementById(f.id);
+                if (!el.value.trim()) {
+                    errors.push(f.label + ' is required.');
+                    el.classList.add('input-error');
+                    el.addEventListener('input', function() {
+                        el.classList.remove('input-error');
+                    }, { once: true });
+                }
+            });
+
+            var summary = document.getElementById('lcValSummary');
+            var list = document.getElementById('lcValList');
+
+            if (errors.length) {
+                e.preventDefault();
+                list.innerHTML = errors.map(function(err) {
+                    return '<li>' + err + '</li>';
+                }).join('');
+                summary.classList.add('show');
+                summary.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            } else {
+                summary.classList.remove('show');
+                var btn = document.getElementById('lcSubmitBtn');
+                btn.disabled = true;
+                btn.textContent = '⏳ Saving...';
+            }
+        });
+
+        lcUpdatePreview();
+    </script>
+}

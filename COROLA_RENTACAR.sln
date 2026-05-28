@@ -1,0 +1,49 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.14.36429.23
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "COROLA_RENTACAR.EntityLayer", "COROLA_RENTACAR.EntityLayer\COROLA_RENTACAR.EntityLayer.csproj", "{43A99C50-819E-4181-8D7C-67D6DF6F0B1B}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "COROLA_RENTACAR.DataAccessLayer", "COROLA_RENTACAR.DataAccessLayer\COROLA_RENTACAR.DataAccessLayer.csproj", "{63EA8C53-0FEA-48BA-9FD5-9E34F50F6B41}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "COROLA_RENTACAR.BusinessLayer", "COROLA_RENTACAR.BusinessLayer\COROLA_RENTACAR.BusinessLayer.csproj", "{05F84A6B-8507-47F4-B43D-7E021756C764}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "COROLA_RENTACAR.WebUI", "COROLA_RENTACAR.WebUI\COROLA_RENTACAR.WebUI.csproj", "{1A936103-404A-4971-B326-BD717AFAB338}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CorolaDtoLayer", "CorolaDtoLayer\CorolaDtoLayer.csproj", "{6206D5A9-63F9-4F46-99A8-399C2566D3C8}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{43A99C50-819E-4181-8D7C-67D6DF6F0B1B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{43A99C50-819E-4181-8D7C-67D6DF6F0B1B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{43A99C50-819E-4181-8D7C-67D6DF6F0B1B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{43A99C50-819E-4181-8D7C-67D6DF6F0B1B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{63EA8C53-0FEA-48BA-9FD5-9E34F50F6B41}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{63EA8C53-0FEA-48BA-9FD5-9E34F50F6B41}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{63EA8C53-0FEA-48BA-9FD5-9E34F50F6B41}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{63EA8C53-0FEA-48BA-9FD5-9E34F50F6B41}.Release|Any CPU.Build.0 = Release|Any CPU
+		{05F84A6B-8507-47F4-B43D-7E021756C764}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{05F84A6B-8507-47F4-B43D-7E021756C764}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{05F84A6B-8507-47F4-B43D-7E021756C764}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{05F84A6B-8507-47F4-B43D-7E021756C764}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1A936103-404A-4971-B326-BD717AFAB338}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1A936103-404A-4971-B326-BD717AFAB338}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1A936103-404A-4971-B326-BD717AFAB338}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1A936103-404A-4971-B326-BD717AFAB338}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6206D5A9-63F9-4F46-99A8-399C2566D3C8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6206D5A9-63F9-4F46-99A8-399C2566D3C8}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6206D5A9-63F9-4F46-99A8-399C2566D3C8}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6206D5A9-63F9-4F46-99A8-399C2566D3C8}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {46124AC1-457D-4A80-8379-24B74D860963}
+	EndGlobalSection
+EndGlobal

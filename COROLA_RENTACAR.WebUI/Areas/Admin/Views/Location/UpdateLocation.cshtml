@@ -1,0 +1,263 @@
+﻿@model COROLA_RENTACAR.EntityLayer.Entities.Location
+
+@{
+    ViewData["Title"] = "Update Location";
+    Layout = "~/Views/AdminLayout/Index.cshtml";
+}
+
+<style>
+    .location-form-root {
+        padding: 28px;
+        color: #e2e8f0;
+        font-family: 'DM Sans', 'Segoe UI', sans-serif;
+    }
+
+    .location-breadcrumb {
+        font-size: 12px;
+        color: #7a8499;
+        margin-bottom: 8px;
+    }
+
+        .location-breadcrumb a {
+            color: #7a8499;
+            text-decoration: none;
+        }
+
+            .location-breadcrumb a:hover {
+                color: #e8ff47;
+            }
+
+    .location-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-end;
+        gap: 16px;
+        margin-bottom: 24px;
+        flex-wrap: wrap;
+    }
+
+    .location-title {
+        font-size: 26px;
+        font-weight: 800;
+        margin: 0;
+    }
+
+    .location-subtitle {
+        color: #7a8499;
+        font-size: 13px;
+        margin-top: 6px;
+    }
+
+    .location-card {
+        background: #13161e;
+        border: 1px solid rgba(255,255,255,.07);
+        border-radius: 16px;
+        max-width: 820px;
+        overflow: hidden;
+    }
+
+    .location-card-header {
+        padding: 18px;
+        border-bottom: 1px solid rgba(255,255,255,.07);
+        font-weight: 800;
+    }
+
+    .location-card-body {
+        padding: 18px;
+    }
+
+    .location-grid {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 16px;
+    }
+
+    .location-field {
+        margin-bottom: 16px;
+    }
+
+        .location-field.full {
+            grid-column: 1 / -1;
+        }
+
+        .location-field label {
+            display: block;
+            font-size: 13px;
+            font-weight: 700;
+            margin-bottom: 7px;
+        }
+
+        .location-field input,
+        .location-field textarea {
+            width: 100%;
+            background: #1a1e2a;
+            border: 1px solid rgba(255,255,255,.07);
+            border-radius: 10px;
+            color: #e2e8f0;
+            padding: 11px 13px;
+            outline: none;
+            resize: vertical;
+        }
+
+            .location-field input:focus,
+            .location-field textarea:focus {
+                border-color: #e8ff47;
+                box-shadow: 0 0 0 3px rgba(232,255,71,.12);
+            }
+
+    .location-required {
+        color: #ff5259;
+    }
+
+    .location-validation {
+        background: rgba(255,82,89,.1);
+        border: 1px solid rgba(255,82,89,.25);
+        color: #ff5259;
+        border-radius: 10px;
+        padding: 12px 14px;
+        margin-bottom: 16px;
+        font-size: 13px;
+    }
+
+    .btn-accent,
+    .btn-outline {
+        border-radius: 10px;
+        padding: 10px 16px;
+        font-size: 13px;
+        font-weight: 800;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 7px;
+        cursor: pointer;
+    }
+
+    .btn-accent {
+        background: #e8ff47;
+        color: #0d0f14;
+        border: none;
+    }
+
+    .btn-outline {
+        background: #1a1e2a;
+        color: #e2e8f0;
+        border: 1px solid rgba(255,255,255,.07);
+    }
+
+    .location-actions {
+        display: flex;
+        gap: 10px;
+        justify-content: flex-end;
+        margin-top: 20px;
+    }
+
+    @@media(max-width: 800px) {
+        .location-grid {
+            grid-template-columns: 1fr;
+        }
+    }
+</style>
+
+<div class="location-form-root">
+
+    <div class="location-breadcrumb">
+        Vehicle Management ›
+        <a href="/Admin/Location/LocationList">Location List</a>
+        › Update Location
+    </div>
+
+    <div class="location-header">
+        <div>
+            <h1 class="location-title">Update Location</h1>
+            <p class="location-subtitle">Edit the selected pickup and return location.</p>
+        </div>
+
+        <a href="/Admin/Location/LocationList" class="btn-outline">✕ Cancel</a>
+    </div>
+
+    @if (!ViewData.ModelState.IsValid)
+    {
+        <div class="location-validation">
+            <div asp-validation-summary="All"></div>
+        </div>
+    }
+
+    <form id="locationForm" action="/Admin/Location/UpdateLocation" method="post" novalidate>
+        @Html.AntiForgeryToken()
+
+        <input type="hidden" name="LocationId" value="@Model.LocationId" />
+
+        <div class="location-card">
+            <div class="location-card-header">
+                📍 Location Information
+            </div>
+
+            <div class="location-card-body">
+                <div class="location-grid">
+                    <div class="location-field">
+                        <label>Location Name <span class="location-required">*</span></label>
+                        <input type="text"
+                               id="locationName"
+                               name="LocationName"
+                               value="@Model.LocationName"
+                               placeholder="e.g. Sabiha Gokcen Airport Office"
+                               maxlength="100"
+                               autocomplete="off" />
+                    </div>
+
+                    <div class="location-field">
+                        <label>City <span class="location-required">*</span></label>
+                        <input type="text"
+                               id="city"
+                               name="City"
+                               value="@Model.City"
+                               placeholder="e.g. Istanbul"
+                               maxlength="50"
+                               autocomplete="off" />
+                    </div>
+
+                    <div class="location-field">
+                        <label>Authorized Person <span class="location-required">*</span></label>
+                        <input type="text"
+                               id="authorizedPerson"
+                               name="AuthorizedPerson"
+                               value="@Model.AuthorizedPerson"
+                               placeholder="e.g. John Carter"
+                               maxlength="80"
+                               autocomplete="off" />
+                    </div>
+
+                    <div class="location-field full">
+                        <label>Address <span class="location-required">*</span></label>
+                        <textarea id="address"
+                                  name="Address"
+                                  rows="4"
+                                  maxlength="250"
+                                  placeholder="Full office address">@Model.Address</textarea>
+                    </div>
+                </div>
+
+                <div class="location-actions">
+                    <a href="/Admin/Location/LocationList" class="btn-outline">Cancel</a>
+                    <button type="button" class="btn-accent" onclick="submitLocationForm()">💾 Save Changes</button>
+                </div>
+            </div>
+        </div>
+    </form>
+</div>
+
+<script>
+    function submitLocationForm() {
+        const locationName = document.getElementById('locationName').value.trim();
+        const city = document.getElementById('city').value.trim();
+        const authorizedPerson = document.getElementById('authorizedPerson').value.trim();
+        const address = document.getElementById('address').value.trim();
+
+        if (!locationName || !city || !authorizedPerson || !address) {
+            alert("All required fields must be filled.");
+            return;
+        }
+
+        document.getElementById('locationForm').submit();
+    }
+</script>

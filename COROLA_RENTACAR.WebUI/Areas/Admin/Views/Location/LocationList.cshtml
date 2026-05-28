@@ -1,0 +1,412 @@
+﻿@model List<COROLA_RENTACAR.EntityLayer.Entities.Location>
+
+@{
+    ViewData["Title"] = "Location List";
+    Layout = "~/Views/AdminLayout/Index.cshtml";
+
+    var totalCount = Model?.Count ?? 0;
+    var cityCount = Model?.Select(x => x.City).Distinct().Count() ?? 0;
+}
+
+<style>
+    .loc-root {
+        padding: 28px;
+        color: #e2e8f0;
+        font-family: 'DM Sans', 'Segoe UI', sans-serif;
+    }
+
+    .loc-breadcrumb {
+        font-size: 12px;
+        color: #7a8499;
+        margin-bottom: 8px;
+    }
+
+    .loc-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-end;
+        gap: 16px;
+        margin-bottom: 24px;
+        flex-wrap: wrap;
+    }
+
+    .loc-title {
+        font-size: 26px;
+        font-weight: 800;
+        margin: 0;
+        color: #e2e8f0;
+    }
+
+    .loc-subtitle {
+        color: #7a8499;
+        font-size: 13px;
+        margin-top: 6px;
+    }
+
+    .btn-accent {
+        background: #e8ff47;
+        color: #0d0f14;
+        border: none;
+        border-radius: 10px;
+        padding: 10px 16px;
+        font-size: 13px;
+        font-weight: 800;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 7px;
+        cursor: pointer;
+    }
+
+    .btn-edit {
+        background: rgba(79,141,255,.12);
+        color: #4f8dff;
+        border: 1px solid rgba(79,141,255,.25);
+        border-radius: 8px;
+        padding: 7px 12px;
+        font-size: 12px;
+        font-weight: 700;
+        text-decoration: none;
+    }
+
+    .btn-danger {
+        background: rgba(255,82,89,.1);
+        color: #ff5259;
+        border: 1px solid rgba(255,82,89,.2);
+        border-radius: 8px;
+        padding: 7px 12px;
+        font-size: 12px;
+        font-weight: 700;
+        cursor: pointer;
+    }
+
+    .loc-stats {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(220px, 300px));
+        gap: 14px;
+        margin-bottom: 20px;
+    }
+
+    .loc-stat {
+        background: #13161e;
+        border: 1px solid rgba(255,255,255,.07);
+        border-radius: 14px;
+        padding: 18px;
+        display: flex;
+        align-items: center;
+        gap: 14px;
+    }
+
+    .loc-stat-icon {
+        width: 42px;
+        height: 42px;
+        border-radius: 12px;
+        background: rgba(232,255,71,.12);
+        color: #e8ff47;
+        display: grid;
+        place-items: center;
+        font-size: 20px;
+    }
+
+    .loc-stat-num {
+        font-size: 24px;
+        font-weight: 800;
+        line-height: 1;
+    }
+
+    .loc-stat-label {
+        color: #7a8499;
+        font-size: 12px;
+        margin-top: 4px;
+    }
+
+    .loc-toolbar {
+        display: flex;
+        gap: 12px;
+        margin-bottom: 18px;
+        flex-wrap: wrap;
+    }
+
+    .loc-search {
+        min-width: 240px;
+        max-width: 420px;
+        flex: 1;
+        background: #13161e;
+        border: 1px solid rgba(255,255,255,.07);
+        border-radius: 10px;
+        color: #e2e8f0;
+        padding: 11px 13px;
+        outline: none;
+    }
+
+    .loc-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(310px, 1fr));
+        gap: 16px;
+    }
+
+    .loc-card {
+        background: #13161e;
+        border: 1px solid rgba(255,255,255,.07);
+        border-radius: 18px;
+        padding: 18px;
+    }
+
+    .loc-card-top {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 14px;
+    }
+
+    .loc-id {
+        color: #7a8499;
+        font-size: 12px;
+        background: #1a1e2a;
+        padding: 4px 9px;
+        border-radius: 7px;
+    }
+
+    .loc-city {
+        color: #e8ff47;
+        background: rgba(232,255,71,.12);
+        border: 1px solid rgba(232,255,71,.22);
+        padding: 4px 9px;
+        border-radius: 7px;
+        font-size: 12px;
+        font-weight: 800;
+    }
+
+    .loc-icon {
+        width: 50px;
+        height: 50px;
+        border-radius: 14px;
+        background: rgba(79,141,255,.12);
+        color: #4f8dff;
+        display: grid;
+        place-items: center;
+        font-size: 22px;
+        margin-bottom: 12px;
+    }
+
+    .loc-name {
+        font-size: 18px;
+        font-weight: 800;
+        margin-bottom: 6px;
+    }
+
+    .loc-info {
+        color: #7a8499;
+        font-size: 13px;
+        line-height: 1.6;
+        margin-bottom: 14px;
+    }
+
+    .loc-info strong {
+        color: #e2e8f0;
+        font-weight: 700;
+    }
+
+    .loc-actions {
+        display: flex;
+        gap: 8px;
+    }
+
+    .loc-empty {
+        grid-column: 1 / -1;
+        text-align: center;
+        color: #7a8499;
+        padding: 60px 20px;
+    }
+
+    .loc-modal-backdrop {
+        display: none;
+        position: fixed;
+        inset: 0;
+        background: rgba(0,0,0,.7);
+        z-index: 5000;
+        align-items: center;
+        justify-content: center;
+        backdrop-filter: blur(4px);
+    }
+
+    .loc-modal-backdrop.open {
+        display: flex;
+    }
+
+    .loc-modal {
+        background: #13161e;
+        border: 1px solid rgba(255,255,255,.07);
+        border-radius: 18px;
+        padding: 28px;
+        width: 100%;
+        max-width: 390px;
+        text-align: center;
+    }
+
+    .loc-modal-title {
+        font-size: 18px;
+        font-weight: 800;
+        margin-bottom: 10px;
+    }
+
+    .loc-modal-msg {
+        color: #7a8499;
+        font-size: 13px;
+        line-height: 1.6;
+        margin-bottom: 20px;
+    }
+
+    .loc-modal-actions {
+        display: flex;
+        justify-content: center;
+        gap: 10px;
+    }
+
+    @@media(max-width: 700px) {
+        .loc-stats {
+            grid-template-columns: 1fr;
+        }
+    }
+</style>
+
+<div class="loc-root">
+
+    <div class="loc-breadcrumb">
+        Vehicle Management › Location List
+    </div>
+
+    <div class="loc-header">
+        <div>
+            <h1 class="loc-title">Location Management</h1>
+            <p class="loc-subtitle">View and manage pickup and return locations.</p>
+        </div>
+
+        <a href="/Admin/Location/CreateLocation" class="btn-accent">
+            ＋ Add New Location
+        </a>
+    </div>
+
+    <div class="loc-stats">
+        <div class="loc-stat">
+            <div class="loc-stat-icon">📍</div>
+            <div>
+                <div class="loc-stat-num">@totalCount</div>
+                <div class="loc-stat-label">Total Locations</div>
+            </div>
+        </div>
+
+        <div class="loc-stat">
+            <div class="loc-stat-icon">🏙️</div>
+            <div>
+                <div class="loc-stat-num">@cityCount</div>
+                <div class="loc-stat-label">Covered Cities</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="loc-toolbar">
+        <input type="text" id="locSearch" class="loc-search" placeholder="Search location, city, address..." oninput="renderLocations()" />
+    </div>
+
+    <div class="loc-grid" id="locGrid"></div>
+
+</div>
+
+<div class="loc-modal-backdrop" id="locDeleteModal">
+    <div class="loc-modal">
+        <div style="font-size:38px;margin-bottom:10px;">🗑️</div>
+        <div class="loc-modal-title">Delete Location</div>
+        <p class="loc-modal-msg" id="locDeleteMessage"></p>
+
+        <div class="loc-modal-actions">
+            <button type="button" class="btn-accent" onclick="closeDeleteModal()" style="background:#1a1e2a;color:#e2e8f0;border:1px solid rgba(255,255,255,.07);">
+                Cancel
+            </button>
+
+            <form id="locDeleteForm" method="post" action="">
+                @Html.AntiForgeryToken()
+                <button type="submit" class="btn-danger">Yes, Delete</button>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+    const LOCATION_DATA = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.Select(x => new {
+        x.LocationId,
+        x.LocationName,
+        x.City,
+        x.Address,
+        x.AuthorizedPerson
+    })));
+
+    function renderLocations() {
+        const q = document.getElementById('locSearch').value.toLowerCase();
+        const grid = document.getElementById('locGrid');
+
+        const items = LOCATION_DATA.filter(x => {
+            const text = `${x.LocationName || ''} ${x.City || ''} ${x.Address || ''} ${x.AuthorizedPerson || ''}`.toLowerCase();
+            return text.includes(q);
+        });
+
+        if (items.length === 0) {
+            grid.innerHTML = `
+                <div class="loc-empty">
+                    <div style="font-size:42px;">🔍</div>
+                    <p>No locations found.</p>
+                </div>`;
+            return;
+        }
+
+        grid.innerHTML = items.map(location => `
+            <div class="loc-card">
+                <div class="loc-card-top">
+                    <span class="loc-id">#${location.LocationId}</span>
+                    <span class="loc-city">${escapeHtml(location.City)}</span>
+                </div>
+
+                <div class="loc-icon">📍</div>
+
+                <div class="loc-name">${escapeHtml(location.LocationName)}</div>
+
+                <div class="loc-info">
+                    <div><strong>Address:</strong> ${escapeHtml(location.Address)}</div>
+                    <div><strong>Authorized Person:</strong> ${escapeHtml(location.AuthorizedPerson)}</div>
+                </div>
+
+                <div class="loc-actions">
+                    <a href="/Admin/Location/UpdateLocation?id=${location.LocationId}" class="btn-edit">✏️ Edit</a>
+                    <button type="button" class="btn-danger" onclick='openDeleteModal(${location.LocationId}, ${JSON.stringify(location.LocationName)})'>
+                        🗑️ Delete
+                    </button>
+                </div>
+            </div>
+        `).join('');
+    }
+
+    function openDeleteModal(id, name) {
+        document.getElementById('locDeleteMessage').innerHTML =
+            `<strong>${escapeHtml(name)}</strong> will be permanently deleted.<br />This action cannot be undone.`;
+
+        document.getElementById('locDeleteForm').action = `/Admin/Location/DeleteLocation?id=${id}`;
+        document.getElementById('locDeleteModal').classList.add('open');
+    }
+
+    function closeDeleteModal() {
+        document.getElementById('locDeleteModal').classList.remove('open');
+    }
+
+    function escapeHtml(value) {
+        if (!value) return '';
+
+        return String(value)
+            .replace(/&/g, '&amp;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;')
+            .replace(/"/g, '&quot;')
+            .replace(/'/g, '&#x27;');
+    }
+
+    renderLocations();
+</script>

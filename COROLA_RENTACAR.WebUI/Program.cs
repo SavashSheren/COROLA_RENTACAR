@@ -32,6 +32,7 @@ builder.Services.AddAutoMapper(typeof(GenericMapping));
 
 builder.Services.AddScoped<IValidator<Brand>, BrandValidator>();
 builder.Services.AddScoped<IValidator<Category>, CategoryValidator>();
+builder.Services.AddScoped<IValidator<Location>, LocationValidator>();
 
 builder.Services.AddControllersWithViews();
 

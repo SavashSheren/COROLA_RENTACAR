@@ -3,6 +3,7 @@ using COROLA_RENTACAR.DataAccessLayer.Abstract;
 using CorolaDtoLayer.Dto.CostumerDto;
 using AutoMapper;
 using COROLA_RENTACAR.EntityLayer.Entities;
+using CorolaDtoLayer.Dto.CostomerDto;
 
 namespace COROLA_RENTACAR.BusinessLayer.Concrete
 {
@@ -41,10 +42,10 @@ namespace COROLA_RENTACAR.BusinessLayer.Concrete
             await _customerDal.UpdateAsync(value);
         }
 
-        public async Task<GetCostumerByIdDto> GetCustomerByIdAsync(int id)
+        public async Task<GetCostomerByIdDto> GetCustomerByIdAsync(int id)
         {
             var values = await _customerDal.GetByIdAsync(id);
-            return _mapper.Map<GetCostumerByIdDto>(values);
+            return _mapper.Map<GetCostomerByIdDto>(values);
         }
     }
 }

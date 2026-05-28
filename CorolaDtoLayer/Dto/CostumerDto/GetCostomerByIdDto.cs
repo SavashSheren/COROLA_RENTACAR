@@ -4,9 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace CorolaDtoLayer.Dto.CostumerDto
+namespace CorolaDtoLayer.Dto.CostomerDto
 {
-    public class GetCostumerByIdDto
+    public class GetCostomerByIdDto
     {
         public int CustomerId { get; set; }
         public string FirstName { get; set; }

@@ -1,10 +1,5 @@
 ﻿using COROLA_RENTACAR.EntityLayer.Entities;
 using FluentValidation;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace COROLA_RENTACAR.BusinessLayer.ValidationRules
 {
@@ -12,8 +7,10 @@ namespace COROLA_RENTACAR.BusinessLayer.ValidationRules
     {
         public CategoryValidator()
         {
-            RuleFor(x => x.CategoryName).NotEmpty().WithMessage("Category Name Cannot Be Empty");
-            RuleFor(x => x.CategoryName).MinimumLength(2).WithMessage("Please Min. 2 Character ").MaximumLength(20).WithMessage("Max. 20 Character");
+            RuleFor(x => x.CategoryName)
+                .NotEmpty().WithMessage("Category name cannot be empty.")
+                .MinimumLength(2).WithMessage("Category name must be at least 2 characters long.")
+                .MaximumLength(50).WithMessage("Category name can be at most 50 characters.");
         }
     }
 }

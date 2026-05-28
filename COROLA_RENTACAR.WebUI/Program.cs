@@ -31,6 +31,7 @@ builder.Services.AddScoped<ICustomerDal, EfCustomerDal>();
 builder.Services.AddAutoMapper(typeof(GenericMapping));
 
 builder.Services.AddScoped<IValidator<Brand>, BrandValidator>();
+builder.Services.AddScoped<IValidator<Category>, CategoryValidator>();
 
 builder.Services.AddControllersWithViews();
 

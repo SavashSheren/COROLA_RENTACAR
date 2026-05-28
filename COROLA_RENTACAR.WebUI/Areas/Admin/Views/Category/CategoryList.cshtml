@@ -1,0 +1,365 @@
+﻿@model List<COROLA_RENTACAR.EntityLayer.Entities.Category>
+
+@{
+    ViewData["Title"] = "Category List";
+    Layout = "~/Views/AdminLayout/Index.cshtml";
+
+    var totalCount = Model?.Count ?? 0;
+}
+
+<style>
+    .cat-root {
+        padding: 28px;
+        color: #e2e8f0;
+        font-family: 'DM Sans', 'Segoe UI', sans-serif;
+    }
+
+    .cat-breadcrumb {
+        font-size: 12px;
+        color: #7a8499;
+        margin-bottom: 8px;
+    }
+
+    .cat-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-end;
+        gap: 16px;
+        margin-bottom: 24px;
+        flex-wrap: wrap;
+    }
+
+    .cat-title {
+        font-size: 26px;
+        font-weight: 800;
+        margin: 0;
+        color: #e2e8f0;
+    }
+
+    .cat-subtitle {
+        color: #7a8499;
+        font-size: 13px;
+        margin-top: 6px;
+    }
+
+    .btn-accent {
+        background: #e8ff47;
+        color: #0d0f14;
+        border: none;
+        border-radius: 10px;
+        padding: 10px 16px;
+        font-size: 13px;
+        font-weight: 800;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 7px;
+        cursor: pointer;
+    }
+
+    .btn-edit {
+        background: rgba(79,141,255,.12);
+        color: #4f8dff;
+        border: 1px solid rgba(79,141,255,.25);
+        border-radius: 8px;
+        padding: 7px 12px;
+        font-size: 12px;
+        font-weight: 700;
+        text-decoration: none;
+    }
+
+    .btn-danger {
+        background: rgba(255,82,89,.1);
+        color: #ff5259;
+        border: 1px solid rgba(255,82,89,.2);
+        border-radius: 8px;
+        padding: 7px 12px;
+        font-size: 12px;
+        font-weight: 700;
+        cursor: pointer;
+    }
+
+    .cat-stat {
+        background: #13161e;
+        border: 1px solid rgba(255,255,255,.07);
+        border-radius: 14px;
+        padding: 18px;
+        margin-bottom: 20px;
+        display: flex;
+        align-items: center;
+        gap: 14px;
+        max-width: 300px;
+    }
+
+    .cat-stat-icon {
+        width: 42px;
+        height: 42px;
+        border-radius: 12px;
+        background: rgba(232,255,71,.12);
+        color: #e8ff47;
+        display: grid;
+        place-items: center;
+        font-size: 20px;
+    }
+
+    .cat-stat-num {
+        font-size: 24px;
+        font-weight: 800;
+        line-height: 1;
+    }
+
+    .cat-stat-label {
+        color: #7a8499;
+        font-size: 12px;
+        margin-top: 4px;
+    }
+
+    .cat-toolbar {
+        display: flex;
+        gap: 12px;
+        margin-bottom: 18px;
+        flex-wrap: wrap;
+    }
+
+    .cat-search {
+        min-width: 240px;
+        max-width: 360px;
+        flex: 1;
+        background: #13161e;
+        border: 1px solid rgba(255,255,255,.07);
+        border-radius: 10px;
+        color: #e2e8f0;
+        padding: 11px 13px;
+        outline: none;
+    }
+
+    .cat-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+        gap: 16px;
+    }
+
+    .cat-card {
+        background: #13161e;
+        border: 1px solid rgba(255,255,255,.07);
+        border-radius: 18px;
+        padding: 18px;
+    }
+
+    .cat-card-top {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 18px;
+    }
+
+    .cat-id {
+        color: #7a8499;
+        font-size: 12px;
+        background: #1a1e2a;
+        padding: 4px 9px;
+        border-radius: 7px;
+    }
+
+    .cat-icon {
+        width: 50px;
+        height: 50px;
+        border-radius: 14px;
+        background: rgba(232,255,71,.12);
+        color: #e8ff47;
+        display: grid;
+        place-items: center;
+        font-size: 22px;
+        margin-bottom: 12px;
+    }
+
+    .cat-name {
+        font-size: 18px;
+        font-weight: 800;
+        margin-bottom: 4px;
+    }
+
+    .cat-meta {
+        color: #7a8499;
+        font-size: 12px;
+        margin-bottom: 16px;
+    }
+
+    .cat-actions {
+        display: flex;
+        gap: 8px;
+    }
+
+    .cat-empty {
+        grid-column: 1 / -1;
+        text-align: center;
+        color: #7a8499;
+        padding: 60px 20px;
+    }
+
+    .cat-modal-backdrop {
+        display: none;
+        position: fixed;
+        inset: 0;
+        background: rgba(0,0,0,.7);
+        z-index: 5000;
+        align-items: center;
+        justify-content: center;
+        backdrop-filter: blur(4px);
+    }
+
+    .cat-modal-backdrop.open {
+        display: flex;
+    }
+
+    .cat-modal {
+        background: #13161e;
+        border: 1px solid rgba(255,255,255,.07);
+        border-radius: 18px;
+        padding: 28px;
+        width: 100%;
+        max-width: 380px;
+        text-align: center;
+    }
+
+    .cat-modal-title {
+        font-size: 18px;
+        font-weight: 800;
+        margin-bottom: 10px;
+    }
+
+    .cat-modal-msg {
+        color: #7a8499;
+        font-size: 13px;
+        line-height: 1.6;
+        margin-bottom: 20px;
+    }
+
+    .cat-modal-actions {
+        display: flex;
+        justify-content: center;
+        gap: 10px;
+    }
+</style>
+
+<div class="cat-root">
+
+    <div class="cat-breadcrumb">
+        Vehicle Management › Category List
+    </div>
+
+    <div class="cat-header">
+        <div>
+            <h1 class="cat-title">Category Management</h1>
+            <p class="cat-subtitle">View and manage vehicle categories in the system.</p>
+        </div>
+
+        <a href="/Admin/Category/CreateCategory" class="btn-accent">
+            ＋ Add New Category
+        </a>
+    </div>
+
+    <div class="cat-stat">
+        <div class="cat-stat-icon">📂</div>
+        <div>
+            <div class="cat-stat-num">@totalCount</div>
+            <div class="cat-stat-label">Total Categories</div>
+        </div>
+    </div>
+
+    <div class="cat-toolbar">
+        <input type="text" id="catSearch" class="cat-search" placeholder="Search category..." oninput="renderCategories()" />
+    </div>
+
+    <div class="cat-grid" id="catGrid"></div>
+
+</div>
+
+<div class="cat-modal-backdrop" id="catDeleteModal">
+    <div class="cat-modal">
+        <div style="font-size:38px;margin-bottom:10px;">🗑️</div>
+        <div class="cat-modal-title">Delete Category</div>
+        <p class="cat-modal-msg" id="catDeleteMessage"></p>
+
+        <div class="cat-modal-actions">
+            <button type="button" class="btn-accent" onclick="closeDeleteModal()" style="background:#1a1e2a;color:#e2e8f0;border:1px solid rgba(255,255,255,.07);">
+                Cancel
+            </button>
+
+            <form id="catDeleteForm" method="post" action="">
+                @Html.AntiForgeryToken()
+                <button type="submit" class="btn-danger">Yes, Delete</button>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+    const CATEGORY_DATA = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.Select(x => new {
+        x.CategoryId,
+        x.CategoryName
+    })));
+
+    function renderCategories() {
+        const q = document.getElementById('catSearch').value.toLowerCase();
+        const grid = document.getElementById('catGrid');
+
+        const items = CATEGORY_DATA.filter(x =>
+            (x.CategoryName || '').toLowerCase().includes(q)
+        );
+
+        if (items.length === 0) {
+            grid.innerHTML = `
+                <div class="cat-empty">
+                    <div style="font-size:42px;">🔍</div>
+                    <p>No categories found.</p>
+                </div>`;
+            return;
+        }
+
+        grid.innerHTML = items.map(category => `
+            <div class="cat-card">
+                <div class="cat-card-top">
+                    <span class="cat-id">#${category.CategoryId}</span>
+                </div>
+
+                <div class="cat-icon">📂</div>
+
+                <div class="cat-name">${escapeHtml(category.CategoryName)}</div>
+                <div class="cat-meta">Vehicle category record</div>
+
+                <div class="cat-actions">
+                    <a href="/Admin/Category/UpdateCategory?id=${category.CategoryId}" class="btn-edit">✏️ Edit</a>
+                    <button type="button" class="btn-danger" onclick='openDeleteModal(${category.CategoryId}, ${JSON.stringify(category.CategoryName)})'>
+                        🗑️ Delete
+                    </button>
+                </div>
+            </div>
+        `).join('');
+    }
+
+    function openDeleteModal(id, name) {
+        document.getElementById('catDeleteMessage').innerHTML =
+            `<strong>${escapeHtml(name)}</strong> will be permanently deleted.<br />This action cannot be undone.`;
+
+        document.getElementById('catDeleteForm').action = `/Admin/Category/DeleteCategory?id=${id}`;
+        document.getElementById('catDeleteModal').classList.add('open');
+    }
+
+    function closeDeleteModal() {
+        document.getElementById('catDeleteModal').classList.remove('open');
+    }
+
+    function escapeHtml(value) {
+        if (!value) return '';
+
+        return String(value)
+            .replace(/&/g, '&amp;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;')
+            .replace(/"/g, '&quot;')
+            .replace(/'/g, '&#x27;');
+    }
+
+    renderCategories();
+</script>

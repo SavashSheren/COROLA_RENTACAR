@@ -1,0 +1,208 @@
+﻿@model COROLA_RENTACAR.EntityLayer.Entities.Category
+
+@{
+    ViewData["Title"] = "Update Category";
+    Layout = "~/Views/AdminLayout/Index.cshtml";
+}
+
+<style>
+    .category-form-root {
+        padding: 28px;
+        color: #e2e8f0;
+        font-family: 'DM Sans', 'Segoe UI', sans-serif;
+    }
+
+    .category-breadcrumb {
+        font-size: 12px;
+        color: #7a8499;
+        margin-bottom: 8px;
+    }
+
+        .category-breadcrumb a {
+            color: #7a8499;
+            text-decoration: none;
+        }
+
+            .category-breadcrumb a:hover {
+                color: #e8ff47;
+            }
+
+    .category-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-end;
+        gap: 16px;
+        margin-bottom: 24px;
+        flex-wrap: wrap;
+    }
+
+    .category-title {
+        font-size: 26px;
+        font-weight: 800;
+        margin: 0;
+    }
+
+    .category-subtitle {
+        color: #7a8499;
+        font-size: 13px;
+        margin-top: 6px;
+    }
+
+    .category-card {
+        background: #13161e;
+        border: 1px solid rgba(255,255,255,.07);
+        border-radius: 16px;
+        max-width: 720px;
+        overflow: hidden;
+    }
+
+    .category-card-header {
+        padding: 18px;
+        border-bottom: 1px solid rgba(255,255,255,.07);
+        font-weight: 800;
+    }
+
+    .category-card-body {
+        padding: 18px;
+    }
+
+    .category-field {
+        margin-bottom: 16px;
+    }
+
+        .category-field label {
+            display: block;
+            font-size: 13px;
+            font-weight: 700;
+            margin-bottom: 7px;
+        }
+
+        .category-field input {
+            width: 100%;
+            background: #1a1e2a;
+            border: 1px solid rgba(255,255,255,.07);
+            border-radius: 10px;
+            color: #e2e8f0;
+            padding: 11px 13px;
+            outline: none;
+        }
+
+            .category-field input:focus {
+                border-color: #e8ff47;
+                box-shadow: 0 0 0 3px rgba(232,255,71,.12);
+            }
+
+    .category-required {
+        color: #ff5259;
+    }
+
+    .category-validation {
+        background: rgba(255,82,89,.1);
+        border: 1px solid rgba(255,82,89,.25);
+        color: #ff5259;
+        border-radius: 10px;
+        padding: 12px 14px;
+        margin-bottom: 16px;
+        font-size: 13px;
+    }
+
+    .btn-accent,
+    .btn-outline {
+        border-radius: 10px;
+        padding: 10px 16px;
+        font-size: 13px;
+        font-weight: 800;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 7px;
+        cursor: pointer;
+    }
+
+    .btn-accent {
+        background: #e8ff47;
+        color: #0d0f14;
+        border: none;
+    }
+
+    .btn-outline {
+        background: #1a1e2a;
+        color: #e2e8f0;
+        border: 1px solid rgba(255,255,255,.07);
+    }
+
+    .category-actions {
+        display: flex;
+        gap: 10px;
+        justify-content: flex-end;
+        margin-top: 20px;
+    }
+</style>
+
+<div class="category-form-root">
+
+    <div class="category-breadcrumb">
+        Vehicle Management ›
+        <a href="/Admin/Category/CategoryList">Category List</a>
+        › Update Category
+    </div>
+
+    <div class="category-header">
+        <div>
+            <h1 class="category-title">Update Category</h1>
+            <p class="category-subtitle">Edit the selected vehicle category.</p>
+        </div>
+
+        <a href="/Admin/Category/CategoryList" class="btn-outline">✕ Cancel</a>
+    </div>
+
+    @if (!ViewData.ModelState.IsValid)
+    {
+        <div class="category-validation">
+            <div asp-validation-summary="All"></div>
+        </div>
+    }
+
+    <form id="categoryForm" action="/Admin/Category/UpdateCategory" method="post" novalidate>
+        @Html.AntiForgeryToken()
+
+        <input type="hidden" name="CategoryId" value="@Model.CategoryId" />
+
+        <div class="category-card">
+            <div class="category-card-header">
+                📂 Category Information
+            </div>
+
+            <div class="category-card-body">
+                <div class="category-field">
+                    <label>Category Name <span class="category-required">*</span></label>
+                    <input type="text"
+                           id="categoryName"
+                           name="CategoryName"
+                           value="@Model.CategoryName"
+                           placeholder="e.g. Sedan, SUV, Hatchback"
+                           maxlength="50"
+                           autocomplete="off" />
+                </div>
+
+                <div class="category-actions">
+                    <a href="/Admin/Category/CategoryList" class="btn-outline">Cancel</a>
+                    <button type="button" class="btn-accent" onclick="submitCategoryForm()">💾 Save Changes</button>
+                </div>
+            </div>
+        </div>
+    </form>
+</div>
+
+<script>
+    function submitCategoryForm() {
+        const name = document.getElementById('categoryName').value.trim();
+
+        if (!name) {
+            alert("Category name is required.");
+            return;
+        }
+
+        document.getElementById('categoryForm').submit();
+    }
+</script>

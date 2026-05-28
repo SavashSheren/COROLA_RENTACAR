@@ -21,16 +21,16 @@ namespace COROLA_RENTACAR.DataAccessLayer.Concrete
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<Car>()
-                .HasOne(x => x.Brand)
-                .WithMany()
-                .HasForeignKey(x => x.BrandId)
-                .OnDelete(DeleteBehavior.Restrict);
+      .HasOne(x => x.Brand)
+      .WithMany(x => x.Cars)
+      .HasForeignKey(x => x.BrandId)
+      .OnDelete(DeleteBehavior.Restrict);
 
             modelBuilder.Entity<Car>()
-                .HasOne(x => x.Category)
-                .WithMany()
-                .HasForeignKey(x => x.CategoryId)
-                .OnDelete(DeleteBehavior.Restrict);
+    .HasOne(x => x.Category)
+    .WithMany(x => x.Cars)
+    .HasForeignKey(x => x.CategoryId)
+    .OnDelete(DeleteBehavior.Restrict);
 
             modelBuilder.Entity<CarImage>()
                 .HasOne(x => x.Car)

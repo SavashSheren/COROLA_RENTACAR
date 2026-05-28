@@ -1,0 +1,660 @@
+﻿@using COROLA_RENTACAR.EntityLayer.Entities
+@using COROLA_RENTACAR.EntityLayer.Enums
+@model List<COROLA_RENTACAR.EntityLayer.Entities.Reservation>
+
+@{
+    ViewData["Title"] = "Dashboard";
+    Layout = "~/Views/AdminLayout/Index.cshtml";
+
+    var latestCustomers = ViewBag.LatestCustomers as List<Customer> ?? new List<Customer>();
+
+    var totalCars = Convert.ToInt32(ViewBag.TotalCars ?? 0);
+    var availableCars = Convert.ToInt32(ViewBag.AvailableCars ?? 0);
+    var unavailableCars = Convert.ToInt32(ViewBag.UnavailableCars ?? 0);
+
+    var totalCustomers = Convert.ToInt32(ViewBag.TotalCustomers ?? 0);
+    var pendingLicenses = Convert.ToInt32(ViewBag.PendingLicenses ?? 0);
+    var approvedLicenses = Convert.ToInt32(ViewBag.ApprovedLicenses ?? 0);
+    var rejectedLicenses = Convert.ToInt32(ViewBag.RejectedLicenses ?? 0);
+
+    var totalReservations = Convert.ToInt32(ViewBag.TotalReservations ?? 0);
+    var pendingReservations = Convert.ToInt32(ViewBag.PendingReservations ?? 0);
+    var approvedReservations = Convert.ToInt32(ViewBag.ApprovedReservations ?? 0);
+    var rejectedReservations = Convert.ToInt32(ViewBag.RejectedReservations ?? 0);
+    var cancelledReservations = Convert.ToInt32(ViewBag.CancelledReservations ?? 0);
+
+    var totalRevenue = Convert.ToDecimal(ViewBag.TotalRevenue ?? 0);
+    var monthlyRevenue = Convert.ToDecimal(ViewBag.MonthlyRevenue ?? 0);
+}
+
+<style>
+    .dash-root {
+        padding: 28px;
+        color: #e2e8f0;
+        font-family: 'DM Sans', 'Segoe UI', sans-serif;
+    }
+
+    .dash-breadcrumb {
+        font-size: 12px;
+        color: #7a8499;
+        margin-bottom: 8px;
+    }
+
+    .dash-header {
+        display: flex;
+        align-items: flex-end;
+        justify-content: space-between;
+        gap: 16px;
+        margin-bottom: 24px;
+        flex-wrap: wrap;
+    }
+
+    .dash-title {
+        font-size: 28px;
+        font-weight: 900;
+        margin: 0;
+        color: #e2e8f0;
+    }
+
+    .dash-subtitle {
+        color: #7a8499;
+        font-size: 13px;
+        margin-top: 6px;
+    }
+
+    .dash-date {
+        background: #13161e;
+        border: 1px solid rgba(255,255,255,.07);
+        border-radius: 12px;
+        padding: 10px 14px;
+        color: #7a8499;
+        font-size: 13px;
+        font-weight: 700;
+    }
+
+    .dash-stats {
+        display: grid;
+        grid-template-columns: repeat(4, minmax(180px, 1fr));
+        gap: 14px;
+        margin-bottom: 22px;
+    }
+
+    .dash-stat-card {
+        background: #13161e;
+        border: 1px solid rgba(255,255,255,.07);
+        border-radius: 16px;
+        padding: 18px;
+        position: relative;
+        overflow: hidden;
+    }
+
+        .dash-stat-card::after {
+            content: "";
+            position: absolute;
+            right: -30px;
+            top: -30px;
+            width: 90px;
+            height: 90px;
+            border-radius: 50%;
+            background: rgba(232,255,71,.06);
+        }
+
+    .dash-stat-top {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 18px;
+        position: relative;
+        z-index: 1;
+    }
+
+    .dash-stat-icon {
+        width: 42px;
+        height: 42px;
+        border-radius: 12px;
+        background: rgba(232,255,71,.12);
+        color: #e8ff47;
+        display: grid;
+        place-items: center;
+        font-size: 20px;
+    }
+
+        .dash-stat-icon.green {
+            background: rgba(48,224,161,.12);
+            color: #30e0a1;
+        }
+
+        .dash-stat-icon.blue {
+            background: rgba(79,141,255,.12);
+            color: #4f8dff;
+        }
+
+        .dash-stat-icon.red {
+            background: rgba(255,82,89,.12);
+            color: #ff5259;
+        }
+
+    .dash-stat-label {
+        color: #7a8499;
+        font-size: 12px;
+        font-weight: 700;
+    }
+
+    .dash-stat-value {
+        font-size: 27px;
+        font-weight: 900;
+        line-height: 1;
+        position: relative;
+        z-index: 1;
+    }
+
+    .dash-stat-note {
+        margin-top: 8px;
+        color: #7a8499;
+        font-size: 12px;
+        position: relative;
+        z-index: 1;
+    }
+
+    .dash-grid {
+        display: grid;
+        grid-template-columns: minmax(0, 1.4fr) minmax(320px, .8fr);
+        gap: 18px;
+        margin-bottom: 22px;
+    }
+
+    .dash-card {
+        background: #13161e;
+        border: 1px solid rgba(255,255,255,.07);
+        border-radius: 18px;
+        overflow: hidden;
+    }
+
+    .dash-card-header {
+        padding: 18px;
+        border-bottom: 1px solid rgba(255,255,255,.07);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 12px;
+    }
+
+    .dash-card-title {
+        font-size: 16px;
+        font-weight: 900;
+        margin: 0;
+    }
+
+    .dash-card-link {
+        color: #e8ff47;
+        font-size: 12px;
+        font-weight: 800;
+        text-decoration: none;
+    }
+
+    .dash-card-body {
+        padding: 18px;
+    }
+
+    .dash-progress-list {
+        display: grid;
+        gap: 16px;
+    }
+
+    .dash-progress-item {
+        display: grid;
+        gap: 8px;
+    }
+
+    .dash-progress-head {
+        display: flex;
+        justify-content: space-between;
+        color: #e2e8f0;
+        font-size: 13px;
+        font-weight: 800;
+    }
+
+    .dash-progress-track {
+        height: 9px;
+        border-radius: 999px;
+        background: #1a1e2a;
+        overflow: hidden;
+    }
+
+    .dash-progress-fill {
+        height: 100%;
+        border-radius: 999px;
+        background: #e8ff47;
+    }
+
+        .dash-progress-fill.green {
+            background: #30e0a1;
+        }
+
+        .dash-progress-fill.blue {
+            background: #4f8dff;
+        }
+
+        .dash-progress-fill.red {
+            background: #ff5259;
+        }
+
+    .dash-table-list {
+        display: grid;
+        gap: 12px;
+    }
+
+    .dash-row {
+        background: #1a1e2a;
+        border: 1px solid rgba(255,255,255,.07);
+        border-radius: 13px;
+        padding: 13px;
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) auto;
+        gap: 12px;
+        align-items: center;
+    }
+
+    .dash-row-title {
+        font-weight: 900;
+        font-size: 14px;
+        margin-bottom: 4px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    .dash-row-subtitle {
+        color: #7a8499;
+        font-size: 12px;
+        line-height: 1.5;
+    }
+
+    .dash-status {
+        border-radius: 8px;
+        padding: 5px 9px;
+        font-size: 11px;
+        font-weight: 900;
+        white-space: nowrap;
+    }
+
+        .dash-status.pending {
+            background: rgba(255,181,71,.14);
+            color: #ffb547;
+            border: 1px solid rgba(255,181,71,.25);
+        }
+
+        .dash-status.approved {
+            background: rgba(48,224,161,.14);
+            color: #30e0a1;
+            border: 1px solid rgba(48,224,161,.25);
+        }
+
+        .dash-status.rejected,
+        .dash-status.cancelled {
+            background: rgba(255,82,89,.14);
+            color: #ff5259;
+            border: 1px solid rgba(255,82,89,.25);
+        }
+
+    .dash-empty {
+        text-align: center;
+        color: #7a8499;
+        padding: 35px 16px;
+    }
+
+    .dash-actions {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 14px;
+    }
+
+    .dash-action {
+        background: #13161e;
+        border: 1px solid rgba(255,255,255,.07);
+        color: #e2e8f0;
+        border-radius: 16px;
+        padding: 18px;
+        text-decoration: none;
+        display: flex;
+        align-items: center;
+        gap: 13px;
+        transition: .2s;
+    }
+
+        .dash-action:hover {
+            border-color: rgba(232,255,71,.32);
+            background: rgba(232,255,71,.05);
+            color: #e8ff47;
+        }
+
+    .dash-action-icon {
+        width: 42px;
+        height: 42px;
+        border-radius: 12px;
+        background: rgba(232,255,71,.12);
+        color: #e8ff47;
+        display: grid;
+        place-items: center;
+        font-size: 20px;
+    }
+
+    .dash-action-title {
+        font-size: 14px;
+        font-weight: 900;
+    }
+
+    .dash-action-subtitle {
+        color: #7a8499;
+        font-size: 12px;
+        margin-top: 3px;
+    }
+
+    @@media(max-width: 1100px) {
+        .dash-stats {
+            grid-template-columns: repeat(2, 1fr);
+        }
+
+        .dash-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .dash-actions {
+            grid-template-columns: repeat(2, 1fr);
+        }
+    }
+
+    @@media(max-width: 650px) {
+        .dash-stats,
+        .dash-actions {
+            grid-template-columns: 1fr;
+        }
+    }
+</style>
+
+<div class="dash-root">
+
+    <div class="dash-breadcrumb">
+        Admin Panel › Dashboard
+    </div>
+
+    <div class="dash-header">
+        <div>
+            <h1 class="dash-title">Dashboard</h1>
+            <p class="dash-subtitle">Operational overview for COROLA Rent A Car management.</p>
+        </div>
+
+        <div class="dash-date">
+            @DateTime.Now.ToString("dd MMM yyyy, HH:mm")
+        </div>
+    </div>
+
+    <div class="dash-stats">
+        <div class="dash-stat-card">
+            <div class="dash-stat-top">
+                <div class="dash-stat-icon">🚗</div>
+                <div class="dash-stat-label">Cars</div>
+            </div>
+            <div class="dash-stat-value">@totalCars</div>
+            <div class="dash-stat-note">@availableCars available / @unavailableCars unavailable</div>
+        </div>
+
+        <div class="dash-stat-card">
+            <div class="dash-stat-top">
+                <div class="dash-stat-icon blue">📋</div>
+                <div class="dash-stat-label">Reservations</div>
+            </div>
+            <div class="dash-stat-value">@totalReservations</div>
+            <div class="dash-stat-note">@pendingReservations pending requests</div>
+        </div>
+
+        <div class="dash-stat-card">
+            <div class="dash-stat-top">
+                <div class="dash-stat-icon green">👤</div>
+                <div class="dash-stat-label">Customers</div>
+            </div>
+            <div class="dash-stat-value">@totalCustomers</div>
+            <div class="dash-stat-note">@pendingLicenses pending licenses</div>
+        </div>
+
+        <div class="dash-stat-card">
+            <div class="dash-stat-top">
+                <div class="dash-stat-icon red">₺</div>
+                <div class="dash-stat-label">Revenue</div>
+            </div>
+            <div class="dash-stat-value">@totalRevenue.ToString("N0") ₺</div>
+            <div class="dash-stat-note">@monthlyRevenue.ToString("N0") ₺ this month</div>
+        </div>
+    </div>
+
+    <div class="dash-grid">
+
+        <div class="dash-card">
+            <div class="dash-card-header">
+                <h2 class="dash-card-title">Latest Reservations</h2>
+                <a href="/Admin/Reservation/ReservationList" class="dash-card-link">View All</a>
+            </div>
+
+            <div class="dash-card-body">
+                @if (Model == null || !Model.Any())
+                {
+                    <div class="dash-empty">
+                        <div style="font-size:38px;">📋</div>
+                        <p>No reservation records yet.</p>
+                    </div>
+                }
+                else
+                {
+                    <div class="dash-table-list">
+                        @foreach (var reservation in Model)
+                        {
+                            var carName = $"{reservation.Car?.Brand?.BrandName} {reservation.Car?.Model}";
+                            var customerName = $"{reservation.Customer?.FirstName} {reservation.Customer?.LastName}";
+                            var statusText = reservation.ReservationStatus.ToString();
+                            var statusClass = statusText.ToLower();
+
+                            <div class="dash-row">
+                                <div>
+                                    <div class="dash-row-title">@carName</div>
+                                    <div class="dash-row-subtitle">
+                                        @customerName • @reservation.PickupDate.ToString("dd MMM") - @reservation.ReturnDate.ToString("dd MMM") • @reservation.TotalPrice.ToString("N0") ₺
+                                    </div>
+                                </div>
+
+                                <span class="dash-status @statusClass">@statusText</span>
+                            </div>
+                        }
+                    </div>
+                }
+            </div>
+        </div>
+
+        <div class="dash-card">
+            <div class="dash-card-header">
+                <h2 class="dash-card-title">Business Health</h2>
+                <a href="/Admin/Customer/CustomerList" class="dash-card-link">Review</a>
+            </div>
+
+            <div class="dash-card-body">
+                @{
+                    var carAvailabilityRate = totalCars == 0 ? 0 : (availableCars * 100 / totalCars);
+                    var licenseApprovalRate = totalCustomers == 0 ? 0 : (approvedLicenses * 100 / totalCustomers);
+                    var reservationApprovalRate = totalReservations == 0 ? 0 : (approvedReservations * 100 / totalReservations);
+                    var pendingReservationRate = totalReservations == 0 ? 0 : (pendingReservations * 100 / totalReservations);
+                }
+
+                <div class="dash-progress-list">
+                    <div class="dash-progress-item">
+                        <div class="dash-progress-head">
+                            <span>Car Availability</span>
+                            <span>@carAvailabilityRate%</span>
+                        </div>
+                        <div class="dash-progress-track">
+                            <div class="dash-progress-fill green" style="width:@carAvailabilityRate%"></div>
+                        </div>
+                    </div>
+
+                    <div class="dash-progress-item">
+                        <div class="dash-progress-head">
+                            <span>License Approval</span>
+                            <span>@licenseApprovalRate%</span>
+                        </div>
+                        <div class="dash-progress-track">
+                            <div class="dash-progress-fill blue" style="width:@licenseApprovalRate%"></div>
+                        </div>
+                    </div>
+
+                    <div class="dash-progress-item">
+                        <div class="dash-progress-head">
+                            <span>Reservation Approval</span>
+                            <span>@reservationApprovalRate%</span>
+                        </div>
+                        <div class="dash-progress-track">
+                            <div class="dash-progress-fill" style="width:@reservationApprovalRate%"></div>
+                        </div>
+                    </div>
+
+                    <div class="dash-progress-item">
+                        <div class="dash-progress-head">
+                            <span>Pending Reservation Load</span>
+                            <span>@pendingReservationRate%</span>
+                        </div>
+                        <div class="dash-progress-track">
+                            <div class="dash-progress-fill red" style="width:@pendingReservationRate%"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <div class="dash-grid">
+
+        <div class="dash-card">
+            <div class="dash-card-header">
+                <h2 class="dash-card-title">Latest Customers</h2>
+                <a href="/Admin/Customer/CustomerList" class="dash-card-link">View All</a>
+            </div>
+
+            <div class="dash-card-body">
+                @if (!latestCustomers.Any())
+                {
+                    <div class="dash-empty">
+                        <div style="font-size:38px;">👤</div>
+                        <p>No customer records yet.</p>
+                    </div>
+                }
+                else
+                {
+                    <div class="dash-table-list">
+                        @foreach (var customer in latestCustomers)
+                        {
+                            var fullName = $"{customer.FirstName} {customer.LastName}";
+                            var licenseStatus = customer.DriverLicenseVerificationStatus.ToString();
+                            var licenseClass = licenseStatus.ToLower();
+
+                            <div class="dash-row">
+                                <div>
+                                    <div class="dash-row-title">@fullName</div>
+                                    <div class="dash-row-subtitle">
+                                        @customer.Email • @customer.Phone
+                                    </div>
+                                </div>
+
+                                <span class="dash-status @licenseClass">@licenseStatus</span>
+                            </div>
+                        }
+                    </div>
+                }
+            </div>
+        </div>
+
+        <div class="dash-card">
+            <div class="dash-card-header">
+                <h2 class="dash-card-title">Reservation Status</h2>
+                <a href="/Admin/Reservation/ReservationList" class="dash-card-link">Manage</a>
+            </div>
+
+            <div class="dash-card-body">
+                <div class="dash-progress-list">
+                    <div class="dash-progress-item">
+                        <div class="dash-progress-head">
+                            <span>Pending</span>
+                            <span>@pendingReservations</span>
+                        </div>
+                        <div class="dash-progress-track">
+                            <div class="dash-progress-fill blue" style="width:@(totalReservations == 0 ? 0 : pendingReservations * 100 / totalReservations)%"></div>
+                        </div>
+                    </div>
+
+                    <div class="dash-progress-item">
+                        <div class="dash-progress-head">
+                            <span>Approved</span>
+                            <span>@approvedReservations</span>
+                        </div>
+                        <div class="dash-progress-track">
+                            <div class="dash-progress-fill green" style="width:@(totalReservations == 0 ? 0 : approvedReservations * 100 / totalReservations)%"></div>
+                        </div>
+                    </div>
+
+                    <div class="dash-progress-item">
+                        <div class="dash-progress-head">
+                            <span>Rejected</span>
+                            <span>@rejectedReservations</span>
+                        </div>
+                        <div class="dash-progress-track">
+                            <div class="dash-progress-fill red" style="width:@(totalReservations == 0 ? 0 : rejectedReservations * 100 / totalReservations)%"></div>
+                        </div>
+                    </div>
+
+                    <div class="dash-progress-item">
+                        <div class="dash-progress-head">
+                            <span>Cancelled</span>
+                            <span>@cancelledReservations</span>
+                        </div>
+                        <div class="dash-progress-track">
+                            <div class="dash-progress-fill red" style="width:@(totalReservations == 0 ? 0 : cancelledReservations * 100 / totalReservations)%"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <div class="dash-actions">
+        <a href="/Admin/Car/CreateCar" class="dash-action">
+            <div class="dash-action-icon">🚗</div>
+            <div>
+                <div class="dash-action-title">Add Car</div>
+                <div class="dash-action-subtitle">Create new vehicle</div>
+            </div>
+        </a>
+
+        <a href="/Admin/Reservation/CreateReservation" class="dash-action">
+            <div class="dash-action-icon">📋</div>
+            <div>
+                <div class="dash-action-title">New Reservation</div>
+                <div class="dash-action-subtitle">Create booking</div>
+            </div>
+        </a>
+
+        <a href="/Admin/Customer/CustomerList" class="dash-action">
+            <div class="dash-action-icon">🪪</div>
+            <div>
+                <div class="dash-action-title">Verify Licenses</div>
+                <div class="dash-action-subtitle">Review customers</div>
+            </div>
+        </a>
+
+        <a href="/Admin/CarImage/CreateCarImage" class="dash-action">
+            <div class="dash-action-icon">🖼️</div>
+            <div>
+                <div class="dash-action-title">Add Image</div>
+                <div class="dash-action-subtitle">Update gallery</div>
+            </div>
+        </a>
+    </div>
+
+</div>

@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using COROLA_RENTACAR.EntityLayer.Entities;
+using CorolaDtoLayer.Dto.CostomerDto;
 using CorolaDtoLayer.Dto.CostumerDto;
 
 namespace COROLA_RENTACAR.BusinessLayer.Mapping
@@ -11,7 +12,7 @@ namespace COROLA_RENTACAR.BusinessLayer.Mapping
             CreateMap<Customer, ResultCustomerDto>().ReverseMap();
             CreateMap<Customer, CreateCustomerDto>().ReverseMap();
             CreateMap<Customer, UpdateCustomerDto>().ReverseMap();
-            CreateMap<Customer, GetCostumerByIdDto>().ReverseMap();
+            CreateMap<Customer, GetCustomerByIdDto>().ReverseMap();
         }
     }
 }

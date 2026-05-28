@@ -12,7 +12,7 @@ namespace COROLA_RENTACAR.BusinessLayer.Abstract
     public interface ICustomerService 
     {
         Task<List<ResultCustomerDto>> GetAllCustomerAsync();
-        Task<GetCostomerByIdDto> GetCustomerByIdAsync(int id);
+        Task<GetCustomerByIdDto> GetCustomerByIdAsync(int id);
         Task CreateCustomerAsync(CreateCustomerDto dto);
         Task UpdateCustomerAsync(UpdateCustomerDto dto);
         Task DeleteCustomerAsync(int id);

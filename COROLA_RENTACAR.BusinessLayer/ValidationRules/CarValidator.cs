@@ -1,21 +1,19 @@
 ﻿using COROLA_RENTACAR.EntityLayer.Entities;
 using FluentValidation;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace COROLA_RENTACAR.BusinessLayer.ValidationRules
 {
-    public class CarValidator :AbstractValidator<Car>
+    public class CarValidator : AbstractValidator<Car>
     {
         public CarValidator()
         {
-            RuleFor(x => x.Brand)
-                .NotEmpty().WithMessage("Brand field cannot be empty.")
-                .MinimumLength(2).WithMessage("Brand must be at least 2 characters long.")
-                .MaximumLength(50).WithMessage("Brand can be at most 50 characters.");
+            RuleFor(x => x.BrandId)
+                .NotEmpty().WithMessage("Brand must be selected.")
+                .GreaterThan(0).WithMessage("Please select a valid brand.");
+
+            RuleFor(x => x.CategoryId)
+                .NotEmpty().WithMessage("Category must be selected.")
+                .GreaterThan(0).WithMessage("Please select a valid category.");
 
             RuleFor(x => x.Model)
                 .NotEmpty().WithMessage("Model field cannot be empty.")
@@ -56,15 +54,8 @@ namespace COROLA_RENTACAR.BusinessLayer.ValidationRules
                 .NotEmpty().WithMessage("Transmission type cannot be empty.")
                 .MaximumLength(30).WithMessage("Transmission type can be at most 30 characters.");
 
-            RuleFor(x => x.CategoryId)
-                .NotEmpty().WithMessage("Category must be selected.")
-                .GreaterThan(0).WithMessage("Please select a valid category.");
-
             RuleFor(x => x.ImageUrl)
-                .NotEmpty().WithMessage("Car image cannot be empty.")
-                .Must(url => Uri.IsWellFormedUriString(url, UriKind.Absolute))
-                .WithMessage("Please enter a valid image URL.");
+                .NotEmpty().WithMessage("Car image cannot be empty.");
         }
-
     }
 }

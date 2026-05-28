@@ -1,5 +1,4 @@
 ﻿using COROLA_RENTACAR.EntityLayer.Entities;
-using COROLA_RENTACAR.EntityLayer.Entities.COROLA_RENTACAR.EntityLayer.Entities;
 using Microsoft.EntityFrameworkCore;
 
 namespace COROLA_RENTACAR.DataAccessLayer.Concrete

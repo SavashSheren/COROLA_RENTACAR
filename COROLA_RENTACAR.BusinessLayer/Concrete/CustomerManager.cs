@@ -42,10 +42,10 @@ namespace COROLA_RENTACAR.BusinessLayer.Concrete
             await _customerDal.UpdateAsync(value);
         }
 
-        public async Task<GetCostomerByIdDto> GetCustomerByIdAsync(int id)
+        public async Task<GetCustomerByIdDto> GetCustomerByIdAsync(int id)
         {
             var values = await _customerDal.GetByIdAsync(id);
-            return _mapper.Map<GetCostomerByIdDto>(values);
+            return _mapper.Map<GetCustomerByIdDto>(values);
         }
     }
 }

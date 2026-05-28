@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace CorolaDtoLayer.Dto.CostomerDto
 {
-    public class GetCostomerByIdDto
+    public class GetCustomerByIdDto
     {
         public int CustomerId { get; set; }
         public string FirstName { get; set; }

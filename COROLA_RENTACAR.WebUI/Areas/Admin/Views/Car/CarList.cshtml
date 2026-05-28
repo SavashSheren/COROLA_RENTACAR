@@ -1,0 +1,478 @@
+﻿@model List<COROLA_RENTACAR.EntityLayer.Entities.Car>
+
+@{
+    ViewData["Title"] = "Car List";
+    Layout = "~/Views/AdminLayout/Index.cshtml";
+
+    var totalCount = Model?.Count ?? 0;
+    var availableCount = Model?.Count(x => x.IsAvailable) ?? 0;
+    var unavailableCount = Model?.Count(x => !x.IsAvailable) ?? 0;
+}
+
+<style>
+    .car-root {
+        padding: 28px;
+        color: #e2e8f0;
+        font-family: 'DM Sans', 'Segoe UI', sans-serif;
+    }
+
+    .car-breadcrumb {
+        font-size: 12px;
+        color: #7a8499;
+        margin-bottom: 8px;
+    }
+
+    .car-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-end;
+        gap: 16px;
+        margin-bottom: 24px;
+        flex-wrap: wrap;
+    }
+
+    .car-title {
+        font-size: 26px;
+        font-weight: 800;
+        margin: 0;
+        color: #e2e8f0;
+    }
+
+    .car-subtitle {
+        color: #7a8499;
+        font-size: 13px;
+        margin-top: 6px;
+    }
+
+    .btn-accent {
+        background: #e8ff47;
+        color: #0d0f14;
+        border: none;
+        border-radius: 10px;
+        padding: 10px 16px;
+        font-size: 13px;
+        font-weight: 800;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 7px;
+        cursor: pointer;
+    }
+
+    .btn-edit {
+        background: rgba(79,141,255,.12);
+        color: #4f8dff;
+        border: 1px solid rgba(79,141,255,.25);
+        border-radius: 8px;
+        padding: 7px 12px;
+        font-size: 12px;
+        font-weight: 700;
+        text-decoration: none;
+    }
+
+    .btn-danger {
+        background: rgba(255,82,89,.1);
+        color: #ff5259;
+        border: 1px solid rgba(255,82,89,.2);
+        border-radius: 8px;
+        padding: 7px 12px;
+        font-size: 12px;
+        font-weight: 700;
+        cursor: pointer;
+    }
+
+    .car-stats {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(180px, 1fr));
+        gap: 14px;
+        margin-bottom: 20px;
+    }
+
+    .car-stat {
+        background: #13161e;
+        border: 1px solid rgba(255,255,255,.07);
+        border-radius: 14px;
+        padding: 18px;
+        display: flex;
+        align-items: center;
+        gap: 14px;
+    }
+
+    .car-stat-icon {
+        width: 42px;
+        height: 42px;
+        border-radius: 12px;
+        background: rgba(232,255,71,.12);
+        color: #e8ff47;
+        display: grid;
+        place-items: center;
+        font-size: 20px;
+    }
+
+    .car-stat-icon.green {
+        background: rgba(48,224,161,.12);
+        color: #30e0a1;
+    }
+
+    .car-stat-icon.red {
+        background: rgba(255,82,89,.12);
+        color: #ff5259;
+    }
+
+    .car-stat-num {
+        font-size: 24px;
+        font-weight: 800;
+        line-height: 1;
+    }
+
+    .car-stat-label {
+        color: #7a8499;
+        font-size: 12px;
+        margin-top: 4px;
+    }
+
+    .car-toolbar {
+        display: flex;
+        gap: 12px;
+        margin-bottom: 18px;
+        flex-wrap: wrap;
+    }
+
+    .car-search {
+        min-width: 260px;
+        max-width: 440px;
+        flex: 1;
+        background: #13161e;
+        border: 1px solid rgba(255,255,255,.07);
+        border-radius: 10px;
+        color: #e2e8f0;
+        padding: 11px 13px;
+        outline: none;
+    }
+
+    .car-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+        gap: 18px;
+    }
+
+    .car-card {
+        background: #13161e;
+        border: 1px solid rgba(255,255,255,.07);
+        border-radius: 18px;
+        overflow: hidden;
+    }
+
+    .car-img {
+        height: 180px;
+        background: #1a1e2a;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .car-img img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+
+    .car-status {
+        position: absolute;
+        top: 12px;
+        left: 12px;
+        border-radius: 8px;
+        padding: 5px 10px;
+        font-size: 12px;
+        font-weight: 800;
+        backdrop-filter: blur(6px);
+    }
+
+    .car-status.available {
+        background: rgba(48,224,161,.18);
+        color: #30e0a1;
+        border: 1px solid rgba(48,224,161,.28);
+    }
+
+    .car-status.unavailable {
+        background: rgba(255,82,89,.18);
+        color: #ff5259;
+        border: 1px solid rgba(255,82,89,.28);
+    }
+
+    .car-price {
+        position: absolute;
+        bottom: 12px;
+        right: 12px;
+        background: rgba(0,0,0,.65);
+        color: #e8ff47;
+        border-radius: 8px;
+        padding: 6px 10px;
+        font-weight: 900;
+        font-size: 14px;
+    }
+
+    .car-body {
+        padding: 16px;
+    }
+
+    .car-id {
+        color: #7a8499;
+        font-size: 12px;
+        margin-bottom: 8px;
+    }
+
+    .car-name {
+        font-size: 18px;
+        font-weight: 900;
+        margin-bottom: 4px;
+    }
+
+    .car-meta {
+        color: #7a8499;
+        font-size: 13px;
+        margin-bottom: 12px;
+    }
+
+    .car-specs {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 7px;
+        margin-bottom: 14px;
+    }
+
+    .car-spec {
+        background: #1a1e2a;
+        border: 1px solid rgba(255,255,255,.07);
+        color: #7a8499;
+        border-radius: 8px;
+        padding: 6px 9px;
+        font-size: 12px;
+    }
+
+    .car-actions {
+        display: flex;
+        gap: 8px;
+    }
+
+    .car-empty {
+        grid-column: 1 / -1;
+        text-align: center;
+        color: #7a8499;
+        padding: 60px 20px;
+    }
+
+    .car-modal-backdrop {
+        display: none;
+        position: fixed;
+        inset: 0;
+        background: rgba(0,0,0,.7);
+        z-index: 5000;
+        align-items: center;
+        justify-content: center;
+        backdrop-filter: blur(4px);
+    }
+
+    .car-modal-backdrop.open {
+        display: flex;
+    }
+
+    .car-modal {
+        background: #13161e;
+        border: 1px solid rgba(255,255,255,.07);
+        border-radius: 18px;
+        padding: 28px;
+        width: 100%;
+        max-width: 390px;
+        text-align: center;
+    }
+
+    .car-modal-title {
+        font-size: 18px;
+        font-weight: 800;
+        margin-bottom: 10px;
+    }
+
+    .car-modal-msg {
+        color: #7a8499;
+        font-size: 13px;
+        line-height: 1.6;
+        margin-bottom: 20px;
+    }
+
+    .car-modal-actions {
+        display: flex;
+        justify-content: center;
+        gap: 10px;
+    }
+
+    @@media(max-width: 800px) {
+        .car-stats {
+            grid-template-columns: 1fr;
+        }
+    }
+</style>
+
+<div class="car-root">
+
+    <div class="car-breadcrumb">
+        Vehicle Management › Car List
+    </div>
+
+    <div class="car-header">
+        <div>
+            <h1 class="car-title">Car Management</h1>
+            <p class="car-subtitle">View and manage all rental cars in the system.</p>
+        </div>
+
+        <a href="/Admin/Car/CreateCar" class="btn-accent">
+            ＋ Add New Car
+        </a>
+    </div>
+
+    <div class="car-stats">
+        <div class="car-stat">
+            <div class="car-stat-icon">🚗</div>
+            <div>
+                <div class="car-stat-num">@totalCount</div>
+                <div class="car-stat-label">Total Cars</div>
+            </div>
+        </div>
+
+        <div class="car-stat">
+            <div class="car-stat-icon green">✅</div>
+            <div>
+                <div class="car-stat-num">@availableCount</div>
+                <div class="car-stat-label">Available Cars</div>
+            </div>
+        </div>
+
+        <div class="car-stat">
+            <div class="car-stat-icon red">⛔</div>
+            <div>
+                <div class="car-stat-num">@unavailableCount</div>
+                <div class="car-stat-label">Unavailable Cars</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="car-toolbar">
+        <input type="text" id="carSearch" class="car-search" placeholder="Search brand, model, plate..." oninput="renderCars()" />
+    </div>
+
+    <div class="car-grid" id="carGrid"></div>
+
+</div>
+
+<div class="car-modal-backdrop" id="carDeleteModal">
+    <div class="car-modal">
+        <div style="font-size:38px;margin-bottom:10px;">🗑️</div>
+        <div class="car-modal-title">Delete Car</div>
+        <p class="car-modal-msg" id="carDeleteMessage"></p>
+
+        <div class="car-modal-actions">
+            <button type="button" class="btn-accent" onclick="closeDeleteModal()" style="background:#1a1e2a;color:#e2e8f0;border:1px solid rgba(255,255,255,.07);">
+                Cancel
+            </button>
+
+            <form id="carDeleteForm" method="post" action="">
+                @Html.AntiForgeryToken()
+                <button type="submit" class="btn-danger">Yes, Delete</button>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+    const CAR_DATA = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.Select(x => new {
+        x.CarId,
+        BrandName = x.Brand != null ? x.Brand.BrandName : "",
+        CategoryName = x.Category != null ? x.Category.CategoryName : "",
+        x.Model,
+        x.ModelYear,
+        x.PlateNumber,
+        x.DailyPrice,
+        x.SeatCount,
+        x.LuggageCapacity,
+        x.Mileage,
+        x.FuelType,
+        x.TransmissionType,
+        x.IsAvailable,
+        x.ImageUrl
+    })));
+
+    function renderCars() {
+        const q = document.getElementById('carSearch').value.toLowerCase();
+        const grid = document.getElementById('carGrid');
+
+        const items = CAR_DATA.filter(x => {
+            const text = `${x.BrandName || ''} ${x.CategoryName || ''} ${x.Model || ''} ${x.PlateNumber || ''} ${x.FuelType || ''} ${x.TransmissionType || ''}`.toLowerCase();
+            return text.includes(q);
+        });
+
+        if (items.length === 0) {
+            grid.innerHTML = `
+                <div class="car-empty">
+                    <div style="font-size:42px;">🔍</div>
+                    <p>No cars found.</p>
+                </div>`;
+            return;
+        }
+
+        grid.innerHTML = items.map(car => `
+            <div class="car-card">
+                <div class="car-img">
+                    <img src="${escapeHtml(car.ImageUrl)}" alt="${escapeHtml(car.BrandName)} ${escapeHtml(car.Model)}" onerror="this.style.display='none'" />
+                    <span class="car-status ${car.IsAvailable ? 'available' : 'unavailable'}">
+                        ${car.IsAvailable ? 'Available' : 'Unavailable'}
+                    </span>
+                    <span class="car-price">${Number(car.DailyPrice).toLocaleString('en-US')} ₺ / day</span>
+                </div>
+
+                <div class="car-body">
+                    <div class="car-id">#${car.CarId} • ${escapeHtml(car.PlateNumber)}</div>
+                    <div class="car-name">${escapeHtml(car.BrandName)} ${escapeHtml(car.Model)}</div>
+                    <div class="car-meta">${escapeHtml(car.CategoryName)} • ${car.ModelYear} • ${car.Mileage} km</div>
+
+                    <div class="car-specs">
+                        <span class="car-spec">⛽ ${escapeHtml(car.FuelType)}</span>
+                        <span class="car-spec">⚙️ ${escapeHtml(car.TransmissionType)}</span>
+                        <span class="car-spec">👥 ${car.SeatCount} seats</span>
+                        <span class="car-spec">🧳 ${car.LuggageCapacity} luggage</span>
+                    </div>
+
+                    <div class="car-actions">
+                        <a href="/Admin/Car/UpdateCar?id=${car.CarId}" class="btn-edit">✏️ Edit</a>
+                        <button type="button" class="btn-danger" onclick='openDeleteModal(${car.CarId}, ${JSON.stringify(car.BrandName + " " + car.Model)})'>
+                            🗑️ Delete
+                        </button>
+                    </div>
+                </div>
+            </div>
+        `).join('');
+    }
+
+    function openDeleteModal(id, name) {
+        document.getElementById('carDeleteMessage').innerHTML =
+            `<strong>${escapeHtml(name)}</strong> will be permanently deleted.<br />This action cannot be undone.`;
+
+        document.getElementById('carDeleteForm').action = `/Admin/Car/DeleteCar?id=${id}`;
+        document.getElementById('carDeleteModal').classList.add('open');
+    }
+
+    function closeDeleteModal() {
+        document.getElementById('carDeleteModal').classList.remove('open');
+    }
+
+    function escapeHtml(value) {
+        if (!value) return '';
+
+        return String(value)
+            .replace(/&/g, '&amp;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;')
+            .replace(/"/g, '&quot;')
+            .replace(/'/g, '&#x27;');
+    }
+
+    renderCars();
+</script>

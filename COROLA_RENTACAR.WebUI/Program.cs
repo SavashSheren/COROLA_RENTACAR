@@ -34,6 +34,9 @@ builder.Services.AddScoped<IValidator<Brand>, BrandValidator>();
 builder.Services.AddScoped<IValidator<Category>, CategoryValidator>();
 builder.Services.AddScoped<IValidator<Location>, LocationValidator>();
 builder.Services.AddScoped<IValidator<Car>, CarValidator>();
+builder.Services.AddScoped<ICarImageService, CarImageManager>();
+builder.Services.AddScoped<ICarImageDal, EfCarImageDal>();
+builder.Services.AddScoped<IValidator<CarImage>, CarImageValidator>();
 
 builder.Services.AddControllersWithViews();
 

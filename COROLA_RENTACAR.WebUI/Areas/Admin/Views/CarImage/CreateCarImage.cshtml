@@ -1,0 +1,345 @@
+﻿@using COROLA_RENTACAR.EntityLayer.Entities
+@model COROLA_RENTACAR.EntityLayer.Entities.CarImage
+
+@{
+    ViewData["Title"] = "Create Car Image";
+    Layout = "~/Views/AdminLayout/Index.cshtml";
+
+    var cars = ViewBag.Cars as List<Car> ?? new List<Car>();
+}
+
+<style>
+    .image-form-root {
+        padding: 28px;
+        color: #e2e8f0;
+        font-family: 'DM Sans', 'Segoe UI', sans-serif;
+    }
+
+    .image-breadcrumb {
+        font-size: 12px;
+        color: #7a8499;
+        margin-bottom: 8px;
+    }
+
+        .image-breadcrumb a {
+            color: #7a8499;
+            text-decoration: none;
+        }
+
+            .image-breadcrumb a:hover {
+                color: #e8ff47;
+            }
+
+    .image-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-end;
+        gap: 16px;
+        margin-bottom: 24px;
+        flex-wrap: wrap;
+    }
+
+    .image-title {
+        font-size: 26px;
+        font-weight: 800;
+        margin: 0;
+    }
+
+    .image-subtitle {
+        color: #7a8499;
+        font-size: 13px;
+        margin-top: 6px;
+    }
+
+    .image-layout {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) 380px;
+        gap: 18px;
+    }
+
+    .image-card {
+        background: #13161e;
+        border: 1px solid rgba(255,255,255,.07);
+        border-radius: 16px;
+        overflow: hidden;
+        margin-bottom: 16px;
+    }
+
+    .image-card-header {
+        padding: 18px;
+        border-bottom: 1px solid rgba(255,255,255,.07);
+        font-weight: 800;
+    }
+
+    .image-card-body {
+        padding: 18px;
+    }
+
+    .image-field {
+        margin-bottom: 16px;
+    }
+
+        .image-field label {
+            display: block;
+            font-size: 13px;
+            font-weight: 700;
+            margin-bottom: 7px;
+        }
+
+        .image-field input,
+        .image-field select {
+            width: 100%;
+            background: #1a1e2a;
+            border: 1px solid rgba(255,255,255,.07);
+            border-radius: 10px;
+            color: #e2e8f0;
+            padding: 11px 13px;
+            outline: none;
+        }
+
+            .image-field input:focus,
+            .image-field select:focus {
+                border-color: #e8ff47;
+                box-shadow: 0 0 0 3px rgba(232,255,71,.12);
+            }
+
+    .image-required {
+        color: #ff5259;
+    }
+
+    .image-validation {
+        background: rgba(255,82,89,.1);
+        border: 1px solid rgba(255,82,89,.25);
+        color: #ff5259;
+        border-radius: 10px;
+        padding: 12px 14px;
+        margin-bottom: 16px;
+        font-size: 13px;
+    }
+
+    .image-preview {
+        height: 260px;
+        border-radius: 14px;
+        background: #1a1e2a;
+        border: 1px dashed rgba(255,255,255,.07);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        overflow: hidden;
+        color: #7a8499;
+        text-align: center;
+    }
+
+        .image-preview img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: none;
+        }
+
+    .image-check-row {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        background: #1a1e2a;
+        border: 1px solid rgba(255,255,255,.07);
+        border-radius: 12px;
+        padding: 13px;
+    }
+
+        .image-check-row input {
+            width: 18px;
+            height: 18px;
+            accent-color: #e8ff47;
+        }
+
+        .image-check-row label {
+            margin: 0;
+            font-size: 13px;
+            font-weight: 800;
+        }
+
+    .btn-accent,
+    .btn-outline {
+        border-radius: 10px;
+        padding: 10px 16px;
+        font-size: 13px;
+        font-weight: 800;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 7px;
+        cursor: pointer;
+    }
+
+    .btn-accent {
+        background: #e8ff47;
+        color: #0d0f14;
+        border: none;
+    }
+
+    .btn-outline {
+        background: #1a1e2a;
+        color: #e2e8f0;
+        border: 1px solid rgba(255,255,255,.07);
+    }
+
+    .image-actions {
+        display: flex;
+        gap: 10px;
+        justify-content: flex-end;
+        margin-top: 20px;
+    }
+
+    @@media(max-width: 900px) {
+        .image-layout {
+            grid-template-columns: 1fr;
+        }
+    }
+</style>
+
+<div class="image-form-root">
+
+    <div class="image-breadcrumb">
+        Vehicle Management ›
+        <a href="/Admin/CarImage/CarImageList">Car Images</a>
+        › Add New Image
+    </div>
+
+    <div class="image-header">
+        <div>
+            <h1 class="image-title">Add New Car Image</h1>
+            <p class="image-subtitle">Attach a gallery image to a rental car.</p>
+        </div>
+
+        <a href="/Admin/CarImage/CarImageList" class="btn-outline">✕ Cancel</a>
+    </div>
+
+    @if (!ViewData.ModelState.IsValid)
+    {
+        <div class="image-validation">
+            <div asp-validation-summary="All"></div>
+        </div>
+    }
+
+    <form id="imageForm" action="/Admin/CarImage/CreateCarImage" method="post" novalidate>
+        @Html.AntiForgeryToken()
+
+        <div class="image-layout">
+
+            <div>
+                <div class="image-card">
+                    <div class="image-card-header">🖼️ Image Information</div>
+
+                    <div class="image-card-body">
+                        <div class="image-field">
+                            <label>Car <span class="image-required">*</span></label>
+                            <select name="CarId" id="carId">
+                                <option value="0">Select car</option>
+                                @foreach (var car in cars)
+                                {
+                                    var carText = $"{car.Brand?.BrandName} {car.Model} - {car.PlateNumber}";
+
+                                    if (car.CarId == Model.CarId)
+                                    {
+                                        <option value="@car.CarId" selected>@carText</option>
+                                    }
+                                    else
+                                    {
+                                        <option value="@car.CarId">@carText</option>
+                                    }
+                                }
+                            </select>
+                        </div>
+
+                        <div class="image-field">
+                            <label>Image URL <span class="image-required">*</span></label>
+                            <input type="text"
+                                   id="imageUrl"
+                                   name="ImageUrl"
+                                   value="@Model?.ImageUrl"
+                                   placeholder="https://example.com/car-gallery-image.jpg"
+                                   oninput="previewImage(this.value)"
+                                   autocomplete="off" />
+                        </div>
+
+                        <div class="image-check-row">
+                            @if (Model?.IsCoverImage == true)
+                            {
+                                <input type="checkbox" id="isCoverImage" name="IsCoverImage" value="true" checked />
+                            }
+                            else
+                            {
+                                <input type="checkbox" id="isCoverImage" name="IsCoverImage" value="true" />
+                            }
+
+                            <input type="hidden" name="IsCoverImage" value="false" />
+                            <label for="isCoverImage">Set as cover image</label>
+                        </div>
+
+                        <div class="image-actions">
+                            <a href="/Admin/CarImage/CarImageList" class="btn-outline">Cancel</a>
+                            <button type="button" class="btn-accent" onclick="submitImageForm()">＋ Save Image</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div>
+                <div class="image-card">
+                    <div class="image-card-header">👁️ Live Preview</div>
+
+                    <div class="image-card-body">
+                        <div class="image-preview">
+                            <img id="previewTag" src="" alt="Car Image Preview" />
+                            <div id="previewPlaceholder">
+                                <div style="font-size:42px;">🖼️</div>
+                                <div>Enter image URL<br />to see preview</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="image-card">
+                    <div class="image-card-header">💡 Tips</div>
+                    <div class="image-card-body" style="color:#7a8499;font-size:13px;line-height:1.7;">
+                        Use high-quality landscape images for the best gallery appearance.
+                        If this image is selected as cover, other images of the same car will automatically lose cover status.
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </form>
+</div>
+
+<script>
+    function previewImage(value) {
+        const image = document.getElementById('previewTag');
+        const placeholder = document.getElementById('previewPlaceholder');
+
+        if (!value) {
+            image.style.display = 'none';
+            placeholder.style.display = 'block';
+            return;
+        }
+
+        image.src = value;
+        image.style.display = 'block';
+        placeholder.style.display = 'none';
+    }
+
+    function submitImageForm() {
+        const carId = document.getElementById('carId').value;
+        const imageUrl = document.getElementById('imageUrl').value.trim();
+
+        if (carId === "0" || !imageUrl) {
+            alert("Please select a car and enter image URL.");
+            return;
+        }
+
+        document.getElementById('imageForm').submit();
+    }
+
+    previewImage(document.getElementById('imageUrl').value);
+</script>

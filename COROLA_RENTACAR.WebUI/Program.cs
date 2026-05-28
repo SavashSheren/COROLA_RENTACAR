@@ -55,6 +55,8 @@ if (!app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
+app.UseStaticFiles();
+
 app.UseRouting();
 
 app.UseAuthorization();
@@ -63,7 +65,7 @@ app.MapStaticAssets();
 
 app.MapControllerRoute(
     name: "areas",
-    pattern: "{area:exists}/{controller=Brand}/{action=BrandList}/{id?}")
+    pattern: "{area:exists}/{controller=Dashboard}/{action=Index}/{id?}")
     .WithStaticAssets();
 
 app.MapControllerRoute(

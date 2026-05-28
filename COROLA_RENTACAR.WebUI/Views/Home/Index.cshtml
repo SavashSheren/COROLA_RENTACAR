@@ -1,8 +1,266 @@
-﻿@{
-    ViewData["Title"] = "Home Page";
+﻿@model List<COROLA_RENTACAR.EntityLayer.Entities.Car>
+
+@{
+    ViewData["Title"] = "Home";
+    Layout = "~/Views/Shared/_UILayout.cshtml";
 }
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
-</div>
+<section class="slider style_four">
+    <div class="shape-image" style="background-image: url(/carola/assets/images/shape/shape-5.png);"></div>
+    <div class="shape-image-2" style="background-image: url(/carola/assets/images/shape/shape-6.png);"></div>
+
+    <div class="owl-carousel owl_navs_one owl_dots_one theme_carousel owl-theme"
+         data-options='{"loop": true, "margin": 0, "autoheight":true, "lazyload":true, "nav": true, "dots": true, "autoplay": true, "autoplayTimeout": 7000, "smartSpeed": 1800, "responsive":{ "0" :{ "items": "1" }, "768" :{ "items" : "1" } , "1000":{ "items" : "1" }}}'>
+
+        <div class="slide-item-content">
+            <div class="slide-item content_left">
+                <div class="container">
+                    <div class="row">
+                        <div class="col-lg-6 col-md-12">
+                            <div class="slider_content">
+                                <h6 class="animate_up d-inline-block">COROLA Rent A Car</h6>
+                                <h1 class="animate_left">Premium Cars <br><span>For Smart Rentals</span></h1>
+                                <p class="description animate_right">
+                                    Choose your car, complete driver license verification and create your rental request safely.
+                                </p>
+                                <div class="button_all animate_down">
+                                    <a href="/Car" class="btn-style-four animated">Explore Cars</a>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-lg-6 col-md-12">
+                            <div class="slider-image">
+                                <img src="/carola/assets/images/sliders/slider-4.png" alt="COROLA Rent A Car">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="slide-item-content">
+            <div class="slide-item content_left">
+                <div class="container">
+                    <div class="row">
+                        <div class="col-lg-6 col-md-12">
+                            <div class="slider_content">
+                                <h6 class="animate_up d-inline-block">Fast Reservation</h6>
+                                <h1 class="animate_left">Verified Drivers <br><span>Reliable Rentals</span></h1>
+                                <p class="description animate_right">
+                                    Driver license approval flow makes the rental process safer and more professional.
+                                </p>
+                                <div class="button_all animate_down">
+                                    <a href="/Car" class="btn-style-four animated">Rent Now</a>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-lg-6 col-md-12">
+                            <div class="slider-image">
+                                <img src="/carola/assets/images/sliders/slider-4.png" alt="COROLA Rent A Car">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</section>
+
+<section class="booking-section style-three">
+    <div class="container">
+        <div class="filter-wrapper">
+            <div class="filter-group">
+                <form action="/Car" method="get">
+                    <div class="filter-area">
+                        <div class="row align-items-center">
+                            <div class="col-xl-3 col-md-6 col-sm-12 divider">
+                                <div class="single-search-box">
+                                    <div class="icon"><i class="icon-24"></i></div>
+                                    <div class="searchbox-input">
+                                        <label>Pickup Location</label>
+                                        <input type="text" name="pickupLocation" value="Istanbul" />
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-xl-3 col-md-6 col-sm-12 divider">
+                                <div class="single-search-box">
+                                    <div class="icon"><i class="icon-25"></i></div>
+                                    <div class="searchbox-input">
+                                        <label>Pickup Date</label>
+                                        <input type="date" name="pickupDate" />
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-xl-3 col-md-6 col-sm-12 divider">
+                                <div class="single-search-box">
+                                    <div class="icon"><i class="icon-26"></i></div>
+                                    <div class="searchbox-input">
+                                        <label>Return Date</label>
+                                        <input type="date" name="returnDate" />
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-xl-3 col-md-6 col-sm-12">
+                                <button type="submit" class="btn-style-one" style="width:100%;">
+                                    Search Cars <i class="icon-13"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="about-style-three pt_120 pb_120">
+    <div class="container">
+        <div class="row clearfix align-items-center">
+            <div class="col-lg-6 col-md-12">
+                <div class="about-three-image">
+                    <img src="/carola/assets/images/resource/about-3.png" alt="COROLA Rent A Car">
+                </div>
+            </div>
+
+            <div class="col-lg-6 col-md-12">
+                <div class="about-three-content">
+                    <div class="section-title mb_30">
+                        <span class="sub-title">About COROLA</span>
+                        <h2 class="title">Reliable Car Rental With Smart Verification</h2>
+                    </div>
+
+                    <p>
+                        COROLA Rent A Car combines vehicle management, reservation flow and driver license verification
+                        in one modern rental system.
+                    </p>
+
+                    <ul class="about-three-list">
+                        <li>Verified driver license approval flow</li>
+                        <li>Dynamic car and reservation management</li>
+                        <li>Clear daily pricing and fast rental request</li>
+                    </ul>
+
+                    <div class="about-three-btn mt_30">
+                        <a href="/Home/About" class="btn-style-one">Learn More <i class="icon-13"></i></a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="popular-car-section pt_120 pb_90">
+    <div class="container">
+        <div class="section-title centred mb_60">
+            <span class="sub-title">Popular Cars</span>
+            <h2 class="title">Available Rental Cars</h2>
+        </div>
+
+        <div class="row">
+            @if (Model == null || !Model.Any())
+            {
+                <div class="col-12">
+                    <div style="text-align:center;padding:50px;color:#777;">
+                        No cars available yet.
+                    </div>
+                </div>
+            }
+            else
+            {
+                foreach (var car in Model)
+                {
+                    <div class="col-xl-4 col-lg-4 col-md-6 col-sm-12">
+                        <div class="single-popular-car-block">
+                            <div class="single-popular-car-image">
+                                <img src="@car.ImageUrl"
+                                     alt="@car.Brand?.BrandName @car.Model"
+                                     onerror="this.src='/carola/assets/images/popular-car/popular-car-1.jpg';">
+
+                                <div class="single-popular-car-rent-per-day">
+                                    <span>@car.DailyPrice.ToString("N0") ₺</span>/ Day
+                                </div>
+                            </div>
+
+                            <div class="single-popular-car-content">
+                                <div class="single-popular-car-rating">
+                                    <i class="icon-9"></i> Available
+                                </div>
+
+                                <h5 class="single-popular-car-title">
+                                    @car.Brand?.BrandName @car.Model
+                                </h5>
+
+                                <p class="single-popular-car-text">
+                                    @car.ModelYear model, @car.FuelType fuel, @car.TransmissionType transmission.
+                                </p>
+
+                                <div class="border-divider"></div>
+
+                                <ul class="single-popular-car-info">
+                                    <li><i class="icon-6"></i>Category: @car.Category?.CategoryName</li>
+                                    <li><i class="icon-7"></i>Luggage: @car.LuggageCapacity</li>
+                                    <li><i class="icon-8"></i>Passengers: @car.SeatCount</li>
+                                </ul>
+
+                                <div class="single-popular-car-book-btn">
+                                    <a href="/Car/Detail/@car.CarId" class="btn-style-three">View Details</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                }
+            }
+        </div>
+
+        <div style="text-align:center;margin-top:30px;">
+            <a href="/Car" class="btn-style-one">View All Cars <i class="icon-13"></i></a>
+        </div>
+    </div>
+</section>
+
+<section class="choose-section pt_120 pb_90">
+    <div class="container">
+        <div class="section-title centred mb_60">
+            <span class="sub-title">Why Choose Us</span>
+            <h2 class="title">Built For Safe And Fast Rentals</h2>
+        </div>
+
+        <div class="row">
+            <div class="col-lg-4 col-md-6 col-sm-12">
+                <div class="choose-block-one">
+                    <div class="inner-box">
+                        <div class="icon-box"><i class="icon-8"></i></div>
+                        <h4>Verified Customers</h4>
+                        <p>Driver license approval keeps the rental process controlled and secure.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-4 col-md-6 col-sm-12">
+                <div class="choose-block-one">
+                    <div class="inner-box">
+                        <div class="icon-box"><i class="icon-9"></i></div>
+                        <h4>Clear Pricing</h4>
+                        <p>Total price is calculated by selected car, daily price and rental dates.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-4 col-md-6 col-sm-12">
+                <div class="choose-block-one">
+                    <div class="inner-box">
+                        <div class="icon-box"><i class="icon-10"></i></div>
+                        <h4>Modern Management</h4>
+                        <p>Cars, customers, images and reservations are managed from a powerful admin panel.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>

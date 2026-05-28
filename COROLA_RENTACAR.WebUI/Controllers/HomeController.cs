@@ -1,32 +1,40 @@
-using COROLA_RENTACAR.WebUI.Models;
+using COROLA_RENTACAR.BusinessLayer.Abstract;
 using Microsoft.AspNetCore.Mvc;
-using System.Diagnostics;
 
 namespace COROLA_RENTACAR.WebUI.Controllers
 {
     public class HomeController : Controller
     {
-        private readonly ILogger<HomeController> _logger;
+        private readonly ICarService _carService;
 
-        public HomeController(ILogger<HomeController> logger)
+        public HomeController(ICarService carService)
         {
-            _logger = logger;
+            _carService = carService;
         }
 
-        public IActionResult Index()
+        [HttpGet]
+        public async Task<IActionResult> Index()
+        {
+            var cars = await _carService.TGetAllCarsWithDetailsAsync();
+            var featuredCars = cars
+                .Where(x => x.IsAvailable)
+                .OrderByDescending(x => x.CarId)
+                .Take(6)
+                .ToList();
+
+            return View(featuredCars);
+        }
+
+        [HttpGet]
+        public IActionResult About()
         {
             return View();
         }
 
-        public IActionResult Privacy()
+        [HttpGet]
+        public IActionResult Contact()
         {
             return View();
-        }
-
-        [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
-        public IActionResult Error()
-        {
-            return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
         }
     }
 }

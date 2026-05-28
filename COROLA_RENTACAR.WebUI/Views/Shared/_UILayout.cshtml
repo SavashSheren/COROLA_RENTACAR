@@ -1,0 +1,227 @@
+﻿@{
+    var pageTitle = ViewData["Title"]?.ToString() ?? "COROLA Rent A Car";
+}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
+
+    <title>@pageTitle | COROLA Rent A Car</title>
+
+    <link href="/carola/assets/css/bootstrap.css" rel="stylesheet">
+    <link href="/carola/assets/css/fontawesome-all.css" rel="stylesheet">
+    <link href="/carola/assets/css/iconfont.css" rel="stylesheet">
+    <link href="/carola/assets/css/owl.css" rel="stylesheet">
+    <link href="/carola/assets/css/global.css" rel="stylesheet">
+    <link href="/carola/assets/css/jquery.fancybox.min.css" rel="stylesheet">
+    <link href="/carola/assets/css/elements-css/header.css" rel="stylesheet">
+    <link href="/carola/assets/css/elements-css/footer.css" rel="stylesheet">
+    <link href="/carola/assets/css/elements-css/booking-form.css" rel="stylesheet">
+    <link href="/carola/assets/language-switcher/polyglot-language-switcher.css" rel="stylesheet" />
+    <link href="/carola/assets/css/daterangepicker.css" rel="stylesheet">
+    <link href="/carola/assets/css/jquery-ui.css" rel="stylesheet">
+    <link href="/carola/assets/css/style.css" rel="stylesheet">
+    <link href="/carola/assets/css/responsive.css" rel="stylesheet">
+
+    <link rel="shortcut icon" href="/carola/assets/images/favicon.png" type="image/x-icon">
+    <link rel="icon" href="/carola/assets/images/favicon.png" type="image/x-icon">
+
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@100..900&display=swap" rel="stylesheet">
+</head>
+
+<body class="boxed_wrapper">
+
+    <header class="header home-four">
+        <div class="main_header">
+            <div class="container">
+                <div class="main_header_inner">
+                    <div class="main_header_logo">
+                        <figure>
+                            <a href="/">
+                                <img src="/carola/assets/images/logo.png" alt="COROLA Rent A Car">
+                            </a>
+                        </figure>
+                    </div>
+
+                    <div class="main_header_menu menu_area">
+                        <div class="mobile-nav-toggler">
+                            <span class="icon-bar"></span>
+                            <span class="icon-bar"></span>
+                            <span class="icon-bar"></span>
+                            <span class="icon-bar"></span>
+                        </div>
+
+                        <nav class="main-menu">
+                            <div class="collapse navbar-collapse show">
+                                <ul class="navigation">
+                                    <li><a href="/">Home</a></li>
+                                    <li><a href="/Car">Cars</a></li>
+                                    <li><a href="/Home/About">About</a></li>
+                                    <li><a href="/Home/Contact">Contact</a></li>
+                                    <li><a href="/Admin/Dashboard/Index">Admin</a></li>
+                                </ul>
+                            </div>
+                        </nav>
+                    </div>
+
+                    <div class="header_right_content">
+                        <div class="link-btn">
+                            <a href="/Car" class="btn-style-one">Rent A Car</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="sticky_header">
+            <div class="container">
+                <div class="main_header_inner">
+                    <div class="main_header_logo">
+                        <figure>
+                            <a href="/">
+                                <img src="/carola/assets/images/logo.png" alt="COROLA Rent A Car">
+                            </a>
+                        </figure>
+                    </div>
+
+                    <div class="main_header_menu menu_area">
+                        <nav class="main-menu"></nav>
+                    </div>
+
+                    <div class="header_right_content">
+                        <div class="link-btn">
+                            <a href="/Car" class="btn-style-one">Rent A Car</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="mobile-menu">
+            <div class="menu-backdrop"></div>
+            <div class="close-btn">X</div>
+            <nav class="menu-box">
+                <div class="nav-logo">
+                    <a href="/">
+                        <img src="/carola/assets/images/mobile-logo.png" alt="COROLA Rent A Car">
+                    </a>
+                </div>
+
+                <div class="menu-outer"></div>
+
+                <div class="contact-info">
+                    <h4>Contact Info</h4>
+                    <ul>
+                        <li>Istanbul, Türkiye</li>
+                        <li><a href="tel:+905551112233">+90 555 111 22 33</a></li>
+                        <li><a href="mailto:info@corolarentacar.com">info@corolarentacar.com</a></li>
+                    </ul>
+                </div>
+
+                <ul class="social-links centred">
+                    <li><a href="#"><span class="fab fa-facebook-square"></span></a></li>
+                    <li><a href="#"><span class="fab fa-instagram"></span></a></li>
+                    <li><a href="#"><span class="fab fa-linkedin"></span></a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    @RenderBody()
+
+    <footer class="main_footer home-three pt_120">
+        <div class="container">
+            <div class="footer-top-outer">
+                <div class="row">
+                    <div class="col-xl-3 col-lg-3 col-md-6 col-sm-12">
+                        <div class="footer_widget footer_about_widget">
+                            <figure class="footer_widget_logo">
+                                <a href="/">
+                                    <img src="/carola/assets/images/footer-logo.png" alt="COROLA Rent A Car">
+                                </a>
+                            </figure>
+
+                            <h6><strong>Follow Us On:</strong></h6>
+
+                            <ul class="social-links">
+                                <li><a href="#"><i class="fab fa-square-facebook"></i></a></li>
+                                <li><a href="#"><i class="fab fa-square-instagram"></i></a></li>
+                                <li><a href="#"><i class="fab fa-linkedin"></i></a></li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="col-xl-3 col-lg-3 col-md-6 col-sm-12">
+                        <div class="footer_widget footer_resources_widget">
+                            <h4 class="footer_widget_title">Quick Links</h4>
+                            <ul class="resources_page_list">
+                                <li><a href="/">Home</a></li>
+                                <li><a href="/Car">Cars</a></li>
+                                <li><a href="/Home/About">About</a></li>
+                                <li><a href="/Home/Contact">Contact</a></li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="col-xl-2 col-lg-2 col-md-6 col-sm-12">
+                        <div class="footer_widget footer_community_widget">
+                            <h4 class="footer_widget_title">Services</h4>
+                            <ul class="community_page_list">
+                                <li><a href="/Car">Daily Rental</a></li>
+                                <li><a href="/Car">Airport Rental</a></li>
+                                <li><a href="/Car">Luxury Cars</a></li>
+                                <li><a href="/Car">Economy Cars</a></li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="col-xl-4 col-lg-4 col-md-6 col-sm-12">
+                        <div class="footer_widget footer_contact_widget">
+                            <h4 class="footer_widget_title">Contact</h4>
+                            <p>Istanbul, Türkiye</p>
+                            <ul class="footer-info-list">
+                                <li><a href="mailto:info@corolarentacar.com">info@corolarentacar.com</a></li>
+                                <li><a href="tel:+905551112233">+90 555 111 22 33</a></li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="footer-bottom-outer">
+                <div class="copyright">
+                    Copyright &copy; @DateTime.Now.Year
+                    <a href="/">COROLA Rent A Car</a>. All Rights Reserved
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <button class="scroll-top scroll-to-target" data-target="html">
+        <i class="icon-13"></i>
+    </button>
+
+    <script src="/carola/assets/js/jquery-3.7.1.min.js"></script>
+    <script src="/carola/assets/js/jquery-ui.js"></script>
+    <script src="/carola/assets/js/moment.min.js"></script>
+    <script src="/carola/assets/js/daterangepicker.min.js"></script>
+    <script src="/carola/assets/js/bootstrap.min.js"></script>
+    <script src="/carola/assets/js/popper.min.js"></script>
+    <script src="/carola/assets/js/select2.min.js"></script>
+    <script src="/carola/assets/js/jquery.nice-select.min.js"></script>
+    <script src="/carola/assets/js/jquery.fancybox.js"></script>
+    <script src="/carola/assets/js/appear.js"></script>
+    <script src="/carola/assets/js/wow.js"></script>
+    <script src="/carola/assets/js/owl.js"></script>
+    <script src="/carola/assets/js/validation.js"></script>
+    <script src="/carola/assets/language-switcher/jquery.polyglot.language.switcher.js"></script>
+    <script src="/carola/assets/js/main.js"></script>
+    <script src="/carola/assets/js/booking-form.js"></script>
+
+    @RenderSection("Scripts", required: false)
+</body>
+</html>

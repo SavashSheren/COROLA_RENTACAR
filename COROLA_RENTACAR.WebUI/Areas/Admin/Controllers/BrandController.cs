@@ -1,5 +1,6 @@
 ﻿using COROLA_RENTACAR.BusinessLayer.Abstract;
 using COROLA_RENTACAR.EntityLayer.Entities;
+using FluentValidation;
 using Microsoft.AspNetCore.Mvc;
 
 namespace COROLA_RENTACAR.WebUI.Areas.Admin.Controllers
@@ -14,41 +15,83 @@ namespace COROLA_RENTACAR.WebUI.Areas.Admin.Controllers
             _brandService = brandService;
         }
 
+        [HttpGet]
         public async Task<IActionResult> BrandList()
         {
             var values = await _brandService.TGetAllAsync();
             return View(values);
         }
+
         [HttpGet]
-        public async Task<IActionResult> CreateBrand()
+        public IActionResult CreateBrand()
         {
-            return View();
+            var brand = new Brand
+            {
+                Status = true
+            };
+
+            return View(brand);
         }
+
         [HttpPost]
+        [ValidateAntiForgeryToken]
         public async Task<IActionResult> CreateBrand(Brand brand)
         {
-            await _brandService.TInsertAsync(brand);
-            return RedirectToAction("BrandList");
+            try
+            {
+                await _brandService.TInsertAsync(brand);
+                return Redirect("/Admin/Brand/BrandList");
+            }
+            catch (ValidationException ex)
+            {
+                foreach (var error in ex.Errors)
+                {
+                    ModelState.AddModelError(error.PropertyName, error.ErrorMessage);
+                }
+
+                return View(brand);
+            }
         }
 
         [HttpGet]
         public async Task<IActionResult> UpdateBrand(int id)
         {
-            var valur = await _brandService.TGetByIdAsync(id);
-            return View();
-        }
-        [HttpPost]
-        public async Task<IActionResult> UpdateBrand(Brand brand)
-        {
-            await _brandService.TUpdateAsync(brand);
-            return RedirectToAction("BrandList");
+            var value = await _brandService.TGetByIdAsync(id);
+
+            if (value == null)
+            {
+                return NotFound();
+            }
+
+            return View(value);
         }
 
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> UpdateBrand(Brand brand)
+        {
+            try
+            {
+                await _brandService.TUpdateAsync(brand);
+                return Redirect("/Admin/Brand/BrandList");
+            }
+            catch (ValidationException ex)
+            {
+                foreach (var error in ex.Errors)
+                {
+                    ModelState.AddModelError(error.PropertyName, error.ErrorMessage);
+                }
+
+                return View(brand);
+            }
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteBrand(int id)
         {
             await _brandService.TDeleteAsync(id);
-            return RedirectToAction("BrandList");
-
+            return Redirect("/Admin/Brand/BrandList");
         }
     }
 }

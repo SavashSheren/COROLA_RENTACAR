@@ -1,7 +1,7 @@
 ﻿@model COROLA_RENTACAR.EntityLayer.Entities.Brand
 
 @{
-    ViewData["Title"] = "CreateBrand";
+    ViewData["Title"] = "Create Brand";
     Layout = "~/Views/AdminLayout/Index.cshtml";
 }
 
@@ -12,160 +12,91 @@
         --bg-dark3: #1a1e2a;
         --accent: #e8ff47;
         --accent-dim: rgba(232,255,71,.12);
-        --accent2: #4f8dff;
-        --accent2-dim: rgba(79,141,255,.12);
         --danger: #ff5259;
         --success: #30e0a1;
         --border: rgba(255,255,255,.07);
         --text: #e2e8f0;
         --text-muted: #7a8499;
-        --radius: 12px;
-        --radius-lg: 18px;
-    }
-
-    *, *::before, *::after {
-        box-sizing: border-box;
-        margin: 0;
-        padding: 0;
+        --radius: 14px;
     }
 
     .cb-root {
         padding: 28px;
-        font-family: 'DM Sans', 'Segoe UI', sans-serif;
         color: var(--text);
+        font-family: 'DM Sans', 'Segoe UI', sans-serif;
     }
 
     .cb-breadcrumb {
         display: flex;
         align-items: center;
-        gap: 6px;
+        gap: 7px;
         font-size: 12px;
         color: var(--text-muted);
-        margin-bottom: 6px;
+        margin-bottom: 8px;
     }
 
         .cb-breadcrumb a {
             color: var(--text-muted);
             text-decoration: none;
-            transition: color .15s;
         }
 
             .cb-breadcrumb a:hover {
-                color: var(--text);
+                color: var(--accent);
             }
-
-        .cb-breadcrumb span {
-            color: var(--text);
-        }
 
     .cb-page-header {
         display: flex;
-        align-items: flex-end;
         justify-content: space-between;
+        align-items: flex-end;
         gap: 16px;
-        margin-bottom: 28px;
+        margin-bottom: 24px;
         flex-wrap: wrap;
     }
 
     .cb-page-title {
-        font-family: 'Syne', Georgia, sans-serif;
         font-size: 26px;
-        font-weight: 700;
+        font-weight: 800;
+        margin: 0;
         color: var(--text);
-        line-height: 1;
     }
 
     .cb-page-subtitle {
-        font-size: 13px;
         color: var(--text-muted);
-        margin-top: 5px;
-    }
-
-    .btn-accent {
-        background: var(--accent);
-        color: #0d0f14;
-        border: none;
-        border-radius: 10px;
-        padding: 9px 20px;
         font-size: 13px;
-        font-weight: 600;
-        font-family: inherit;
-        cursor: pointer;
-        display: inline-flex;
-        align-items: center;
-        gap: 7px;
-        text-decoration: none;
-        transition: opacity .2s;
+        margin-top: 6px;
     }
-
-        .btn-accent:hover {
-            opacity: .85;
-            color: #0d0f14;
-        }
-
-    .btn-outline {
-        background: transparent;
-        color: var(--text-muted);
-        border: 1px solid var(--border);
-        border-radius: 10px;
-        padding: 9px 18px;
-        font-size: 13px;
-        font-weight: 500;
-        font-family: inherit;
-        cursor: pointer;
-        display: inline-flex;
-        align-items: center;
-        gap: 7px;
-        text-decoration: none;
-        transition: background .2s, color .2s;
-    }
-
-        .btn-outline:hover {
-            background: var(--bg-dark2);
-            color: var(--text);
-        }
 
     .cb-layout {
         display: grid;
-        grid-template-columns: 1fr 320px;
-        gap: 20px;
-        align-items: start;
+        grid-template-columns: minmax(0, 1fr) 340px;
+        gap: 18px;
     }
 
-    @@media (max-width: 860px) {
-        .cb-layout {
-            grid-template-columns: 1fr;
-        }
-    }
-
-    .cb-card {
+    .cb-card,
+    .cb-sidebar-card {
         background: var(--bg-dark2);
         border: 1px solid var(--border);
-        border-radius: var(--radius-lg);
+        border-radius: var(--radius);
+        margin-bottom: 16px;
         overflow: hidden;
-        margin-bottom: 20px;
     }
 
-        .cb-card:last-child {
-            margin-bottom: 0;
-        }
-
-    .cb-card-head {
+    .cb-card-head,
+    .cb-sidebar-head {
+        padding: 16px 18px;
+        border-bottom: 1px solid var(--border);
         display: flex;
         align-items: center;
-        gap: 10px;
-        padding: 16px 20px;
-        border-bottom: 1px solid var(--border);
+        gap: 12px;
+        font-weight: 800;
     }
 
     .cb-card-icon {
-        width: 32px;
-        height: 32px;
-        border-radius: 9px;
+        width: 38px;
+        height: 38px;
+        border-radius: 10px;
         display: grid;
         place-items: center;
-        font-size: 15px;
-        flex-shrink: 0;
     }
 
         .cb-card-icon.yellow {
@@ -173,417 +104,225 @@
             color: var(--accent);
         }
 
-        .cb-card-icon.purple {
-            background: rgba(167,139,250,.1);
-            color: #a78bfa;
-        }
-
         .cb-card-icon.green {
-            background: rgba(48,224,161,.1);
+            background: rgba(48,224,161,.12);
             color: var(--success);
         }
 
     .cb-card-title {
-        font-size: 14px;
-        font-weight: 600;
-        color: var(--text);
+        font-size: 15px;
+        font-weight: 800;
     }
 
     .cb-card-subtitle {
         font-size: 12px;
         color: var(--text-muted);
-        margin-top: 1px;
+        margin-top: 3px;
     }
 
-    .cb-card-body {
-        padding: 20px;
+    .cb-card-body,
+    .cb-sidebar-body {
+        padding: 18px;
     }
 
     .cb-field {
-        display: flex;
-        flex-direction: column;
-        gap: 6px;
-        margin-bottom: 18px;
+        margin-bottom: 16px;
     }
 
-        .cb-field:last-child {
-            margin-bottom: 0;
-        }
-
         .cb-field label {
-            font-size: 12px;
-            font-weight: 600;
-            color: var(--text-muted);
-            text-transform: uppercase;
-            letter-spacing: .6px;
-        }
-
-        .cb-field .cb-hint {
-            font-size: 11px;
-            color: var(--text-muted);
-            margin-top: -2px;
+            display: block;
+            font-size: 13px;
+            font-weight: 700;
+            margin-bottom: 7px;
         }
 
     .cb-required {
         color: var(--danger);
-        margin-left: 3px;
     }
 
     .cb-field input {
+        width: 100%;
         background: var(--bg-dark3);
         border: 1px solid var(--border);
         border-radius: 10px;
         color: var(--text);
-        padding: 10px 14px;
-        font-size: 13px;
-        font-family: inherit;
+        padding: 11px 13px;
         outline: none;
-        width: 100%;
-        transition: border .2s, box-shadow .2s;
     }
-
-        .cb-field input::placeholder {
-            color: var(--text-muted);
-        }
 
         .cb-field input:focus {
             border-color: var(--accent);
             box-shadow: 0 0 0 3px var(--accent-dim);
         }
 
-        .cb-field input.input-error {
-            border-color: var(--danger);
-            box-shadow: 0 0 0 3px rgba(255,82,89,.12);
+    .cb-hint {
+        font-size: 11px;
+        color: var(--text-muted);
+        margin-top: 6px;
+    }
+
+    .cb-validation-summary {
+        background: rgba(255,82,89,.1);
+        border: 1px solid rgba(255,82,89,.25);
+        color: var(--danger);
+        border-radius: 10px;
+        padding: 12px 14px;
+        margin-bottom: 16px;
+        font-size: 13px;
+    }
+
+        .cb-validation-summary ul {
+            margin: 0;
+            padding-left: 18px;
         }
 
-    .cb-err-msg {
-        font-size: 11px;
-        color: var(--danger);
-        margin-top: 2px;
-        display: none;
+    .cb-img-preview {
+        height: 145px;
+        border-radius: 12px;
+        background: var(--bg-dark3);
+        border: 1px dashed var(--border);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        overflow: hidden;
+        color: var(--text-muted);
+        text-align: center;
     }
 
-    .cb-field.has-error .cb-err-msg {
-        display: block;
-    }
-
-    .cb-field.has-error input {
-        border-color: var(--danger);
-        box-shadow: 0 0 0 3px rgba(255,82,89,.12);
-    }
+        .cb-img-preview img {
+            max-width: 120px;
+            max-height: 100px;
+            object-fit: contain;
+            display: none;
+        }
 
     .cb-toggle-row {
         display: flex;
         align-items: center;
         justify-content: space-between;
-        gap: 12px;
+        gap: 16px;
     }
 
     .cb-toggle-label {
-        font-size: 13px;
-        font-weight: 500;
-        color: var(--text);
+        font-weight: 800;
     }
 
     .cb-toggle-desc {
         font-size: 12px;
         color: var(--text-muted);
-        margin-top: 2px;
+        margin-top: 4px;
     }
 
     .cb-toggle {
-        position: relative;
-        width: 44px;
-        height: 24px;
-        flex-shrink: 0;
-        background: var(--bg-dark3);
-        border: 1px solid var(--border);
-        border-radius: 12px;
+        width: 54px;
+        height: 30px;
+        border-radius: 999px;
+        background: rgba(255,82,89,.25);
+        padding: 4px;
         cursor: pointer;
-        transition: background .2s, border-color .2s;
+        transition: .2s;
     }
 
         .cb-toggle.on {
-            background: var(--accent-dim);
-            border-color: rgba(232,255,71,.3);
+            background: rgba(48,224,161,.35);
         }
 
     .cb-toggle-knob {
-        position: absolute;
-        top: 3px;
-        left: 3px;
-        width: 16px;
-        height: 16px;
+        width: 22px;
+        height: 22px;
         border-radius: 50%;
-        background: var(--text-muted);
-        transition: left .2s, background .2s;
+        background: #fff;
+        transition: .2s;
     }
 
     .cb-toggle.on .cb-toggle-knob {
-        left: 23px;
-        background: var(--accent);
+        transform: translateX(24px);
     }
 
-    .cb-img-preview {
-        width: 100%;
-        height: 150px;
+    .btn-accent,
+    .btn-outline {
         border-radius: 10px;
-        background: var(--bg-dark3);
-        border: 1px dashed var(--border);
-        display: flex;
-        flex-direction: column;
+        padding: 10px 16px;
+        font-size: 13px;
+        font-weight: 800;
+        text-decoration: none;
+        display: inline-flex;
         align-items: center;
-        justify-content: center;
-        gap: 8px;
-        overflow: hidden;
-        transition: border-color .2s;
-        margin-top: 14px;
+        gap: 7px;
+        cursor: pointer;
     }
 
-        .cb-img-preview img {
-            width: 100%;
-            height: 100%;
-            object-fit: contain;
-            padding: 12px;
-            display: none;
-        }
-
-        .cb-img-preview .cb-preview-placeholder {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .cb-img-preview.has-img .cb-preview-placeholder {
-            display: none;
-        }
-
-        .cb-img-preview.has-img img {
-            display: block;
-        }
-
-    .cb-preview-icon {
-        font-size: 28px;
-        color: var(--text-muted);
+    .btn-accent {
+        background: var(--accent);
+        color: #0d0f14;
+        border: none;
     }
 
-    .cb-preview-label {
-        font-size: 12px;
-        color: var(--text-muted);
-        text-align: center;
-        line-height: 1.5;
+    .btn-outline {
+        background: var(--bg-dark3);
+        color: var(--text);
+        border: 1px solid var(--border);
     }
 
     .cb-action-bar {
         display: flex;
-        align-items: center;
-        justify-content: flex-end;
         gap: 10px;
-        padding-top: 20px;
-        border-top: 1px solid var(--border);
-        margin-top: 4px;
-    }
-
-    .cb-sidebar-card {
-        background: var(--bg-dark2);
-        border: 1px solid var(--border);
-        border-radius: var(--radius-lg);
-        overflow: hidden;
-        margin-bottom: 16px;
-    }
-
-        .cb-sidebar-card:last-child {
-            margin-bottom: 0;
-        }
-
-    .cb-sidebar-head {
-        padding: 14px 18px;
-        border-bottom: 1px solid var(--border);
-        font-size: 13px;
-        font-weight: 600;
-        color: var(--text);
-    }
-
-    .cb-sidebar-body {
-        padding: 16px 18px;
+        justify-content: flex-end;
     }
 
     .cb-live-row {
         display: flex;
         justify-content: space-between;
-        align-items: center;
-        padding: 8px 0;
+        gap: 12px;
         border-bottom: 1px solid var(--border);
+        padding: 10px 0;
+        font-size: 13px;
     }
 
-        .cb-live-row:last-child {
-            border-bottom: none;
-            padding-bottom: 0;
-        }
-
     .cb-live-key {
-        font-size: 12px;
         color: var(--text-muted);
     }
 
     .cb-live-val {
-        font-size: 13px;
-        font-weight: 500;
-        color: var(--text);
+        max-width: 180px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        text-align: right;
     }
-
-        .cb-live-val.empty {
-            color: var(--text-muted);
-            font-style: italic;
-            font-weight: 400;
-            font-size: 12px;
-        }
-
-        .cb-live-val.accent {
-            color: var(--accent);
-        }
 
     .cb-status-pill {
         display: inline-flex;
         align-items: center;
         gap: 5px;
+        border-radius: 8px;
+        padding: 4px 9px;
         font-size: 12px;
-        font-weight: 600;
-        padding: 3px 10px;
-        border-radius: 6px;
+        font-weight: 800;
     }
 
         .cb-status-pill.active {
             background: rgba(48,224,161,.12);
             color: var(--success);
-            border: 1px solid rgba(48,224,161,.25);
         }
 
         .cb-status-pill.passive {
-            background: rgba(255,82,89,.1);
+            background: rgba(255,82,89,.12);
             color: var(--danger);
-            border: 1px solid rgba(255,82,89,.2);
         }
 
-    .cb-status-dot {
-        width: 6px;
-        height: 6px;
-        border-radius: 50%;
-        background: currentColor;
-    }
-
-    .cb-req-item {
-        display: flex;
-        align-items: center;
-        gap: 8px;
-        font-size: 13px;
-        padding: 5px 0;
-        transition: color .2s;
-    }
-
-        .cb-req-item.done {
-            color: var(--success);
+    @@media(max-width: 900px) {
+        .cb-layout {
+            grid-template-columns: 1fr;
         }
-
-        .cb-req-item.pending {
-            color: var(--text-muted);
-        }
-
-    .cb-req-icon {
-        font-size: 14px;
     }
-
-    .cb-tip-item {
-        display: flex;
-        gap: 10px;
-        padding: 8px 0;
-        border-bottom: 1px solid var(--border);
-    }
-
-        .cb-tip-item:last-child {
-            border-bottom: none;
-        }
-
-    .cb-tip-icon {
-        font-size: 14px;
-        flex-shrink: 0;
-        margin-top: 1px;
-    }
-
-    .cb-tip-text {
-        font-size: 12px;
-        color: var(--text-muted);
-        line-height: 1.55;
-    }
-
-    .cb-id-badge {
-        display: inline-flex;
-        align-items: center;
-        gap: 6px;
-        background: var(--accent-dim);
-        border: 1px solid rgba(232,255,71,.2);
-        border-radius: 8px;
-        padding: 6px 12px;
-        font-size: 12px;
-        color: var(--accent);
-        font-weight: 600;
-        margin-bottom: 20px;
-    }
-
-    .cb-validation-summary {
-        background: rgba(255,82,89,.08);
-        border: 1px solid rgba(255,82,89,.2);
-        border-radius: 10px;
-        padding: 12px 16px;
-        margin-bottom: 20px;
-        display: none;
-    }
-
-        .cb-validation-summary.show {
-            display: block;
-        }
-
-        .cb-validation-summary p {
-            font-size: 12px;
-            color: var(--danger);
-            line-height: 1.6;
-        }
-
-    .cb-success-toast {
-        position: fixed;
-        bottom: 28px;
-        right: 28px;
-        background: rgba(48,224,161,.15);
-        border: 1px solid rgba(48,224,161,.3);
-        border-radius: 12px;
-        padding: 14px 20px;
-        display: flex;
-        align-items: center;
-        gap: 10px;
-        font-size: 13px;
-        font-weight: 500;
-        color: var(--success);
-        z-index: 999;
-        transform: translateY(80px);
-        opacity: 0;
-        transition: transform .3s ease, opacity .3s ease;
-        pointer-events: none;
-    }
-
-        .cb-success-toast.show {
-            transform: translateY(0);
-            opacity: 1;
-        }
 </style>
-
 
 <div class="cb-root">
 
-    ```
     <div class="cb-breadcrumb">
         Vehicle Management <span>›</span>
-        <a asp-controller="Brand" asp-action="Index">Brand List</a>
+        <a href="/Admin/Brand/BrandList">Brand List</a>
         <span>›</span>
         <span>Add New Brand</span>
     </div>
@@ -593,23 +332,21 @@
             <h1 class="cb-page-title">Add New Brand</h1>
             <p class="cb-page-subtitle">Define a new vehicle brand in the system.</p>
         </div>
+
         <div style="display:flex;gap:10px;">
-            <a asp-controller="Brand" asp-action="Index" class="btn-outline">✕ Cancel</a>
+            <a href="/Admin/Brand/BrandList" class="btn-outline">✕ Cancel</a>
             <button type="button" class="btn-accent" onclick="cbSubmit()">＋ Save Brand</button>
         </div>
     </div>
 
-    <div class="cb-id-badge">
-        🔑 BrandId — Assigned automatically by the database
-    </div>
+    @if (!ViewData.ModelState.IsValid)
+    {
+        <div class="cb-validation-summary">
+            <div asp-validation-summary="All"></div>
+        </div>
+    }
 
-    <div class="cb-validation-summary" id="cbValSummary">
-        <p id="cbValMsg"></p>
-    </div>
-
-    <form id="cbForm"
-          method="post"
-          novalidate>
+    <form id="cbForm" action="/Admin/Brand/CreateBrand" method="post" novalidate>
         @Html.AntiForgeryToken()
 
         <div class="cb-layout">
@@ -623,18 +360,19 @@
                             <div class="cb-card-subtitle">Enter brand name and logo URL</div>
                         </div>
                     </div>
+
                     <div class="cb-card-body">
 
-                        <div class="cb-field" id="fieldBrandName">
+                        <div class="cb-field">
                             <label>Brand Name <span class="cb-required">*</span></label>
                             <input type="text"
                                    id="cbBrandName"
                                    name="BrandName"
+                                   value="@Model?.BrandName"
                                    placeholder="e.g. Toyota, BMW, Audi"
-                                   maxlength="100"
+                                   maxlength="50"
                                    oninput="cbSync()"
                                    autocomplete="off" />
-                            <div class="cb-err-msg">Brand name is required.</div>
                         </div>
 
                         <div class="cb-field">
@@ -642,17 +380,18 @@
                             <input type="text"
                                    id="cbLogoUrl"
                                    name="LogoUrl"
+                                   value="@Model?.LogoUrl"
                                    placeholder="https://example.com/logo.png"
                                    oninput="cbSync(); cbPreviewLogo(this.value)"
                                    autocomplete="off" />
                             <div class="cb-hint">Supported formats: PNG, SVG, WebP, JPG</div>
                         </div>
 
-                        <div class="cb-img-preview" id="cbImgPreview">
+                        <div class="cb-img-preview">
                             <img id="cbPreviewTag" src="" alt="Logo Preview" />
-                            <div class="cb-preview-placeholder">
-                                <div class="cb-preview-icon">🖼️</div>
-                                <div class="cb-preview-label">Enter a logo URL<br />to see preview</div>
+                            <div id="cbPreviewPlaceholder">
+                                <div style="font-size:32px;">🖼️</div>
+                                <div>Enter a logo URL<br />to see preview</div>
                             </div>
                         </div>
 
@@ -667,22 +406,25 @@
                             <div class="cb-card-subtitle">Brand visibility in the system</div>
                         </div>
                     </div>
+
                     <div class="cb-card-body">
                         <div class="cb-toggle-row">
                             <div>
                                 <div class="cb-toggle-label" id="cbToggleLabel">Active</div>
                                 <div class="cb-toggle-desc">Brand is visible and selectable in the system</div>
                             </div>
+
                             <div class="cb-toggle on" id="cbToggle" onclick="cbToggleStatus()">
                                 <div class="cb-toggle-knob"></div>
                             </div>
                         </div>
+
                         <input type="hidden" id="cbStatusInput" name="Status" value="true" />
                     </div>
                 </div>
 
                 <div class="cb-action-bar">
-                    <a asp-controller="Brand" asp-action="Index" class="btn-outline">✕ Clear Form</a>
+                    <a href="/Admin/Brand/BrandList" class="btn-outline">✕ Cancel</a>
                     <button type="button" class="btn-accent" onclick="cbSubmit()">＋ Save Brand</button>
                 </div>
             </div>
@@ -690,13 +432,14 @@
             <div>
                 <div class="cb-sidebar-card">
                     <div class="cb-sidebar-head">📋 Live Preview</div>
-                    <div class="cb-sidebar-body">
 
-                        <div style="height:100px;background:var(--bg-dark3);border-radius:10px;display:flex;align-items:center;justify-content:center;margin-bottom:14px;overflow:hidden;position:relative;">
+                    <div class="cb-sidebar-body">
+                        <div style="height:100px;background:var(--bg-dark3);border-radius:10px;display:flex;align-items:center;justify-content:center;margin-bottom:14px;overflow:hidden;">
                             <img id="cbSidePreview"
                                  src=""
                                  alt=""
                                  style="height:64px;object-fit:contain;display:none;" />
+
                             <div id="cbSidePlaceholder"
                                  style="width:64px;height:64px;border-radius:12px;background:var(--bg-dark2);display:grid;place-items:center;font-size:26px;font-weight:700;color:var(--text-muted);">
                                 ?
@@ -705,29 +448,19 @@
 
                         <div class="cb-live-row">
                             <span class="cb-live-key">Brand Name</span>
-                            <span class="cb-live-val" id="sumName"><em class="cb-live-val empty">—</em></span>
+                            <span class="cb-live-val" id="sumName">—</span>
                         </div>
+
                         <div class="cb-live-row">
                             <span class="cb-live-key">Logo URL</span>
-                            <span class="cb-live-val" id="sumLogo"><em class="cb-live-val empty">—</em></span>
+                            <span class="cb-live-val" id="sumLogo">—</span>
                         </div>
+
                         <div class="cb-live-row" style="border-bottom:none;">
                             <span class="cb-live-key">Status</span>
                             <span id="sumStatus">
-                                <span class="cb-status-pill active">
-                                    <span class="cb-status-dot"></span>Active
-                                </span>
+                                <span class="cb-status-pill active">Active</span>
                             </span>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="cb-sidebar-card">
-                    <div class="cb-sidebar-head">✅ Required Fields</div>
-                    <div class="cb-sidebar-body">
-                        <div class="cb-req-item pending" id="reqBrandName">
-                            <span class="cb-req-icon">○</span>
-                            <span>Brand Name</span>
                         </div>
                     </div>
                 </div>
@@ -735,14 +468,17 @@
                 <div class="cb-sidebar-card">
                     <div class="cb-sidebar-head">💡 Tips</div>
                     <div class="cb-sidebar-body">
-                        <div class="cb-tip-item">
-                            <div class="cb-tip-text">BrandId is assigned automatically by the database.</div>
+                        <div class="cb-live-row">
+                            <span class="cb-live-key">BrandId</span>
+                            <span>Assigned automatically</span>
                         </div>
-                        <div class="cb-tip-item">
-                            <div class="cb-tip-text">Use SVG or high-quality PNG logos for better visuals.</div>
+                        <div class="cb-live-row">
+                            <span class="cb-live-key">Logo</span>
+                            <span>Optional</span>
                         </div>
-                        <div class="cb-tip-item">
-                            <div class="cb-tip-text">Inactive brands will not appear in listings.</div>
+                        <div class="cb-live-row" style="border-bottom:none;">
+                            <span class="cb-live-key">Status</span>
+                            <span>Default active</span>
                         </div>
                     </div>
                 </div>
@@ -750,21 +486,72 @@
 
         </div>
     </form>
-    ```
-
 </div>
 
 <script>
+    let cbStatus = true;
+
     function cbSubmit() {
-        var name = document.getElementById('cbBrandName').value.trim();
+        const name = document.getElementById('cbBrandName').value.trim();
 
         if (!name) {
-            alert("Brand name is required");
+            alert("Brand name is required.");
             return;
         }
 
         document.getElementById('cbForm').submit();
     }
+
+    function cbToggleStatus() {
+        cbStatus = !cbStatus;
+
+        document.getElementById('cbStatusInput').value = cbStatus ? 'true' : 'false';
+        document.getElementById('cbToggle').classList.toggle('on', cbStatus);
+        document.getElementById('cbToggleLabel').innerText = cbStatus ? 'Active' : 'Inactive';
+
+        cbSync();
+    }
+
+    function cbPreviewLogo(value) {
+        const preview = document.getElementById('cbPreviewTag');
+        const placeholder = document.getElementById('cbPreviewPlaceholder');
+        const sidePreview = document.getElementById('cbSidePreview');
+        const sidePlaceholder = document.getElementById('cbSidePlaceholder');
+
+        if (!value) {
+            preview.style.display = 'none';
+            placeholder.style.display = 'block';
+
+            sidePreview.style.display = 'none';
+            sidePlaceholder.style.display = 'grid';
+            return;
+        }
+
+        preview.src = value;
+        preview.style.display = 'block';
+        placeholder.style.display = 'none';
+
+        sidePreview.src = value;
+        sidePreview.style.display = 'block';
+        sidePlaceholder.style.display = 'none';
+    }
+
+    function cbSync() {
+        const name = document.getElementById('cbBrandName').value.trim();
+        const logo = document.getElementById('cbLogoUrl').value.trim();
+
+        document.getElementById('sumName').innerText = name || '—';
+        document.getElementById('sumLogo').innerText = logo || '—';
+
+        document.getElementById('sumStatus').innerHTML = cbStatus
+            ? '<span class="cb-status-pill active">Active</span>'
+            : '<span class="cb-status-pill passive">Inactive</span>';
+
+        const sidePlaceholder = document.getElementById('cbSidePlaceholder');
+        if (sidePlaceholder && !logo) {
+            sidePlaceholder.innerText = name ? name.charAt(0).toUpperCase() : '?';
+        }
+    }
+
+    cbSync();
 </script>
-
-

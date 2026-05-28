@@ -1,61 +1,38 @@
 ﻿using COROLA_RENTACAR.EntityLayer.Entities;
 using FluentValidation;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace COROLA_RENTACAR.BusinessLayer.ValidationRules
 {
- 
-
-public class BrandValidator : AbstractValidator<Brand>
+    public class BrandValidator : AbstractValidator<Brand>
     {
         public BrandValidator()
         {
-            CascadeMode = CascadeMode.Stop;
-
             RuleFor(x => x.BrandName)
                 .NotEmpty().WithMessage("Brand name cannot be empty.")
-                .Length(2, 40).WithMessage("Brand name must be between 2 and 40 characters.")
-                .Matches(@"^[a-zA-ZğüşöçıİĞÜŞÖÇ\s]+$")
-                .WithMessage("Brand name must contain letters only.")
-                .NotEqual("Test").WithMessage("Invalid brand name.");
-
-            RuleFor(x => x.BrandName)
-                .Must(BeAValidBrandName)
-                .WithMessage("Brand name cannot contain special characters.");
+                .MinimumLength(2).WithMessage("Brand name must be at least 2 characters long.")
+                .MaximumLength(50).WithMessage("Brand name can be at most 50 characters.");
 
             RuleFor(x => x.LogoUrl)
-                .NotEmpty().WithMessage("Logo URL cannot be empty.")
+                .MaximumLength(500).WithMessage("Logo URL can be at most 500 characters.")
                 .Must(BeAValidImageUrl)
-                .WithMessage("Logo URL must be a valid image address.");
+                .When(x => !string.IsNullOrWhiteSpace(x.LogoUrl))
+                .WithMessage("Logo URL must be a valid image address. Allowed formats: png, jpg, jpeg, svg, webp.");
+        }
 
-            RuleFor(x => x.Status)
-                .NotNull().WithMessage("Status must be specified.");
-
-            RuleFor(x => x.BrandId)
-                .GreaterThanOrEqualTo(0)
-                .WithMessage("BrandId cannot be negative.");
-
-            When(x => x.Status == true, () =>
+        private bool BeAValidImageUrl(string logoUrl)
+        {
+            if (string.IsNullOrWhiteSpace(logoUrl))
             {
-                RuleFor(x => x.LogoUrl)
-                    .NotEmpty().WithMessage("Logo is required for active brands.");
-            });
-        }
+                return true;
+            }
 
-        private bool BeAValidBrandName(string brandName)
-        {
-            return !brandName.Contains("@") && !brandName.Contains("#");
-        }
+            var lowerUrl = logoUrl.ToLower();
 
-        private bool BeAValidImageUrl(string url)
-        {
-            return url.EndsWith(".png") || url.EndsWith(".jpg") || url.EndsWith(".jpeg");
+            return lowerUrl.EndsWith(".png")
+                || lowerUrl.EndsWith(".jpg")
+                || lowerUrl.EndsWith(".jpeg")
+                || lowerUrl.EndsWith(".svg")
+                || lowerUrl.EndsWith(".webp");
         }
     }
-
-
 }

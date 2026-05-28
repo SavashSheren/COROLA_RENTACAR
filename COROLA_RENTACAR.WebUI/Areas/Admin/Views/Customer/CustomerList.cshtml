@@ -1,0 +1,497 @@
+﻿@using COROLA_RENTACAR.EntityLayer.Enums
+@model List<COROLA_RENTACAR.EntityLayer.Entities.Customer>
+
+@{
+    ViewData["Title"] = "Customer List";
+    Layout = "~/Views/AdminLayout/Index.cshtml";
+
+    var totalCount = Model?.Count ?? 0;
+    var pendingCount = Model?.Count(x => x.DriverLicenseVerificationStatus == DriverLicenseVerificationStatus.Pending) ?? 0;
+    var approvedCount = Model?.Count(x => x.DriverLicenseVerificationStatus == DriverLicenseVerificationStatus.Approved) ?? 0;
+    var rejectedCount = Model?.Count(x => x.DriverLicenseVerificationStatus == DriverLicenseVerificationStatus.Rejected) ?? 0;
+}
+
+<style>
+    .cus-root {
+        padding: 28px;
+        color: #e2e8f0;
+        font-family: 'DM Sans', 'Segoe UI', sans-serif;
+    }
+
+    .cus-breadcrumb {
+        font-size: 12px;
+        color: #7a8499;
+        margin-bottom: 8px;
+    }
+
+    .cus-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-end;
+        gap: 16px;
+        margin-bottom: 24px;
+        flex-wrap: wrap;
+    }
+
+    .cus-title {
+        font-size: 26px;
+        font-weight: 800;
+        margin: 0;
+    }
+
+    .cus-subtitle {
+        color: #7a8499;
+        font-size: 13px;
+        margin-top: 6px;
+    }
+
+    .btn-accent {
+        background: #e8ff47;
+        color: #0d0f14;
+        border: none;
+        border-radius: 10px;
+        padding: 10px 16px;
+        font-size: 13px;
+        font-weight: 800;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 7px;
+        cursor: pointer;
+    }
+
+    .btn-edit {
+        background: rgba(79,141,255,.12);
+        color: #4f8dff;
+        border: 1px solid rgba(79,141,255,.25);
+        border-radius: 8px;
+        padding: 7px 12px;
+        font-size: 12px;
+        font-weight: 700;
+        text-decoration: none;
+        cursor: pointer;
+    }
+
+    .btn-success-soft {
+        background: rgba(48,224,161,.12);
+        color: #30e0a1;
+        border: 1px solid rgba(48,224,161,.25);
+        border-radius: 8px;
+        padding: 7px 12px;
+        font-size: 12px;
+        font-weight: 700;
+        cursor: pointer;
+    }
+
+    .btn-warning-soft {
+        background: rgba(255,181,71,.12);
+        color: #ffb547;
+        border: 1px solid rgba(255,181,71,.25);
+        border-radius: 8px;
+        padding: 7px 12px;
+        font-size: 12px;
+        font-weight: 700;
+        cursor: pointer;
+    }
+
+    .btn-danger {
+        background: rgba(255,82,89,.1);
+        color: #ff5259;
+        border: 1px solid rgba(255,82,89,.2);
+        border-radius: 8px;
+        padding: 7px 12px;
+        font-size: 12px;
+        font-weight: 700;
+        cursor: pointer;
+    }
+
+    .cus-alert {
+        background: rgba(255,82,89,.1);
+        border: 1px solid rgba(255,82,89,.25);
+        color: #ff5259;
+        border-radius: 12px;
+        padding: 12px 14px;
+        margin-bottom: 16px;
+        font-size: 13px;
+        font-weight: 700;
+    }
+
+    .cus-stats {
+        display: grid;
+        grid-template-columns: repeat(4, minmax(150px, 1fr));
+        gap: 14px;
+        margin-bottom: 20px;
+    }
+
+    .cus-stat {
+        background: #13161e;
+        border: 1px solid rgba(255,255,255,.07);
+        border-radius: 14px;
+        padding: 18px;
+        display: flex;
+        align-items: center;
+        gap: 14px;
+    }
+
+    .cus-stat-icon {
+        width: 42px;
+        height: 42px;
+        border-radius: 12px;
+        background: rgba(232,255,71,.12);
+        color: #e8ff47;
+        display: grid;
+        place-items: center;
+        font-size: 20px;
+    }
+
+        .cus-stat-icon.green {
+            background: rgba(48,224,161,.12);
+            color: #30e0a1;
+        }
+
+        .cus-stat-icon.red {
+            background: rgba(255,82,89,.12);
+            color: #ff5259;
+        }
+
+        .cus-stat-icon.blue {
+            background: rgba(79,141,255,.12);
+            color: #4f8dff;
+        }
+
+    .cus-stat-num {
+        font-size: 24px;
+        font-weight: 800;
+        line-height: 1;
+    }
+
+    .cus-stat-label {
+        color: #7a8499;
+        font-size: 12px;
+        margin-top: 4px;
+    }
+
+    .cus-toolbar {
+        display: flex;
+        gap: 12px;
+        margin-bottom: 18px;
+        flex-wrap: wrap;
+    }
+
+    .cus-search {
+        min-width: 260px;
+        max-width: 460px;
+        flex: 1;
+        background: #13161e;
+        border: 1px solid rgba(255,255,255,.07);
+        border-radius: 10px;
+        color: #e2e8f0;
+        padding: 11px 13px;
+        outline: none;
+    }
+
+    .cus-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(370px, 1fr));
+        gap: 18px;
+    }
+
+    .cus-card {
+        background: #13161e;
+        border: 1px solid rgba(255,255,255,.07);
+        border-radius: 18px;
+        overflow: hidden;
+    }
+
+    .cus-license-img {
+        height: 170px;
+        background: #1a1e2a;
+        position: relative;
+        overflow: hidden;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #7a8499;
+    }
+
+        .cus-license-img img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+    .cus-status {
+        position: absolute;
+        top: 12px;
+        left: 12px;
+        border-radius: 8px;
+        padding: 5px 10px;
+        font-size: 12px;
+        font-weight: 900;
+        backdrop-filter: blur(6px);
+    }
+
+        .cus-status.pending {
+            background: rgba(255,181,71,.16);
+            color: #ffb547;
+            border: 1px solid rgba(255,181,71,.30);
+        }
+
+        .cus-status.approved {
+            background: rgba(48,224,161,.16);
+            color: #30e0a1;
+            border: 1px solid rgba(48,224,161,.30);
+        }
+
+        .cus-status.rejected {
+            background: rgba(255,82,89,.16);
+            color: #ff5259;
+            border: 1px solid rgba(255,82,89,.30);
+        }
+
+    .cus-body {
+        padding: 16px;
+    }
+
+    .cus-id {
+        color: #7a8499;
+        font-size: 12px;
+        margin-bottom: 8px;
+    }
+
+    .cus-name {
+        font-size: 18px;
+        font-weight: 900;
+        margin-bottom: 4px;
+    }
+
+    .cus-meta {
+        color: #7a8499;
+        font-size: 13px;
+        line-height: 1.65;
+        margin-bottom: 12px;
+    }
+
+        .cus-meta strong {
+            color: #e2e8f0;
+        }
+
+    .cus-reason {
+        background: rgba(255,82,89,.08);
+        border: 1px solid rgba(255,82,89,.18);
+        color: #ff8b90;
+        border-radius: 10px;
+        padding: 10px;
+        font-size: 12px;
+        margin-bottom: 12px;
+    }
+
+    .cus-actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+    }
+
+        .cus-actions form {
+            display: inline-flex;
+        }
+
+    .cus-empty {
+        grid-column: 1 / -1;
+        text-align: center;
+        color: #7a8499;
+        padding: 60px 20px;
+    }
+
+    @@media(max-width: 900px) {
+        .cus-stats {
+            grid-template-columns: repeat(2, 1fr);
+        }
+
+        .cus-grid {
+            grid-template-columns: 1fr;
+        }
+    }
+
+    @@media(max-width: 600px) {
+        .cus-stats {
+            grid-template-columns: 1fr;
+        }
+    }
+</style>
+
+<div class="cus-root">
+
+    <div class="cus-breadcrumb">
+        CRM › Customer List
+    </div>
+
+    <div class="cus-header">
+        <div>
+            <h1 class="cus-title">Customer Management</h1>
+            <p class="cus-subtitle">Manage customers and driver license verification status.</p>
+        </div>
+
+        <a href="/Admin/Customer/CreateCustomer" class="btn-accent">
+            ＋ Add New Customer
+        </a>
+    </div>
+
+    @if (TempData["CustomerError"] != null)
+    {
+        <div class="cus-alert">@TempData["CustomerError"]</div>
+    }
+
+    <div class="cus-stats">
+        <div class="cus-stat">
+            <div class="cus-stat-icon">👤</div>
+            <div>
+                <div class="cus-stat-num">@totalCount</div>
+                <div class="cus-stat-label">Total Customers</div>
+            </div>
+        </div>
+
+        <div class="cus-stat">
+            <div class="cus-stat-icon blue">⏳</div>
+            <div>
+                <div class="cus-stat-num">@pendingCount</div>
+                <div class="cus-stat-label">Pending Licenses</div>
+            </div>
+        </div>
+
+        <div class="cus-stat">
+            <div class="cus-stat-icon green">✅</div>
+            <div>
+                <div class="cus-stat-num">@approvedCount</div>
+                <div class="cus-stat-label">Approved Licenses</div>
+            </div>
+        </div>
+
+        <div class="cus-stat">
+            <div class="cus-stat-icon red">⛔</div>
+            <div>
+                <div class="cus-stat-num">@rejectedCount</div>
+                <div class="cus-stat-label">Rejected Licenses</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="cus-toolbar">
+        <input type="text" id="customerSearch" class="cus-search" placeholder="Search customer, email, phone, license..." oninput="filterCustomers()" />
+    </div>
+
+    <div class="cus-grid" id="customerGrid">
+        @if (Model == null || !Model.Any())
+        {
+            <div class="cus-empty">
+                <div style="font-size:42px;">👤</div>
+                <p>No customers found.</p>
+            </div>
+        }
+        else
+        {
+            foreach (var customer in Model)
+            {
+                var fullName = $"{customer.FirstName} {customer.LastName}";
+                var statusText = customer.DriverLicenseVerificationStatus.ToString();
+                var statusClass = statusText.ToLower();
+                var searchText = $"{fullName} {customer.Email} {customer.Phone} {customer.DriverLicenseNumber} {statusText}".ToLower();
+
+                <div class="cus-card" data-search="@searchText">
+                    <div class="cus-license-img">
+                        @if (!string.IsNullOrWhiteSpace(customer.DriverLicenseImageUrl))
+                        {
+                            <img src="@customer.DriverLicenseImageUrl" alt="@fullName driver license" onerror="this.style.display='none';" />
+                        }
+                        else
+                        {
+                            <span>No license image</span>
+                        }
+
+                        <span class="cus-status @statusClass">@statusText</span>
+                    </div>
+
+                    <div class="cus-body">
+                        <div class="cus-id">#@customer.CustomerId</div>
+                        <div class="cus-name">@fullName</div>
+
+                        <div class="cus-meta">
+                            <div><strong>Email:</strong> @customer.Email</div>
+                            <div><strong>Phone:</strong> @customer.Phone</div>
+                            <div><strong>License No:</strong> @customer.DriverLicenseNumber</div>
+                            <div><strong>Birth Date:</strong> @customer.BirthDate.ToString("dd MMM yyyy")</div>
+                            @if (customer.DriverLicenseVerifiedDate.HasValue)
+                            {
+                                <div><strong>Verified Date:</strong> @customer.DriverLicenseVerifiedDate.Value.ToString("dd MMM yyyy HH:mm")</div>
+                            }
+                        </div>
+
+                        @if (customer.DriverLicenseVerificationStatus == DriverLicenseVerificationStatus.Rejected && !string.IsNullOrWhiteSpace(customer.DriverLicenseRejectionReason))
+                        {
+                            <div class="cus-reason">
+                                <strong>Rejection Reason:</strong> @customer.DriverLicenseRejectionReason
+                            </div>
+                        }
+
+                        <div class="cus-actions">
+                            <a href="/Admin/Customer/UpdateCustomer?id=@customer.CustomerId" class="btn-edit">✏️ Edit</a>
+
+                            @if (customer.DriverLicenseVerificationStatus != DriverLicenseVerificationStatus.Approved)
+                            {
+                                <form method="post" action="/Admin/Customer/ApproveDriverLicense?id=@customer.CustomerId">
+                                    @Html.AntiForgeryToken()
+                                    <button type="submit" class="btn-success-soft">✅ Approve</button>
+                                </form>
+                            }
+
+                            @if (customer.DriverLicenseVerificationStatus != DriverLicenseVerificationStatus.Rejected)
+                            {
+                                <form method="post" action="/Admin/Customer/RejectDriverLicense?id=@customer.CustomerId" onsubmit="return addRejectReason(this);">
+                                    @Html.AntiForgeryToken()
+                                    <input type="hidden" name="rejectionReason" value="" />
+                                    <button type="submit" class="btn-warning-soft">⛔ Reject</button>
+                                </form>
+                            }
+
+                            @if (customer.DriverLicenseVerificationStatus != DriverLicenseVerificationStatus.Pending)
+                            {
+                                <form method="post" action="/Admin/Customer/MarkDriverLicensePending?id=@customer.CustomerId">
+                                    @Html.AntiForgeryToken()
+                                    <button type="submit" class="btn-warning-soft">⏳ Pending</button>
+                                </form>
+                            }
+
+                            <form method="post" action="/Admin/Customer/DeleteCustomer?id=@customer.CustomerId" onsubmit="return confirm('Are you sure you want to delete this customer?');">
+                                @Html.AntiForgeryToken()
+                                <button type="submit" class="btn-danger">🗑️ Delete</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            }
+        }
+    </div>
+</div>
+
+<script>
+    function filterCustomers() {
+        const q = document.getElementById('customerSearch').value.toLowerCase();
+        const cards = document.querySelectorAll('.cus-card');
+
+        cards.forEach(card => {
+            const text = card.getAttribute('data-search') || '';
+            card.style.display = text.includes(q) ? '' : 'none';
+        });
+    }
+
+    function addRejectReason(form) {
+        const reason = prompt("Enter rejection reason:");
+
+        if (reason === null) {
+            return false;
+        }
+
+        form.querySelector('input[name="rejectionReason"]').value = reason.trim();
+        return true;
+    }
+</script>

@@ -1,20 +1,27 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using COROLA_RENTACAR.EntityLayer.Enums;
 
 namespace COROLA_RENTACAR.EntityLayer.Entities
 {
     public class Customer
     {
         public int CustomerId { get; set; }
+
         public string FirstName { get; set; }
         public string LastName { get; set; }
+
         public string Email { get; set; }
         public string Phone { get; set; }
-        public string DriverLicenseNumber { get; set; }
-        public DateTime BirthDate { get; set; }
-    }
 
+        public string DriverLicenseNumber { get; set; }
+        public string DriverLicenseImageUrl { get; set; }
+
+        public DriverLicenseVerificationStatus DriverLicenseVerificationStatus { get; set; }
+
+        public DateTime? DriverLicenseVerifiedDate { get; set; }
+        public string DriverLicenseRejectionReason { get; set; }
+
+        public DateTime BirthDate { get; set; }
+
+        public List<Reservation> Reservations { get; set; }
+    }
 }

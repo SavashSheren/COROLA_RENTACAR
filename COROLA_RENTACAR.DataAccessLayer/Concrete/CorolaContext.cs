@@ -39,14 +39,14 @@ namespace COROLA_RENTACAR.DataAccessLayer.Concrete
                 .OnDelete(DeleteBehavior.Cascade);
 
             modelBuilder.Entity<Reservation>()
-                .HasOne(x => x.Car)
-                .WithMany(x => x.Reservations)
-                .HasForeignKey(x => x.CarId)
-                .OnDelete(DeleteBehavior.Restrict);
+       .HasOne(x => x.Car)
+       .WithMany(x => x.Reservations)
+       .HasForeignKey(x => x.CarId)
+       .OnDelete(DeleteBehavior.Restrict);
 
             modelBuilder.Entity<Reservation>()
                 .HasOne(x => x.Customer)
-                .WithMany()
+                .WithMany(x => x.Reservations)
                 .HasForeignKey(x => x.CustomerId)
                 .OnDelete(DeleteBehavior.Restrict);
 

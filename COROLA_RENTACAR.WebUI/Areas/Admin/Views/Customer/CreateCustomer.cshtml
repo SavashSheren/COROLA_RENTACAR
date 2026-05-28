@@ -1,0 +1,334 @@
+﻿@model COROLA_RENTACAR.EntityLayer.Entities.Customer
+
+@{
+    ViewData["Title"] = "Create Customer";
+    Layout = "~/Views/AdminLayout/Index.cshtml";
+}
+
+<style>
+    .customer-form-root {
+        padding: 28px;
+        color: #e2e8f0;
+        font-family: 'DM Sans', 'Segoe UI', sans-serif;
+    }
+
+    .customer-breadcrumb {
+        font-size: 12px;
+        color: #7a8499;
+        margin-bottom: 8px;
+    }
+
+        .customer-breadcrumb a {
+            color: #7a8499;
+            text-decoration: none;
+        }
+
+            .customer-breadcrumb a:hover {
+                color: #e8ff47;
+            }
+
+    .customer-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-end;
+        gap: 16px;
+        margin-bottom: 24px;
+        flex-wrap: wrap;
+    }
+
+    .customer-title {
+        font-size: 26px;
+        font-weight: 800;
+        margin: 0;
+    }
+
+    .customer-subtitle {
+        color: #7a8499;
+        font-size: 13px;
+        margin-top: 6px;
+    }
+
+    .customer-layout {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) 380px;
+        gap: 18px;
+    }
+
+    .customer-card {
+        background: #13161e;
+        border: 1px solid rgba(255,255,255,.07);
+        border-radius: 16px;
+        overflow: hidden;
+        margin-bottom: 16px;
+    }
+
+    .customer-card-header {
+        padding: 18px;
+        border-bottom: 1px solid rgba(255,255,255,.07);
+        font-weight: 800;
+    }
+
+    .customer-card-body {
+        padding: 18px;
+    }
+
+    .customer-grid {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 16px;
+    }
+
+    .customer-field {
+        margin-bottom: 16px;
+    }
+
+        .customer-field.full {
+            grid-column: 1 / -1;
+        }
+
+        .customer-field label {
+            display: block;
+            font-size: 13px;
+            font-weight: 700;
+            margin-bottom: 7px;
+        }
+
+        .customer-field input {
+            width: 100%;
+            background: #1a1e2a;
+            border: 1px solid rgba(255,255,255,.07);
+            border-radius: 10px;
+            color: #e2e8f0;
+            padding: 11px 13px;
+            outline: none;
+        }
+
+            .customer-field input:focus {
+                border-color: #e8ff47;
+                box-shadow: 0 0 0 3px rgba(232,255,71,.12);
+            }
+
+    .customer-required {
+        color: #ff5259;
+    }
+
+    .customer-validation {
+        background: rgba(255,82,89,.1);
+        border: 1px solid rgba(255,82,89,.25);
+        color: #ff5259;
+        border-radius: 10px;
+        padding: 12px 14px;
+        margin-bottom: 16px;
+        font-size: 13px;
+    }
+
+    .license-preview {
+        height: 260px;
+        border-radius: 14px;
+        background: #1a1e2a;
+        border: 1px dashed rgba(255,255,255,.07);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        overflow: hidden;
+        color: #7a8499;
+        text-align: center;
+    }
+
+        .license-preview img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: none;
+        }
+
+    .btn-accent,
+    .btn-outline {
+        border-radius: 10px;
+        padding: 10px 16px;
+        font-size: 13px;
+        font-weight: 800;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 7px;
+        cursor: pointer;
+    }
+
+    .btn-accent {
+        background: #e8ff47;
+        color: #0d0f14;
+        border: none;
+    }
+
+    .btn-outline {
+        background: #1a1e2a;
+        color: #e2e8f0;
+        border: 1px solid rgba(255,255,255,.07);
+    }
+
+    .customer-actions {
+        display: flex;
+        gap: 10px;
+        justify-content: flex-end;
+        margin-top: 20px;
+    }
+
+    @@media(max-width: 900px) {
+        .customer-layout {
+            grid-template-columns: 1fr;
+        }
+
+        .customer-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .customer-field.full {
+            grid-column: auto;
+        }
+    }
+</style>
+
+<div class="customer-form-root">
+
+    <div class="customer-breadcrumb">
+        CRM ›
+        <a href="/Admin/Customer/CustomerList">Customer List</a>
+        › Add New Customer
+    </div>
+
+    <div class="customer-header">
+        <div>
+            <h1 class="customer-title">Add New Customer</h1>
+            <p class="customer-subtitle">Create a customer and upload driver license information.</p>
+        </div>
+
+        <a href="/Admin/Customer/CustomerList" class="btn-outline">✕ Cancel</a>
+    </div>
+
+    @if (!ViewData.ModelState.IsValid)
+    {
+        <div class="customer-validation">
+            <div asp-validation-summary="All"></div>
+        </div>
+    }
+
+    <form id="customerForm" action="/Admin/Customer/CreateCustomer" method="post" novalidate>
+        @Html.AntiForgeryToken()
+
+        <div class="customer-layout">
+            <div>
+                <div class="customer-card">
+                    <div class="customer-card-header">👤 Customer Information</div>
+
+                    <div class="customer-card-body">
+                        <div class="customer-grid">
+                            <div class="customer-field">
+                                <label>First Name <span class="customer-required">*</span></label>
+                                <input type="text" id="firstName" name="FirstName" value="@Model?.FirstName" maxlength="50" />
+                            </div>
+
+                            <div class="customer-field">
+                                <label>Last Name <span class="customer-required">*</span></label>
+                                <input type="text" id="lastName" name="LastName" value="@Model?.LastName" maxlength="50" />
+                            </div>
+
+                            <div class="customer-field">
+                                <label>Email <span class="customer-required">*</span></label>
+                                <input type="email" id="email" name="Email" value="@Model?.Email" maxlength="100" />
+                            </div>
+
+                            <div class="customer-field">
+                                <label>Phone <span class="customer-required">*</span></label>
+                                <input type="text" id="phone" name="Phone" value="@Model?.Phone" maxlength="30" />
+                            </div>
+
+                            <div class="customer-field">
+                                <label>Birth Date <span class="customer-required">*</span></label>
+                                <input type="date" id="birthDate" name="BirthDate" value="@Model.BirthDate.ToString("yyyy-MM-dd")" />
+                            </div>
+
+                            <div class="customer-field">
+                                <label>Driver License Number <span class="customer-required">*</span></label>
+                                <input type="text" id="driverLicenseNumber" name="DriverLicenseNumber" value="@Model?.DriverLicenseNumber" maxlength="50" />
+                            </div>
+
+                            <div class="customer-field full">
+                                <label>Driver License Image URL <span class="customer-required">*</span></label>
+                                <input type="text"
+                                       id="driverLicenseImageUrl"
+                                       name="DriverLicenseImageUrl"
+                                       value="@Model?.DriverLicenseImageUrl"
+                                       placeholder="https://example.com/license-image.jpg"
+                                       oninput="previewLicense(this.value)" />
+                            </div>
+                        </div>
+
+                        <div class="customer-actions">
+                            <a href="/Admin/Customer/CustomerList" class="btn-outline">Cancel</a>
+                            <button type="button" class="btn-accent" onclick="submitCustomerForm()">＋ Save Customer</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div>
+                <div class="customer-card">
+                    <div class="customer-card-header">🪪 Driver License Preview</div>
+
+                    <div class="customer-card-body">
+                        <div class="license-preview">
+                            <img id="licensePreviewImage" src="" alt="Driver License Preview" />
+                            <div id="licensePreviewPlaceholder">
+                                <div style="font-size:42px;">🪪</div>
+                                <div>Enter license image URL<br />to see preview</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="customer-card">
+                    <div class="customer-card-header">⚡ Verification Rule</div>
+                    <div class="customer-card-body" style="color:#7a8499;font-size:13px;line-height:1.7;">
+                        New customers are created as Pending. Admin must approve the driver license before reservation can be completed.
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+</div>
+
+<script>
+    function previewLicense(value) {
+        const image = document.getElementById('licensePreviewImage');
+        const placeholder = document.getElementById('licensePreviewPlaceholder');
+
+        if (!value) {
+            image.style.display = 'none';
+            placeholder.style.display = 'block';
+            return;
+        }
+
+        image.src = value;
+        image.style.display = 'block';
+        placeholder.style.display = 'none';
+    }
+
+    function submitCustomerForm() {
+        const firstName = document.getElementById('firstName').value.trim();
+        const lastName = document.getElementById('lastName').value.trim();
+        const email = document.getElementById('email').value.trim();
+        const phone = document.getElementById('phone').value.trim();
+        const licenseNumber = document.getElementById('driverLicenseNumber').value.trim();
+        const licenseImage = document.getElementById('driverLicenseImageUrl').value.trim();
+
+        if (!firstName || !lastName || !email || !phone || !licenseNumber || !licenseImage) {
+            alert("Please fill all required fields.");
+            return;
+        }
+
+        document.getElementById('customerForm').submit();
+    }
+
+    previewLicense(document.getElementById('driverLicenseImageUrl').value);
+</script>

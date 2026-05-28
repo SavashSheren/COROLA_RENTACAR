@@ -1,0 +1,460 @@
+﻿@using COROLA_RENTACAR.EntityLayer.Entities
+@using COROLA_RENTACAR.EntityLayer.Enums
+@using System.Globalization
+@model COROLA_RENTACAR.EntityLayer.Entities.Reservation
+
+@{
+    ViewData["Title"] = "Update Reservation";
+    Layout = "~/Views/AdminLayout/Index.cshtml";
+
+    var cars = ViewBag.Cars as List<Car> ?? new List<Car>();
+    var customers = ViewBag.Customers as List<Customer> ?? new List<Customer>();
+    var locations = ViewBag.Locations as List<Location> ?? new List<Location>();
+    var statuses = ViewBag.Statuses as List<ReservationStatus> ?? new List<ReservationStatus>();
+}
+
+<style>
+    .reservation-form-root {
+        padding: 28px;
+        color: #e2e8f0;
+        font-family: 'DM Sans', 'Segoe UI', sans-serif;
+    }
+
+    .reservation-breadcrumb {
+        font-size: 12px;
+        color: #7a8499;
+        margin-bottom: 8px;
+    }
+
+        .reservation-breadcrumb a {
+            color: #7a8499;
+            text-decoration: none;
+        }
+
+            .reservation-breadcrumb a:hover {
+                color: #e8ff47;
+            }
+
+    .reservation-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-end;
+        gap: 16px;
+        margin-bottom: 24px;
+        flex-wrap: wrap;
+    }
+
+    .reservation-title {
+        font-size: 26px;
+        font-weight: 800;
+        margin: 0;
+    }
+
+    .reservation-subtitle {
+        color: #7a8499;
+        font-size: 13px;
+        margin-top: 6px;
+    }
+
+    .reservation-card {
+        background: #13161e;
+        border: 1px solid rgba(255,255,255,.07);
+        border-radius: 16px;
+        overflow: hidden;
+        margin-bottom: 16px;
+    }
+
+    .reservation-card-header {
+        padding: 18px;
+        border-bottom: 1px solid rgba(255,255,255,.07);
+        font-weight: 800;
+    }
+
+    .reservation-card-body {
+        padding: 18px;
+    }
+
+    .reservation-grid {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 16px;
+    }
+
+    .reservation-field {
+        margin-bottom: 16px;
+    }
+
+        .reservation-field.full {
+            grid-column: 1 / -1;
+        }
+
+        .reservation-field label {
+            display: block;
+            font-size: 13px;
+            font-weight: 700;
+            margin-bottom: 7px;
+        }
+
+        .reservation-field input,
+        .reservation-field select,
+        .reservation-field textarea {
+            width: 100%;
+            background: #1a1e2a;
+            border: 1px solid rgba(255,255,255,.07);
+            border-radius: 10px;
+            color: #e2e8f0;
+            padding: 11px 13px;
+            outline: none;
+            resize: vertical;
+        }
+
+            .reservation-field input:focus,
+            .reservation-field select:focus,
+            .reservation-field textarea:focus {
+                border-color: #e8ff47;
+                box-shadow: 0 0 0 3px rgba(232,255,71,.12);
+            }
+
+    .reservation-required {
+        color: #ff5259;
+    }
+
+    .reservation-validation {
+        background: rgba(255,82,89,.1);
+        border: 1px solid rgba(255,82,89,.25);
+        color: #ff5259;
+        border-radius: 10px;
+        padding: 12px 14px;
+        margin-bottom: 16px;
+        font-size: 13px;
+        font-weight: 700;
+    }
+
+    .price-box {
+        background: rgba(232,255,71,.12);
+        border: 1px solid rgba(232,255,71,.25);
+        color: #e8ff47;
+        border-radius: 14px;
+        padding: 18px;
+        margin-bottom: 16px;
+    }
+
+    .price-label {
+        font-size: 12px;
+        color: #7a8499;
+        margin-bottom: 6px;
+    }
+
+    .price-value {
+        font-size: 28px;
+        font-weight: 900;
+    }
+
+    .license-warning {
+        display: none;
+        background: rgba(255,181,71,.12);
+        border: 1px solid rgba(255,181,71,.25);
+        color: #ffb547;
+        border-radius: 12px;
+        padding: 12px 14px;
+        margin-top: 8px;
+        font-size: 13px;
+        font-weight: 700;
+    }
+
+        .license-warning.show {
+            display: block;
+        }
+
+    .btn-accent,
+    .btn-outline {
+        border-radius: 10px;
+        padding: 10px 16px;
+        font-size: 13px;
+        font-weight: 800;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 7px;
+        cursor: pointer;
+    }
+
+    .btn-accent {
+        background: #e8ff47;
+        color: #0d0f14;
+        border: none;
+    }
+
+    .btn-outline {
+        background: #1a1e2a;
+        color: #e2e8f0;
+        border: 1px solid rgba(255,255,255,.07);
+    }
+
+    .reservation-actions {
+        display: flex;
+        gap: 10px;
+        justify-content: flex-end;
+        margin-top: 20px;
+    }
+
+    @@media(max-width: 800px) {
+        .reservation-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .reservation-field.full {
+            grid-column: auto;
+        }
+    }
+</style>
+
+<div class="reservation-form-root">
+
+    <div class="reservation-breadcrumb">
+        Reservation Management ›
+        <a href="/Admin/Reservation/ReservationList">Reservation List</a>
+        › Update Reservation
+    </div>
+
+    <div class="reservation-header">
+        <div>
+            <h1 class="reservation-title">Update Reservation</h1>
+            <p class="reservation-subtitle">Edit selected reservation details.</p>
+        </div>
+
+        <a href="/Admin/Reservation/ReservationList" class="btn-outline">✕ Cancel</a>
+    </div>
+
+    @if (!ViewData.ModelState.IsValid)
+    {
+        <div class="reservation-validation">
+            <div asp-validation-summary="All"></div>
+        </div>
+    }
+
+    <form id="reservationForm" action="/Admin/Reservation/UpdateReservation" method="post" novalidate>
+        @Html.AntiForgeryToken()
+
+        <input type="hidden" name="ReservationId" value="@Model.ReservationId" />
+        <input type="hidden" id="totalPriceInput" name="TotalPrice" value="@Model.TotalPrice" />
+
+        <div class="reservation-card">
+            <div class="reservation-card-header">📋 Reservation Information</div>
+
+            <div class="reservation-card-body">
+                <div class="reservation-grid">
+
+                    <div class="reservation-field">
+                        <label>Car <span class="reservation-required">*</span></label>
+                        <select name="CarId" id="carId" onchange="calculateTotalPrice()">
+                            <option value="0" data-price="0">Select car</option>
+                            @foreach (var car in cars)
+                            {
+                                var carText = $"{car.Brand?.BrandName} {car.Model} - {car.PlateNumber} ({car.DailyPrice:N2} ₺ / day)";
+                                var price = car.DailyPrice.ToString(CultureInfo.InvariantCulture);
+
+                                if (car.CarId == Model.CarId)
+                                {
+                                    <option value="@car.CarId" data-price="@price" selected>@carText</option>
+                                }
+                                else
+                                {
+                                    <option value="@car.CarId" data-price="@price">@carText</option>
+                                }
+                            }
+                        </select>
+                    </div>
+
+                    <div class="reservation-field">
+                        <label>Customer <span class="reservation-required">*</span></label>
+                        <select name="CustomerId" id="customerId" onchange="checkCustomerLicenseStatus()">
+                            <option value="0" data-license-status="Pending">Select customer</option>
+                            @foreach (var customer in customers)
+                            {
+                                var customerText = $"{customer.FirstName} {customer.LastName} - {customer.Phone} [{customer.DriverLicenseVerificationStatus}]";
+
+                                if (customer.CustomerId == Model.CustomerId)
+                                {
+                                    <option value="@customer.CustomerId" data-license-status="@customer.DriverLicenseVerificationStatus" selected>@customerText</option>
+                                }
+                                else
+                                {
+                                    <option value="@customer.CustomerId" data-license-status="@customer.DriverLicenseVerificationStatus">@customerText</option>
+                                }
+                            }
+                        </select>
+
+                        <div id="licenseWarning" class="license-warning">
+                            This customer cannot create a reservation because the driver's license is not approved.
+                        </div>
+                    </div>
+
+                    <div class="reservation-field">
+                        <label>Pickup Date <span class="reservation-required">*</span></label>
+                        <input type="date"
+                               name="PickupDate"
+                               id="pickupDate"
+                               value="@Model.PickupDate.ToString("yyyy-MM-dd")"
+                               onchange="calculateTotalPrice()" />
+                    </div>
+
+                    <div class="reservation-field">
+                        <label>Return Date <span class="reservation-required">*</span></label>
+                        <input type="date"
+                               name="ReturnDate"
+                               id="returnDate"
+                               value="@Model.ReturnDate.ToString("yyyy-MM-dd")"
+                               onchange="calculateTotalPrice()" />
+                    </div>
+
+                    <div class="reservation-field">
+                        <label>Pickup Location <span class="reservation-required">*</span></label>
+                        <select name="PickupLocationId" id="pickupLocationId">
+                            <option value="0">Select pickup location</option>
+                            @foreach (var location in locations)
+                            {
+                                if (location.LocationId == Model.PickupLocationId)
+                                {
+                                    <option value="@location.LocationId" selected>@location.LocationName - @location.City</option>
+                                }
+                                else
+                                {
+                                    <option value="@location.LocationId">@location.LocationName - @location.City</option>
+                                }
+                            }
+                        </select>
+                    </div>
+
+                    <div class="reservation-field">
+                        <label>Return Location <span class="reservation-required">*</span></label>
+                        <select name="ReturnLocationId" id="returnLocationId">
+                            <option value="0">Select return location</option>
+                            @foreach (var location in locations)
+                            {
+                                if (location.LocationId == Model.ReturnLocationId)
+                                {
+                                    <option value="@location.LocationId" selected>@location.LocationName - @location.City</option>
+                                }
+                                else
+                                {
+                                    <option value="@location.LocationId">@location.LocationName - @location.City</option>
+                                }
+                            }
+                        </select>
+                    </div>
+
+                    <div class="reservation-field">
+                        <label>Status <span class="reservation-required">*</span></label>
+                        <select name="ReservationStatus" id="reservationStatus">
+                            @foreach (var status in statuses)
+                            {
+                                if (status == Model.ReservationStatus)
+                                {
+                                    <option value="@((int)status)" selected>@status</option>
+                                }
+                                else
+                                {
+                                    <option value="@((int)status)">@status</option>
+                                }
+                            }
+                        </select>
+                    </div>
+
+                    <div class="reservation-field full">
+                        <label>Description</label>
+                        <textarea name="Description"
+                                  id="description"
+                                  rows="4"
+                                  maxlength="500"
+                                  placeholder="Optional reservation note">@Model.Description</textarea>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+
+        <div class="price-box">
+            <div class="price-label">Estimated Total Price</div>
+            <div class="price-value" id="totalPriceText">0.00 ₺</div>
+        </div>
+
+        <div class="reservation-actions">
+            <a href="/Admin/Reservation/ReservationList" class="btn-outline">Cancel</a>
+            <button type="button" class="btn-accent" onclick="submitReservationForm()">💾 Save Changes</button>
+        </div>
+    </form>
+</div>
+
+<script>
+    function calculateTotalPrice() {
+        const carSelect = document.getElementById('carId');
+        const selectedOption = carSelect.options[carSelect.selectedIndex];
+        const dailyPrice = Number(selectedOption.getAttribute('data-price') || 0);
+
+        const pickupDateValue = document.getElementById('pickupDate').value;
+        const returnDateValue = document.getElementById('returnDate').value;
+
+        if (!pickupDateValue || !returnDateValue || dailyPrice <= 0) {
+            document.getElementById('totalPriceText').innerText = '0.00 ₺';
+            document.getElementById('totalPriceInput').value = '0';
+            return;
+        }
+
+        const pickupDate = new Date(pickupDateValue);
+        const returnDate = new Date(returnDateValue);
+
+        let dayCount = Math.ceil((returnDate - pickupDate) / (1000 * 60 * 60 * 24));
+
+        if (dayCount < 1) {
+            dayCount = 1;
+        }
+
+        const totalPrice = dailyPrice * dayCount;
+
+        document.getElementById('totalPriceText').innerText = totalPrice.toLocaleString('en-US', {
+            minimumFractionDigits: 2,
+            maximumFractionDigits: 2
+        }) + ' ₺';
+
+        document.getElementById('totalPriceInput').value = totalPrice.toFixed(2);
+    }
+
+    function checkCustomerLicenseStatus() {
+        const customerSelect = document.getElementById('customerId');
+        const selectedOption = customerSelect.options[customerSelect.selectedIndex];
+        const status = selectedOption.getAttribute('data-license-status');
+        const warning = document.getElementById('licenseWarning');
+
+        if (customerSelect.value !== "0" && status !== "Approved") {
+            warning.classList.add('show');
+            return false;
+        }
+
+        warning.classList.remove('show');
+        return true;
+    }
+
+    function submitReservationForm() {
+        const carId = document.getElementById('carId').value;
+        const customerId = document.getElementById('customerId').value;
+        const pickupLocationId = document.getElementById('pickupLocationId').value;
+        const returnLocationId = document.getElementById('returnLocationId').value;
+
+        if (carId === "0" || customerId === "0" || pickupLocationId === "0" || returnLocationId === "0") {
+            alert("Please fill all required fields.");
+            return;
+        }
+
+        if (!checkCustomerLicenseStatus()) {
+            alert("This customer cannot create a reservation because the driver's license is not approved.");
+            return;
+        }
+
+        calculateTotalPrice();
+        document.getElementById('reservationForm').submit();
+    }
+
+    calculateTotalPrice();
+    checkCustomerLicenseStatus();
+</script>

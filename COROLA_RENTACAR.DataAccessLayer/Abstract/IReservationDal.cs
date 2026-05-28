@@ -1,13 +1,12 @@
 ﻿using COROLA_RENTACAR.EntityLayer.Entities;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using COROLA_RENTACAR.EntityLayer.Enums;
 
 namespace COROLA_RENTACAR.DataAccessLayer.Abstract
 {
-    public interface IReservationDal:IGenericDal<Reservation>
+    public interface IReservationDal : IGenericDal<Reservation>
     {
+        Task<List<Reservation>> GetAllReservationsWithDetailsAsync();
+        Task<Reservation> GetReservationWithDetailsByIdAsync(int id);
+        Task UpdateReservationStatusAsync(int reservationId, ReservationStatus status);
     }
 }

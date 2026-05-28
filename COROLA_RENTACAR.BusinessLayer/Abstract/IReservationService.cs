@@ -1,13 +1,13 @@
 ﻿using COROLA_RENTACAR.EntityLayer.Entities;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace COROLA_RENTACAR.BusinessLayer.Abstract
 {
-    public interface IReservationService :IGenericService<Reservation>
+    public interface IReservationService : IGenericService<Reservation>
     {
+        Task<List<Reservation>> TGetAllReservationsWithDetailsAsync();
+        Task<Reservation> TGetReservationWithDetailsByIdAsync(int id);
+        Task TApproveReservationAsync(int reservationId);
+        Task TRejectReservationAsync(int reservationId);
+        Task TCancelReservationAsync(int reservationId);
     }
 }

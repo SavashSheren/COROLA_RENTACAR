@@ -1,0 +1,478 @@
+﻿@using COROLA_RENTACAR.EntityLayer.Enums
+@model List<COROLA_RENTACAR.EntityLayer.Entities.Reservation>
+
+@{
+    ViewData["Title"] = "Reservation List";
+    Layout = "~/Views/AdminLayout/Index.cshtml";
+
+    var totalCount = Model?.Count ?? 0;
+    var pendingCount = Model?.Count(x => x.ReservationStatus == ReservationStatus.Pending) ?? 0;
+    var approvedCount = Model?.Count(x => x.ReservationStatus == ReservationStatus.Approved) ?? 0;
+    var rejectedCount = Model?.Count(x => x.ReservationStatus == ReservationStatus.Rejected) ?? 0;
+}
+
+<style>
+    .res-root {
+        padding: 28px;
+        color: #e2e8f0;
+        font-family: 'DM Sans', 'Segoe UI', sans-serif;
+    }
+
+    .res-breadcrumb {
+        font-size: 12px;
+        color: #7a8499;
+        margin-bottom: 8px;
+    }
+
+    .res-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-end;
+        gap: 16px;
+        margin-bottom: 24px;
+        flex-wrap: wrap;
+    }
+
+    .res-title {
+        font-size: 26px;
+        font-weight: 800;
+        margin: 0;
+    }
+
+    .res-subtitle {
+        color: #7a8499;
+        font-size: 13px;
+        margin-top: 6px;
+    }
+
+    .btn-accent {
+        background: #e8ff47;
+        color: #0d0f14;
+        border: none;
+        border-radius: 10px;
+        padding: 10px 16px;
+        font-size: 13px;
+        font-weight: 800;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 7px;
+        cursor: pointer;
+    }
+
+    .btn-edit {
+        background: rgba(79,141,255,.12);
+        color: #4f8dff;
+        border: 1px solid rgba(79,141,255,.25);
+        border-radius: 8px;
+        padding: 7px 12px;
+        font-size: 12px;
+        font-weight: 700;
+        text-decoration: none;
+        cursor: pointer;
+    }
+
+    .btn-success-soft {
+        background: rgba(48,224,161,.12);
+        color: #30e0a1;
+        border: 1px solid rgba(48,224,161,.25);
+        border-radius: 8px;
+        padding: 7px 12px;
+        font-size: 12px;
+        font-weight: 700;
+        cursor: pointer;
+    }
+
+    .btn-warning-soft {
+        background: rgba(255,181,71,.12);
+        color: #ffb547;
+        border: 1px solid rgba(255,181,71,.25);
+        border-radius: 8px;
+        padding: 7px 12px;
+        font-size: 12px;
+        font-weight: 700;
+        cursor: pointer;
+    }
+
+    .btn-danger {
+        background: rgba(255,82,89,.1);
+        color: #ff5259;
+        border: 1px solid rgba(255,82,89,.2);
+        border-radius: 8px;
+        padding: 7px 12px;
+        font-size: 12px;
+        font-weight: 700;
+        cursor: pointer;
+    }
+
+    .res-stats {
+        display: grid;
+        grid-template-columns: repeat(4, minmax(160px, 1fr));
+        gap: 14px;
+        margin-bottom: 20px;
+    }
+
+    .res-stat {
+        background: #13161e;
+        border: 1px solid rgba(255,255,255,.07);
+        border-radius: 14px;
+        padding: 18px;
+        display: flex;
+        align-items: center;
+        gap: 14px;
+    }
+
+    .res-stat-icon {
+        width: 42px;
+        height: 42px;
+        border-radius: 12px;
+        background: rgba(232,255,71,.12);
+        color: #e8ff47;
+        display: grid;
+        place-items: center;
+        font-size: 20px;
+    }
+
+        .res-stat-icon.green {
+            background: rgba(48,224,161,.12);
+            color: #30e0a1;
+        }
+
+        .res-stat-icon.red {
+            background: rgba(255,82,89,.12);
+            color: #ff5259;
+        }
+
+        .res-stat-icon.blue {
+            background: rgba(79,141,255,.12);
+            color: #4f8dff;
+        }
+
+    .res-stat-num {
+        font-size: 24px;
+        font-weight: 800;
+        line-height: 1;
+    }
+
+    .res-stat-label {
+        color: #7a8499;
+        font-size: 12px;
+        margin-top: 4px;
+    }
+
+    .res-toolbar {
+        display: flex;
+        gap: 12px;
+        margin-bottom: 18px;
+        flex-wrap: wrap;
+    }
+
+    .res-search {
+        min-width: 260px;
+        max-width: 460px;
+        flex: 1;
+        background: #13161e;
+        border: 1px solid rgba(255,255,255,.07);
+        border-radius: 10px;
+        color: #e2e8f0;
+        padding: 11px 13px;
+        outline: none;
+    }
+
+    .res-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(390px, 1fr));
+        gap: 18px;
+    }
+
+    .res-card {
+        background: #13161e;
+        border: 1px solid rgba(255,255,255,.07);
+        border-radius: 18px;
+        padding: 18px;
+    }
+
+    .res-card-top {
+        display: flex;
+        justify-content: space-between;
+        gap: 12px;
+        align-items: flex-start;
+        margin-bottom: 14px;
+    }
+
+    .res-id {
+        color: #7a8499;
+        font-size: 12px;
+        background: #1a1e2a;
+        border-radius: 7px;
+        padding: 4px 9px;
+        display: inline-block;
+        margin-bottom: 8px;
+    }
+
+    .res-car {
+        font-size: 18px;
+        font-weight: 900;
+        margin-bottom: 3px;
+    }
+
+    .res-customer {
+        color: #7a8499;
+        font-size: 13px;
+    }
+
+    .res-status {
+        border-radius: 8px;
+        padding: 5px 10px;
+        font-size: 12px;
+        font-weight: 900;
+        white-space: nowrap;
+    }
+
+        .res-status.pending {
+            background: rgba(255,181,71,.12);
+            color: #ffb547;
+            border: 1px solid rgba(255,181,71,.25);
+        }
+
+        .res-status.approved {
+            background: rgba(48,224,161,.12);
+            color: #30e0a1;
+            border: 1px solid rgba(48,224,161,.25);
+        }
+
+        .res-status.rejected,
+        .res-status.cancelled {
+            background: rgba(255,82,89,.12);
+            color: #ff5259;
+            border: 1px solid rgba(255,82,89,.25);
+        }
+
+    .res-info {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 10px;
+        margin: 14px 0;
+    }
+
+    .res-info-item {
+        background: #1a1e2a;
+        border: 1px solid rgba(255,255,255,.07);
+        border-radius: 10px;
+        padding: 10px;
+    }
+
+    .res-info-key {
+        color: #7a8499;
+        font-size: 11px;
+        margin-bottom: 3px;
+    }
+
+    .res-info-val {
+        font-size: 13px;
+        font-weight: 700;
+    }
+
+    .res-price {
+        font-size: 20px;
+        font-weight: 900;
+        color: #e8ff47;
+        margin-bottom: 14px;
+    }
+
+    .res-actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+    }
+
+        .res-actions form {
+            display: inline-flex;
+        }
+
+    .res-empty {
+        grid-column: 1 / -1;
+        text-align: center;
+        color: #7a8499;
+        padding: 60px 20px;
+    }
+
+    @@media(max-width: 900px) {
+        .res-stats {
+            grid-template-columns: repeat(2, 1fr);
+        }
+
+        .res-grid {
+            grid-template-columns: 1fr;
+        }
+    }
+
+    @@media(max-width: 600px) {
+        .res-stats,
+        .res-info {
+            grid-template-columns: 1fr;
+        }
+    }
+</style>
+
+<div class="res-root">
+
+    <div class="res-breadcrumb">
+        Reservation Management › Reservation List
+    </div>
+
+    <div class="res-header">
+        <div>
+            <h1 class="res-title">Reservation Management</h1>
+            <p class="res-subtitle">View and manage all vehicle reservation requests.</p>
+        </div>
+
+        <a href="/Admin/Reservation/CreateReservation" class="btn-accent">
+            ＋ Add New Reservation
+        </a>
+    </div>
+
+    <div class="res-stats">
+        <div class="res-stat">
+            <div class="res-stat-icon">📋</div>
+            <div>
+                <div class="res-stat-num">@totalCount</div>
+                <div class="res-stat-label">Total Reservations</div>
+            </div>
+        </div>
+
+        <div class="res-stat">
+            <div class="res-stat-icon blue">⏳</div>
+            <div>
+                <div class="res-stat-num">@pendingCount</div>
+                <div class="res-stat-label">Pending</div>
+            </div>
+        </div>
+
+        <div class="res-stat">
+            <div class="res-stat-icon green">✅</div>
+            <div>
+                <div class="res-stat-num">@approvedCount</div>
+                <div class="res-stat-label">Approved</div>
+            </div>
+        </div>
+
+        <div class="res-stat">
+            <div class="res-stat-icon red">⛔</div>
+            <div>
+                <div class="res-stat-num">@rejectedCount</div>
+                <div class="res-stat-label">Rejected</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="res-toolbar">
+        <input type="text" id="reservationSearch" class="res-search" placeholder="Search reservation, customer, car..." oninput="filterReservations()" />
+    </div>
+
+    <div class="res-grid" id="reservationGrid">
+        @if (Model == null || !Model.Any())
+        {
+            <div class="res-empty">
+                <div style="font-size:42px;">📋</div>
+                <p>No reservations found.</p>
+            </div>
+        }
+        else
+        {
+            foreach (var item in Model)
+            {
+                var brandName = item.Car?.Brand?.BrandName ?? "";
+                var modelName = item.Car?.Model ?? "";
+                var plateNumber = item.Car?.PlateNumber ?? "";
+                var customerName = $"{item.Customer?.FirstName} {item.Customer?.LastName}";
+                var pickupLocation = item.PickupLocation?.LocationName ?? "";
+                var returnLocation = item.ReturnLocation?.LocationName ?? "";
+                var statusText = item.ReservationStatus.ToString();
+                var statusClass = statusText.ToLower();
+                var searchText = $"{brandName} {modelName} {plateNumber} {customerName} {pickupLocation} {returnLocation} {statusText}".ToLower();
+
+                <div class="res-card" data-search="@searchText">
+                    <div class="res-card-top">
+                        <div>
+                            <div class="res-id">#@item.ReservationId</div>
+                            <div class="res-car">@brandName @modelName</div>
+                            <div class="res-customer">@customerName • @plateNumber</div>
+                        </div>
+
+                        <span class="res-status @statusClass">@statusText</span>
+                    </div>
+
+                    <div class="res-info">
+                        <div class="res-info-item">
+                            <div class="res-info-key">Pickup Date</div>
+                            <div class="res-info-val">@item.PickupDate.ToString("dd MMM yyyy")</div>
+                        </div>
+
+                        <div class="res-info-item">
+                            <div class="res-info-key">Return Date</div>
+                            <div class="res-info-val">@item.ReturnDate.ToString("dd MMM yyyy")</div>
+                        </div>
+
+                        <div class="res-info-item">
+                            <div class="res-info-key">Pickup Location</div>
+                            <div class="res-info-val">@pickupLocation</div>
+                        </div>
+
+                        <div class="res-info-item">
+                            <div class="res-info-key">Return Location</div>
+                            <div class="res-info-val">@returnLocation</div>
+                        </div>
+                    </div>
+
+                    <div class="res-price">@item.TotalPrice.ToString("N2") ₺</div>
+
+                    <div class="res-actions">
+                        <a href="/Admin/Reservation/UpdateReservation?id=@item.ReservationId" class="btn-edit">✏️ Edit</a>
+
+                        @if (item.ReservationStatus != ReservationStatus.Approved)
+                        {
+                            <form method="post" action="/Admin/Reservation/ApproveReservation?id=@item.ReservationId">
+                                @Html.AntiForgeryToken()
+                                <button type="submit" class="btn-success-soft">✅ Approve</button>
+                            </form>
+                        }
+
+                        @if (item.ReservationStatus != ReservationStatus.Rejected)
+                        {
+                            <form method="post" action="/Admin/Reservation/RejectReservation?id=@item.ReservationId">
+                                @Html.AntiForgeryToken()
+                                <button type="submit" class="btn-warning-soft">⛔ Reject</button>
+                            </form>
+                        }
+
+                        @if (item.ReservationStatus != ReservationStatus.Cancelled)
+                        {
+                            <form method="post" action="/Admin/Reservation/CancelReservation?id=@item.ReservationId">
+                                @Html.AntiForgeryToken()
+                                <button type="submit" class="btn-warning-soft">🚫 Cancel</button>
+                            </form>
+                        }
+
+                        <form method="post" action="/Admin/Reservation/DeleteReservation?id=@item.ReservationId" onsubmit="return confirm('Are you sure you want to delete this reservation?');">
+                            @Html.AntiForgeryToken()
+                            <button type="submit" class="btn-danger">🗑️ Delete</button>
+                        </form>
+                    </div>
+                </div>
+            }
+        }
+    </div>
+</div>
+
+<script>
+    function filterReservations() {
+        const q = document.getElementById('reservationSearch').value.toLowerCase();
+        const cards = document.querySelectorAll('.res-card');
+
+        cards.forEach(card => {
+            const text = card.getAttribute('data-search') || '';
+            card.style.display = text.includes(q) ? '' : 'none';
+        });
+    }
+</script>

@@ -37,10 +37,10 @@ builder.Services.AddScoped<IValidator<Car>, CarValidator>();
 builder.Services.AddScoped<ICarImageService, CarImageManager>();
 builder.Services.AddScoped<ICarImageDal, EfCarImageDal>();
 builder.Services.AddScoped<IValidator<CarImage>, CarImageValidator>();
-//builder.Services.AddScoped<IReservationService, ReservationManager>();
+builder.Services.AddScoped<IReservationService, ReservationManager>();
 builder.Services.AddScoped<IReservationDal, EfReservationDal>();
 builder.Services.AddScoped<IValidator<Customer>, CustomerValidator>();
-//builder.Services.AddScoped<IValidator<Reservation>, ReservationValidator>();
+builder.Services.AddScoped<IValidator<Reservation>, ReservationValidator>();
 
 
 builder.Services.AddControllersWithViews();

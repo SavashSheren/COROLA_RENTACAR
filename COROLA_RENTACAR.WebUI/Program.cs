@@ -9,6 +9,8 @@ using COROLA_RENTACAR.DataAccessLayer.EntityFramework;
 using COROLA_RENTACAR.EntityLayer.Entities;
 using AutoMapper;
 using FluentValidation;
+using COROLA_RENTACAR.WebUI.Models;
+using COROLA_RENTACAR.WebUI.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -43,6 +45,9 @@ builder.Services.AddScoped<IReservationDal, EfReservationDal>();
 builder.Services.AddScoped<IValidator<Customer>, CustomerValidator>();
 builder.Services.AddScoped<IValidator<Reservation>, ReservationValidator>();
 builder.Services.AddHttpClient<IAiDriverLicenseVerificationService, OpenAiDriverLicenseVerificationService>();
+
+builder.Services.Configure<MailSettings>(builder.Configuration.GetSection("MailSettings"));
+builder.Services.AddScoped<IEmailNotificationService, MailKitEmailNotificationService>();
 
 
 builder.Services.AddControllersWithViews();

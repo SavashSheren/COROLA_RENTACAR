@@ -138,14 +138,26 @@
                             <div class="col-md-6">
                                 <div class="form-group" style="margin-bottom:16px;">
                                     <label>Pickup Date *</label>
-                                    <input type="date" id="pickupDate" name="PickupDate" class="form-control" value="@Model.PickupDate.ToString("yyyy-MM-dd")" onchange="calculateTotalPrice()" required />
+                                    <input type="date"
+                                           id="pickupDate"
+                                           name="PickupDate"
+                                           class="form-control"
+                                           value="@Model.PickupDate.ToString("yyyy-MM-dd")"
+                                           onchange="handlePickupDateChange()"
+                                           required />
                                 </div>
                             </div>
 
                             <div class="col-md-6">
                                 <div class="form-group" style="margin-bottom:16px;">
                                     <label>Return Date *</label>
-                                    <input type="date" id="returnDate" name="ReturnDate" class="form-control" value="@Model.ReturnDate.ToString("yyyy-MM-dd")" onchange="calculateTotalPrice()" required />
+                                    <input type="date"
+                                           id="returnDate"
+                                           name="ReturnDate"
+                                           class="form-control"
+                                           value="@Model.ReturnDate.ToString("yyyy-MM-dd")"
+                                           onchange="calculateTotalPrice()"
+                                           required />
                                 </div>
                             </div>
 
@@ -258,6 +270,41 @@
     <script>
         const dailyPrice = Number('@dailyPrice');
 
+        function parseLocalDate(value) {
+            const parts = value.split('-').map(Number);
+            return new Date(parts[0], parts[1] - 1, parts[2]);
+        }
+
+        function formatDateForInput(date) {
+            const year = date.getFullYear();
+            const month = String(date.getMonth() + 1).padStart(2, '0');
+            const day = String(date.getDate()).padStart(2, '0');
+
+            return `${year}-${month}-${day}`;
+        }
+
+        function handlePickupDateChange() {
+            const pickupDateInput = document.getElementById('pickupDate');
+            const returnDateInput = document.getElementById('returnDate');
+
+            if (!pickupDateInput.value) {
+                calculateTotalPrice();
+                return;
+            }
+
+            const pickupDate = parseLocalDate(pickupDateInput.value);
+            const minimumReturnDate = new Date(pickupDate);
+            minimumReturnDate.setDate(minimumReturnDate.getDate() + 1);
+
+            returnDateInput.min = formatDateForInput(minimumReturnDate);
+
+            if (!returnDateInput.value || parseLocalDate(returnDateInput.value) <= pickupDate) {
+                returnDateInput.value = formatDateForInput(minimumReturnDate);
+            }
+
+            calculateTotalPrice();
+        }
+
         function calculateTotalPrice() {
             const pickupDateValue = document.getElementById('pickupDate').value;
             const returnDateValue = document.getElementById('returnDate').value;
@@ -267,8 +314,8 @@
                 return;
             }
 
-            const pickupDate = new Date(pickupDateValue);
-            const returnDate = new Date(returnDateValue);
+            const pickupDate = parseLocalDate(pickupDateValue);
+            const returnDate = parseLocalDate(returnDateValue);
 
             let dayCount = Math.ceil((returnDate - pickupDate) / (1000 * 60 * 60 * 24));
 
@@ -329,11 +376,13 @@
 
             const birthDateValue = document.querySelector('input[name="BirthDate"]').value;
             const issueDateValue = document.getElementById('driverLicenseIssueDate').value;
+            const pickupDateValue = document.getElementById('pickupDate').value;
+            const returnDateValue = document.getElementById('returnDate').value;
             const licenseFileInput = document.getElementById('driverLicenseImage');
 
             const today = new Date();
 
-            const birthDate = new Date(birthDateValue);
+            const birthDate = parseLocalDate(birthDateValue);
             const minimumBirthDate = new Date();
             minimumBirthDate.setFullYear(today.getFullYear() - 21);
 
@@ -342,7 +391,7 @@
                 return false;
             }
 
-            const issueDate = new Date(issueDateValue);
+            const issueDate = parseLocalDate(issueDateValue);
             const minimumIssueDate = new Date();
             minimumIssueDate.setFullYear(today.getFullYear() - 3);
 
@@ -353,6 +402,14 @@
 
             if (issueDate > minimumIssueDate) {
                 alert("Reservation cannot be created. Driver license must be at least 3 years old.");
+                return false;
+            }
+
+            const pickupDate = parseLocalDate(pickupDateValue);
+            const returnDate = parseLocalDate(returnDateValue);
+
+            if (returnDate <= pickupDate) {
+                alert("Return date must be later than pickup date.");
                 return false;
             }
 
@@ -379,6 +436,9 @@
             return true;
         }
 
-        calculateTotalPrice();
+        document.addEventListener('DOMContentLoaded', function () {
+            handlePickupDateChange();
+            calculateTotalPrice();
+        });
     </script>
 }

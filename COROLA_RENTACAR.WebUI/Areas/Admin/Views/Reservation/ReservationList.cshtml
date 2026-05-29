@@ -331,7 +331,19 @@
             ＋ Add New Reservation
         </a>
     </div>
+    @if (TempData["ReservationSuccess"] != null)
+    {
+        <div style="background:rgba(48,224,161,.12);border:1px solid rgba(48,224,161,.25);color:#30e0a1;border-radius:12px;padding:13px 15px;margin-bottom:18px;font-size:13px;font-weight:800;">
+            @TempData["ReservationSuccess"]
+        </div>
+    }
 
+    @if (TempData["ReservationError"] != null)
+    {
+        <div style="background:rgba(255,82,89,.12);border:1px solid rgba(255,82,89,.25);color:#ff5259;border-radius:12px;padding:13px 15px;margin-bottom:18px;font-size:13px;font-weight:800;">
+            @TempData["ReservationError"]
+        </div>
+    }
     <div class="res-stats">
         <div class="res-stat">
             <div class="res-stat-icon">📋</div>

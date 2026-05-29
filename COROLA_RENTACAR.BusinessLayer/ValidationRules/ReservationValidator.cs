@@ -18,9 +18,8 @@ namespace COROLA_RENTACAR.BusinessLayer.ValidationRules
 
             RuleFor(x => x.ReturnDate)
                 .NotEmpty().WithMessage("Return date cannot be empty.")
-                .Must((reservation, returnDate) => returnDate.Date >= reservation.PickupDate.Date)
-                .WithMessage("Return date cannot be earlier than pickup date.");
-
+                .Must((reservation, returnDate) => returnDate.Date > reservation.PickupDate.Date)
+.WithMessage("Return date must be later than pickup date.");
             RuleFor(x => x.PickupLocationId)
                 .GreaterThan(0).WithMessage("Please select a valid pickup location.");
 

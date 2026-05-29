@@ -3,6 +3,7 @@ using COROLA_RENTACAR.EntityLayer.Entities;
 using COROLA_RENTACAR.EntityLayer.Enums;
 using FluentValidation;
 using Microsoft.AspNetCore.Mvc;
+using COROLA_RENTACAR.WebUI.Services;
 
 namespace COROLA_RENTACAR.WebUI.Areas.Admin.Controllers
 {
@@ -13,17 +14,20 @@ namespace COROLA_RENTACAR.WebUI.Areas.Admin.Controllers
         private readonly ICarService _carService;
         private readonly ICustomerService _customerService;
         private readonly ILocationService _locationService;
+        private readonly IEmailNotificationService _emailNotificationService;
 
         public ReservationController(
-            IReservationService reservationService,
-            ICarService carService,
-            ICustomerService customerService,
-            ILocationService locationService)
+      IReservationService reservationService,
+      ICarService carService,
+      ICustomerService customerService,
+      ILocationService locationService,
+      IEmailNotificationService emailNotificationService)
         {
             _reservationService = reservationService;
             _carService = carService;
             _customerService = customerService;
             _locationService = locationService;
+            _emailNotificationService = emailNotificationService;
         }
 
         [HttpGet]
@@ -113,9 +117,26 @@ namespace COROLA_RENTACAR.WebUI.Areas.Admin.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
+   
         public async Task<IActionResult> ApproveReservation(int id)
         {
-            await _reservationService.TApproveReservationAsync(id);
+            try
+            {
+                await _reservationService.TApproveReservationAsync(id);
+
+                var reservation = await _reservationService.TGetReservationWithDetailsByIdAsync(id);
+
+                if (reservation != null)
+                {
+                    await _emailNotificationService.SendReservationApprovedEmailAsync(reservation);
+                    TempData["ReservationSuccess"] = "Reservation approved and approval email has been sent to the customer.";
+                }
+            }
+            catch (Exception ex)
+            {
+                TempData["ReservationError"] = ex.Message;
+            }
+
             return Redirect("/Admin/Reservation/ReservationList");
         }
 

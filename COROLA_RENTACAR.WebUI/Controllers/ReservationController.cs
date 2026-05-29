@@ -15,14 +15,16 @@ namespace COROLA_RENTACAR.WebUI.Controllers
         private readonly IReservationService _reservationService;
         private readonly IWebHostEnvironment _webHostEnvironment;
         private readonly IAiDriverLicenseVerificationService _aiDriverLicenseVerificationService;
+        private readonly IConfiguration _configuration;
 
         public ReservationController(
-     ICarService carService,
-     ICustomerService customerService,
-     ILocationService locationService,
-     IReservationService reservationService,
-     IWebHostEnvironment webHostEnvironment,
-     IAiDriverLicenseVerificationService aiDriverLicenseVerificationService)
+            ICarService carService,
+            ICustomerService customerService,
+            ILocationService locationService,
+            IReservationService reservationService,
+            IWebHostEnvironment webHostEnvironment,
+            IAiDriverLicenseVerificationService aiDriverLicenseVerificationService,
+            IConfiguration configuration)
         {
             _carService = carService;
             _customerService = customerService;
@@ -30,6 +32,7 @@ namespace COROLA_RENTACAR.WebUI.Controllers
             _reservationService = reservationService;
             _webHostEnvironment = webHostEnvironment;
             _aiDriverLicenseVerificationService = aiDriverLicenseVerificationService;
+            _configuration = configuration;
         }
 
         [HttpGet]
@@ -180,10 +183,18 @@ namespace COROLA_RENTACAR.WebUI.Controllers
             if (model.ReturnLocationId <= 0)
                 throw new Exception("Return location is required.");
 
-            if (model.ReturnDate.Date < model.PickupDate.Date)
-                throw new Exception("Return date cannot be earlier than pickup date.");
+            if (model.ReturnDate.Date <= model.PickupDate.Date)
+                throw new Exception("Return date must be later than pickup date.");
 
             await ValidateDriverLicenseImageFileAsync(model.DriverLicenseImage);
+
+            var isAiEnabled = _configuration.GetValue<bool>("OpenAI:EnableAiVerification");
+            var apiKey = _configuration["OpenAI:ApiKey"];
+
+            if (!isAiEnabled || string.IsNullOrWhiteSpace(apiKey))
+            {
+                return "Basic system verification passed. AI verification is disabled or not configured. Admin must manually review the uploaded driver license document.";
+            }
 
             var aiResult = await _aiDriverLicenseVerificationService.VerifyAsync(model.DriverLicenseImage, model);
 

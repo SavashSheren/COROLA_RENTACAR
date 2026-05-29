@@ -1,4 +1,3 @@
-using COROLA_RENTACAR.WebUI.Services;
 using COROLA_RENTACAR.BusinessLayer.Abstract;
 using COROLA_RENTACAR.BusinessLayer.Concrete;
 using COROLA_RENTACAR.BusinessLayer.Mapping;
@@ -7,12 +6,14 @@ using COROLA_RENTACAR.DataAccessLayer.Abstract;
 using COROLA_RENTACAR.DataAccessLayer.Concrete;
 using COROLA_RENTACAR.DataAccessLayer.EntityFramework;
 using COROLA_RENTACAR.EntityLayer.Entities;
-using AutoMapper;
-using FluentValidation;
 using COROLA_RENTACAR.WebUI.Models;
 using COROLA_RENTACAR.WebUI.Services;
+using FluentValidation;
+using QuestPDF.Infrastructure;
 
 var builder = WebApplication.CreateBuilder(args);
+QuestPDF.Settings.License = QuestPDF.Infrastructure.LicenseType.Community;
+builder.Services.AddScoped<IPdfReportService, PdfReportService>();
 
 builder.Services.AddDbContext<CorolaContext>();
 

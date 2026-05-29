@@ -699,37 +699,6 @@
                         </ul>
                     </li>
 
-                    <div class="admin-section-title">Website Content</div>
-
-                    <li class="admin-nav-item has-submenu @contentMenuOpen" id="menuContent">
-                        <a href="javascript:void(0)" class="admin-nav-link">
-                            <i class="bi bi-window-sidebar admin-nav-icon"></i>
-                            <span class="admin-nav-label">Website Content</span>
-                            <i class="bi bi-chevron-right admin-sub-arrow"></i>
-                        </a>
-
-                        <ul class="admin-sub-menu">
-                            <li>
-                                <a href="/Admin/Banner/BannerList" class="@isControllerActive("Banner")">Banner</a>
-                            </li>
-                            <li>
-                                <a href="/Admin/About/AboutList" class="@isControllerActive("About")">About</a>
-                            </li>
-                            <li>
-                                <a href="/Admin/Service/ServiceList" class="@isControllerActive("Service")">Services</a>
-                            </li>
-                            <li>
-                                <a href="/Admin/Testimonial/TestimonialList" class="@isControllerActive("Testimonial")">Testimonials</a>
-                            </li>
-                            <li>
-                                <a href="/Admin/FAQ/FAQList" class="@isControllerActive("FAQ")">FAQ</a>
-                            </li>
-                            <li>
-                                <a href="/Admin/ContactInfo/ContactInfoList" class="@isControllerActive("ContactInfo")">Contact Info</a>
-                            </li>
-                        </ul>
-                    </li>
-
                     <div class="admin-section-title">Productivity</div>
 
                     <li class="admin-nav-item has-submenu @reportMenuOpen" id="menuReports">
@@ -741,13 +710,21 @@
 
                         <ul class="admin-sub-menu">
                             <li>
-                                <a href="/Admin/Report/ReservationReports" class="@isControllerActive("Report")">Reservation Reports</a>
+                                <a href="/Admin/Report/ReservationReports" class="@isControllerActive("Report")">
+                                    Reservation Reports
+                                </a>
                             </li>
+
                             <li>
-                                <a href="/Admin/Report/CarReports">Car Reports</a>
+                                <a href="/Admin/Report/CarReports" class="@isControllerActive("Report")">
+                                    Car Reports
+                                </a>
                             </li>
+
                             <li>
-                                <a href="/Admin/PdfReport/Index" class="@isControllerActive("PdfReport")">PDF Reports</a>
+                                <a href="/Admin/Report/PdfReports" class="@isControllerActive("Report")">
+                                    PDF Reports
+                                </a>
                             </li>
                         </ul>
                     </li>

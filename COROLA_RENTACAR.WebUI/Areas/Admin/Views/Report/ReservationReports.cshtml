@@ -1,0 +1,718 @@
+﻿@using COROLA_RENTACAR.EntityLayer.Entities
+@using COROLA_RENTACAR.EntityLayer.Enums
+@using COROLA_RENTACAR.WebUI.Models
+@using System.Globalization
+@using System.Text.Json
+@model List<COROLA_RENTACAR.EntityLayer.Entities.Reservation>
+
+@{
+    ViewData["Title"] = "Reservation Reports";
+    Layout = "~/Views/AdminLayout/Index.cshtml";
+
+    var filter = ViewBag.Filter as ReservationReportFilterViewModel ?? new ReservationReportFilterViewModel();
+
+    var cars = ViewBag.Cars as List<Car> ?? new List<Car>();
+    var brands = ViewBag.Brands as List<ReportDropdownItemViewModel> ?? new List<ReportDropdownItemViewModel>();
+    var categories = ViewBag.Categories as List<ReportDropdownItemViewModel> ?? new List<ReportDropdownItemViewModel>();
+
+    var startDate = filter.StartDate ?? (ViewBag.StartDate is DateTime sDate ? sDate : DateTime.Today.AddMonths(-1));
+    var endDate = filter.EndDate ?? (ViewBag.EndDate is DateTime eDate ? eDate : DateTime.Today);
+
+    var totalReservations = Convert.ToInt32(ViewBag.TotalReservations ?? 0);
+    var pendingReservations = Convert.ToInt32(ViewBag.PendingReservations ?? 0);
+    var approvedReservations = Convert.ToInt32(ViewBag.ApprovedReservations ?? 0);
+    var rejectedReservations = Convert.ToInt32(ViewBag.RejectedReservations ?? 0);
+    var cancelledReservations = Convert.ToInt32(ViewBag.CancelledReservations ?? 0);
+
+    var totalRevenue = Convert.ToDecimal(ViewBag.TotalRevenue ?? 0);
+    var averageReservationValue = Convert.ToDecimal(ViewBag.AverageReservationValue ?? 0);
+    var totalRentalDays = Convert.ToInt32(ViewBag.TotalRentalDays ?? 0);
+
+    var dayLabels = ViewBag.DayLabels as List<string> ?? new List<string>();
+    var dailyReservationData = ViewBag.DailyReservationData as List<int> ?? new List<int>();
+    var dailyRevenueData = ViewBag.DailyRevenueData as List<decimal> ?? new List<decimal>();
+
+    var statusLabels = ViewBag.StatusLabels as List<string> ?? new List<string>();
+    var statusData = ViewBag.StatusData as List<int> ?? new List<int>();
+}
+
+<style>
+    .report-root {
+        padding: 28px;
+        color: #e2e8f0;
+        font-family: 'DM Sans', 'Segoe UI', sans-serif;
+    }
+
+    .report-breadcrumb {
+        color: #7a8499;
+        font-size: 12px;
+        margin-bottom: 8px;
+    }
+
+    .report-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-end;
+        gap: 16px;
+        flex-wrap: wrap;
+        margin-bottom: 22px;
+    }
+
+    .report-title {
+        font-size: 28px;
+        font-weight: 900;
+        margin: 0;
+    }
+
+    .report-subtitle {
+        color: #7a8499;
+        font-size: 13px;
+        margin-top: 6px;
+    }
+
+    .filter-card {
+        background: #13161e;
+        border: 1px solid rgba(255,255,255,.07);
+        border-radius: 18px;
+        padding: 18px;
+        margin-bottom: 20px;
+    }
+
+    .filter-form {
+        display: flex;
+        gap: 12px;
+        align-items: end;
+        flex-wrap: wrap;
+    }
+
+    .filter-group {
+        display: grid;
+        gap: 7px;
+    }
+
+        .filter-group label {
+            color: #7a8499;
+            font-size: 12px;
+            font-weight: 900;
+        }
+
+    .filter-input {
+        background: #1a1e2a;
+        border: 1px solid rgba(255,255,255,.08);
+        color: #e2e8f0;
+        border-radius: 10px;
+        padding: 10px 12px;
+        min-width: 190px;
+        outline: none;
+    }
+
+        .filter-input:focus {
+            border-color: rgba(232,255,71,.45);
+        }
+
+    .btn-accent {
+        background: #e8ff47;
+        color: #0d0f14;
+        border: none;
+        border-radius: 10px;
+        padding: 11px 16px;
+        font-size: 13px;
+        font-weight: 900;
+        text-decoration: none;
+        cursor: pointer;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        min-height: 42px;
+    }
+
+        .btn-accent.secondary {
+            background: #1a1e2a;
+            color: #e2e8f0;
+            border: 1px solid rgba(255,255,255,.08);
+        }
+
+        .btn-accent.success {
+            background: #30e0a1;
+            color: #0d0f14;
+        }
+
+    .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(4, minmax(180px, 1fr));
+        gap: 14px;
+        margin-bottom: 20px;
+    }
+
+    .stat-card {
+        background: #13161e;
+        border: 1px solid rgba(255,255,255,.07);
+        border-radius: 18px;
+        padding: 18px;
+    }
+
+    .stat-label {
+        color: #7a8499;
+        font-size: 12px;
+        font-weight: 900;
+        margin-bottom: 12px;
+    }
+
+    .stat-value {
+        font-size: 27px;
+        font-weight: 900;
+        line-height: 1;
+    }
+
+    .stat-note {
+        color: #7a8499;
+        font-size: 12px;
+        margin-top: 8px;
+    }
+
+    .chart-grid {
+        display: grid;
+        grid-template-columns: 1.4fr .6fr;
+        gap: 18px;
+        margin-bottom: 20px;
+    }
+
+    .report-card {
+        background: #13161e;
+        border: 1px solid rgba(255,255,255,.07);
+        border-radius: 18px;
+        overflow: hidden;
+    }
+
+    .report-card-header {
+        padding: 18px;
+        border-bottom: 1px solid rgba(255,255,255,.07);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .report-card-title {
+        margin: 0;
+        font-size: 16px;
+        font-weight: 900;
+    }
+
+    .report-card-body {
+        padding: 18px;
+    }
+
+    .chart-box {
+        height: 320px;
+    }
+
+    .table-wrap {
+        overflow-x: auto;
+    }
+
+    .report-table {
+        width: 100%;
+        border-collapse: collapse;
+        min-width: 1280px;
+    }
+
+        .report-table th {
+            color: #7a8499;
+            background: #0f1219;
+            font-size: 12px;
+            text-align: left;
+            padding: 13px;
+            border-bottom: 1px solid rgba(255,255,255,.07);
+            white-space: nowrap;
+        }
+
+        .report-table td {
+            padding: 13px;
+            border-bottom: 1px solid rgba(255,255,255,.06);
+            font-size: 13px;
+            white-space: nowrap;
+        }
+
+    .status-badge {
+        border-radius: 8px;
+        padding: 5px 9px;
+        font-size: 11px;
+        font-weight: 900;
+        white-space: nowrap;
+    }
+
+        .status-badge.pending {
+            color: #ffb547;
+            background: rgba(255,181,71,.14);
+            border: 1px solid rgba(255,181,71,.25);
+        }
+
+        .status-badge.approved {
+            color: #30e0a1;
+            background: rgba(48,224,161,.14);
+            border: 1px solid rgba(48,224,161,.25);
+        }
+
+        .status-badge.rejected,
+        .status-badge.cancelled {
+            color: #ff5259;
+            background: rgba(255,82,89,.14);
+            border: 1px solid rgba(255,82,89,.25);
+        }
+
+    @@media(max-width: 1100px) {
+        .stats-grid,
+        .chart-grid {
+            grid-template-columns: 1fr 1fr;
+        }
+    }
+
+    @@media(max-width: 700px) {
+        .stats-grid,
+        .chart-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .filter-input {
+            width: 100%;
+            min-width: 100%;
+        }
+
+        .filter-group {
+            width: 100%;
+        }
+    }
+</style>
+
+<div class="report-root">
+
+    <div class="report-breadcrumb">
+        Admin Panel › Reports › Reservation Reports
+    </div>
+
+    <div class="report-header">
+        <div>
+            <h1 class="report-title">Reservation Reports</h1>
+            <p class="report-subtitle">Filter reservation requests by status, vehicle, category, customer and price range.</p>
+        </div>
+    </div>
+
+    <div class="filter-card">
+        <form method="get" action="/Admin/Report/ReservationReports" class="filter-form">
+
+            <div class="filter-group">
+                <label>Start Date</label>
+                <input type="date"
+                       name="StartDate"
+                       class="filter-input"
+                       value="@startDate.ToString("yyyy-MM-dd")" />
+            </div>
+
+            <div class="filter-group">
+                <label>End Date</label>
+                <input type="date"
+                       name="EndDate"
+                       class="filter-input"
+                       value="@endDate.ToString("yyyy-MM-dd")" />
+            </div>
+
+            <div class="filter-group">
+                <label>Status</label>
+                <select name="Status" class="filter-input">
+                    <option value="">All Statuses</option>
+                    @foreach (ReservationStatus status in Enum.GetValues(typeof(ReservationStatus)))
+                    {
+                        if (filter.Status == status)
+                        {
+                            <option value="@status" selected>@status</option>
+                        }
+                        else
+                        {
+                            <option value="@status">@status</option>
+                        }
+                    }
+                </select>
+            </div>
+
+            <div class="filter-group">
+                <label>Car</label>
+                <select name="CarId" class="filter-input">
+                    <option value="">All Cars</option>
+                    @foreach (var car in cars)
+                    {
+                        var carName = $"{car.Brand?.BrandName} {car.Model} - {car.PlateNumber}";
+
+                        if (filter.CarId == car.CarId)
+                        {
+                            <option value="@car.CarId" selected>@carName</option>
+                        }
+                        else
+                        {
+                            <option value="@car.CarId">@carName</option>
+                        }
+                    }
+                </select>
+            </div>
+
+            <div class="filter-group">
+                <label>Brand</label>
+                <select name="BrandId" class="filter-input">
+                    <option value="">All Brands</option>
+                    @foreach (var brand in brands)
+                    {
+                        if (filter.BrandId == brand.Id)
+                        {
+                            <option value="@brand.Id" selected>@brand.Name</option>
+                        }
+                        else
+                        {
+                            <option value="@brand.Id">@brand.Name</option>
+                        }
+                    }
+                </select>
+            </div>
+
+            <div class="filter-group">
+                <label>Category</label>
+                <select name="CategoryId" class="filter-input">
+                    <option value="">All Categories</option>
+                    @foreach (var category in categories)
+                    {
+                        if (filter.CategoryId == category.Id)
+                        {
+                            <option value="@category.Id" selected>@category.Name</option>
+                        }
+                        else
+                        {
+                            <option value="@category.Id">@category.Name</option>
+                        }
+                    }
+                </select>
+            </div>
+
+            <div class="filter-group">
+                <label>Min Price</label>
+                <input type="number"
+                       name="MinPrice"
+                       class="filter-input"
+                       value="@(filter.MinPrice.HasValue? filter.MinPrice.Value.ToString(CultureInfo.InvariantCulture) : "")"
+                       placeholder="0" />
+            </div>
+
+            <div class="filter-group">
+                <label>Max Price</label>
+                <input type="number"
+                       name="MaxPrice"
+                       class="filter-input"
+                       value="@(filter.MaxPrice.HasValue? filter.MaxPrice.Value.ToString(CultureInfo.InvariantCulture) : "")"
+                       placeholder="50000" />
+            </div>
+
+            <div class="filter-group">
+                <label>Customer Search</label>
+                <input type="text"
+                       name="CustomerKeyword"
+                       class="filter-input"
+                       value="@filter.CustomerKeyword"
+                       placeholder="Name, email, phone..." />
+            </div>
+
+            <button type="submit" class="btn-accent">
+                Apply Filter
+            </button>
+
+            <button type="submit"
+                    formaction="/Admin/Report/DownloadReservationPdf"
+                    class="btn-accent success">
+                Download Filtered PDF
+            </button>
+
+            <a href="/Admin/Report/ReservationReports" class="btn-accent secondary">
+                Reset
+            </a>
+        </form>
+    </div>
+
+    <div class="stats-grid">
+        <div class="stat-card">
+            <div class="stat-label">TOTAL RESERVATIONS</div>
+            <div class="stat-value">@totalReservations</div>
+            <div class="stat-note">Filtered reservation count</div>
+        </div>
+
+        <div class="stat-card">
+            <div class="stat-label">APPROVED REVENUE</div>
+            <div class="stat-value">@totalRevenue.ToString("N0") ₺</div>
+            <div class="stat-note">Approved reservations only</div>
+        </div>
+
+        <div class="stat-card">
+            <div class="stat-label">AVERAGE VALUE</div>
+            <div class="stat-value">@averageReservationValue.ToString("N0") ₺</div>
+            <div class="stat-note">Per approved reservation</div>
+        </div>
+
+        <div class="stat-card">
+            <div class="stat-label">TOTAL RENTAL DAYS</div>
+            <div class="stat-value">@totalRentalDays</div>
+            <div class="stat-note">Approved rental duration</div>
+        </div>
+    </div>
+
+    <div class="stats-grid">
+        <div class="stat-card">
+            <div class="stat-label">PENDING</div>
+            <div class="stat-value">@pendingReservations</div>
+        </div>
+
+        <div class="stat-card">
+            <div class="stat-label">APPROVED</div>
+            <div class="stat-value">@approvedReservations</div>
+        </div>
+
+        <div class="stat-card">
+            <div class="stat-label">REJECTED</div>
+            <div class="stat-value">@rejectedReservations</div>
+        </div>
+
+        <div class="stat-card">
+            <div class="stat-label">CANCELLED</div>
+            <div class="stat-value">@cancelledReservations</div>
+        </div>
+    </div>
+
+    <div class="chart-grid">
+        <div class="report-card">
+            <div class="report-card-header">
+                <h2 class="report-card-title">Daily Reservation & Revenue Trend</h2>
+            </div>
+            <div class="report-card-body">
+                <div class="chart-box">
+                    <canvas id="dailyReportChart"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <div class="report-card">
+            <div class="report-card-header">
+                <h2 class="report-card-title">Status Distribution</h2>
+            </div>
+            <div class="report-card-body">
+                <div class="chart-box">
+                    <canvas id="statusReportChart"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="report-card">
+        <div class="report-card-header">
+            <h2 class="report-card-title">Reservation Report Detail</h2>
+        </div>
+
+        <div class="report-card-body">
+            <div class="table-wrap">
+                <table class="report-table">
+                    <thead>
+                        <tr>
+                            <th>Code</th>
+                            <th>Customer</th>
+                            <th>Email</th>
+                            <th>Phone</th>
+                            <th>Car</th>
+                            <th>Plate</th>
+                            <th>Category</th>
+                            <th>Fuel</th>
+                            <th>Transmission</th>
+                            <th>Pickup</th>
+                            <th>Return</th>
+                            <th>Days</th>
+                            <th>Status</th>
+                            <th>Total Price</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+                        @if (Model == null || !Model.Any())
+                        {
+                            <tr>
+                                <td colspan="14" style="text-align:center;color:#7a8499;padding:35px;">
+                                    No report data found.
+                                </td>
+                            </tr>
+                        }
+                        else
+                        {
+                            foreach (var item in Model)
+                            {
+                                var customerName = $"{item.Customer?.FirstName} {item.Customer?.LastName}";
+                                var carName = $"{item.Car?.Brand?.BrandName} {item.Car?.Model}";
+                                var statusClass = item.ReservationStatus.ToString().ToLower();
+                                var reservationCode = $"CRL-{DateTime.Now.Year}-{item.ReservationId:D6}";
+
+                                var rentalDays = (item.ReturnDate.Date - item.PickupDate.Date).Days;
+
+                                if (rentalDays < 1)
+                                {
+                                    rentalDays = 1;
+                                }
+
+                                <tr>
+                                    <td>@reservationCode</td>
+                                    <td>@customerName</td>
+                                    <td>@(item.Customer?.Email ?? "-")</td>
+                                    <td>@(item.Customer?.Phone ?? "-")</td>
+                                    <td>@carName</td>
+                                    <td>@(item.Car?.PlateNumber ?? "-")</td>
+                                    <td>@(item.Car?.Category?.CategoryName ?? "-")</td>
+                                    <td>@(item.Car?.FuelType ?? "-")</td>
+                                    <td>@(item.Car?.TransmissionType ?? "-")</td>
+                                    <td>@item.PickupDate.ToString("dd MMM yyyy", CultureInfo.GetCultureInfo("en-US"))</td>
+                                    <td>@item.ReturnDate.ToString("dd MMM yyyy", CultureInfo.GetCultureInfo("en-US"))</td>
+                                    <td>@rentalDays</td>
+                                    <td>
+                                        <span class="status-badge @statusClass">
+                                            @item.ReservationStatus
+                                        </span>
+                                    </td>
+                                    <td>@item.TotalPrice.ToString("N0") ₺</td>
+                                </tr>
+                            }
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<script>
+    const dayLabels = @Html.Raw(JsonSerializer.Serialize(dayLabels));
+    const dailyReservationData = @Html.Raw(JsonSerializer.Serialize(dailyReservationData));
+    const dailyRevenueData = @Html.Raw(JsonSerializer.Serialize(dailyRevenueData));
+
+    const statusLabels = @Html.Raw(JsonSerializer.Serialize(statusLabels));
+    const statusData = @Html.Raw(JsonSerializer.Serialize(statusData));
+
+    Chart.defaults.color = '#9aa4b8';
+    Chart.defaults.borderColor = 'rgba(255,255,255,.08)';
+    Chart.defaults.font.family = "'DM Sans', 'Segoe UI', sans-serif";
+
+    new Chart(document.getElementById('dailyReportChart'), {
+        type: 'line',
+        data: {
+            labels: dayLabels,
+            datasets: [
+                {
+                    label: 'Reservations',
+                    data: dailyReservationData,
+                    tension: .4,
+                    borderColor: '#4f8dff',
+                    backgroundColor: 'rgba(79,141,255,.12)',
+                    pointBackgroundColor: '#4f8dff',
+                    pointBorderColor: '#11131a',
+                    borderWidth: 3,
+                    pointRadius: 4
+                },
+                {
+                    label: 'Revenue',
+                    data: dailyRevenueData,
+                    tension: .4,
+                    borderColor: '#e8ff47',
+                    backgroundColor: 'rgba(232,255,71,.12)',
+                    pointBackgroundColor: '#e8ff47',
+                    pointBorderColor: '#11131a',
+                    borderWidth: 3,
+                    pointRadius: 4,
+                    yAxisID: 'y1'
+                }
+            ]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            interaction: {
+                mode: 'index',
+                intersect: false
+            },
+            plugins: {
+                legend: {
+                    labels: {
+                        usePointStyle: true
+                    }
+                },
+                tooltip: {
+                    backgroundColor: '#0b0d12',
+                    titleColor: '#ffffff',
+                    bodyColor: '#e2e8f0',
+                    borderColor: 'rgba(255,255,255,.12)',
+                    borderWidth: 1
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    ticks: {
+                        precision: 0
+                    }
+                },
+                y1: {
+                    beginAtZero: true,
+                    position: 'right',
+                    grid: {
+                        drawOnChartArea: false
+                    },
+                    ticks: {
+                        callback: function(value) {
+                            return Number(value).toLocaleString('en-US') + ' ₺';
+                        }
+                    }
+                }
+            }
+        }
+    });
+
+    new Chart(document.getElementById('statusReportChart'), {
+        type: 'doughnut',
+        data: {
+            labels: statusLabels,
+            datasets: [{
+                data: statusData,
+                backgroundColor: [
+                    '#ffb547',
+                    '#30e0a1',
+                    '#ff5259',
+                    '#7a8499'
+                ],
+                borderColor: '#13161e',
+                borderWidth: 4
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            cutout: '62%',
+            plugins: {
+                legend: {
+                    position: 'bottom',
+                    labels: {
+                        usePointStyle: true,
+                        boxWidth: 8,
+                        boxHeight: 8,
+                        padding: 16
+                    }
+                },
+                tooltip: {
+                    backgroundColor: '#0b0d12',
+                    titleColor: '#ffffff',
+                    bodyColor: '#e2e8f0',
+                    borderColor: 'rgba(255,255,255,.12)',
+                    borderWidth: 1
+                }
+            }
+        }
+    });
+</script>

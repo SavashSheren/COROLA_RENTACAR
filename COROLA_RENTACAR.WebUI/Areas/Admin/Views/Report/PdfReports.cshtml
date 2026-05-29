@@ -1,0 +1,157 @@
+﻿@{
+    ViewData["Title"] = "PDF Reports";
+    Layout = "~/Views/AdminLayout/Index.cshtml";
+}
+
+<style>
+    .pdf-root {
+        padding: 28px;
+        color: #e2e8f0;
+        font-family: 'DM Sans', 'Segoe UI', sans-serif;
+    }
+
+    .pdf-breadcrumb {
+        color: #7a8499;
+        font-size: 12px;
+        margin-bottom: 8px;
+    }
+
+    .pdf-title {
+        font-size: 28px;
+        font-weight: 900;
+        margin: 0;
+    }
+
+    .pdf-subtitle {
+        color: #7a8499;
+        font-size: 13px;
+        margin-top: 6px;
+        margin-bottom: 24px;
+    }
+
+    .pdf-grid {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(220px, 1fr));
+        gap: 18px;
+    }
+
+    .pdf-card {
+        background: #13161e;
+        border: 1px solid rgba(255,255,255,.07);
+        border-radius: 18px;
+        padding: 22px;
+        min-height: 220px;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+    }
+
+    .pdf-icon {
+        width: 52px;
+        height: 52px;
+        border-radius: 16px;
+        background: rgba(232,255,71,.12);
+        color: #e8ff47;
+        display: grid;
+        place-items: center;
+        font-size: 26px;
+        margin-bottom: 18px;
+    }
+
+    .pdf-card-title {
+        font-size: 18px;
+        font-weight: 900;
+        margin-bottom: 8px;
+    }
+
+    .pdf-card-text {
+        color: #7a8499;
+        font-size: 13px;
+        line-height: 1.7;
+    }
+
+    .pdf-btn {
+        margin-top: 18px;
+        background: #e8ff47;
+        color: #0d0f14;
+        border: none;
+        border-radius: 10px;
+        padding: 11px 14px;
+        font-size: 13px;
+        font-weight: 900;
+        text-decoration: none;
+        display: inline-flex;
+        justify-content: center;
+    }
+
+        .pdf-btn.secondary {
+            background: #1a1e2a;
+            color: #e2e8f0;
+            border: 1px solid rgba(255,255,255,.08);
+        }
+
+    @@media(max-width: 1000px) {
+        .pdf-grid {
+            grid-template-columns: 1fr;
+        }
+    }
+</style>
+
+<div class="pdf-root">
+
+    <div class="pdf-breadcrumb">
+        Admin Panel › Reports › PDF Reports
+    </div>
+
+    <h1 class="pdf-title">PDF Reports</h1>
+    <p class="pdf-subtitle">
+        PDF export center for reservation, car and customer reports. Real PDF generation will be connected in the next sprint.
+    </p>
+
+    <div class="pdf-grid">
+
+        <div class="pdf-card">
+            <div>
+                <div class="pdf-icon">📋</div>
+                <div class="pdf-card-title">Reservation PDF Report</div>
+                <div class="pdf-card-text">
+                    Generate reservation report documents with customer, vehicle, date range, status and revenue data.
+                </div>
+            </div>
+
+            <a href="/Admin/Report/ReservationReports" class="pdf-btn">
+                Open Reservation Report
+            </a>
+        </div>
+
+        <div class="pdf-card">
+            <div>
+                <div class="pdf-icon">🚗</div>
+                <div class="pdf-card-title">Car PDF Report</div>
+                <div class="pdf-card-text">
+                    Export vehicle inventory details including brand, category, plate number, availability and pricing.
+                </div>
+            </div>
+
+            <a href="/Admin/Report/CarReports" class="pdf-btn">
+                Open Car Report
+            </a>
+        </div>
+
+        <div class="pdf-card">
+            <div>
+                <div class="pdf-icon">👤</div>
+                <div class="pdf-card-title">Customer PDF Report</div>
+                <div class="pdf-card-text">
+                    Prepare customer and driver license verification summaries for internal operation tracking.
+                </div>
+            </div>
+
+            <a href="/Admin/Customer/CustomerList" class="pdf-btn secondary">
+                Open Customer List
+            </a>
+        </div>
+
+    </div>
+
+</div>

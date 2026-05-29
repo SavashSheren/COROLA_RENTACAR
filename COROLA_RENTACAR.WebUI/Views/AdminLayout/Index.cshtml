@@ -765,12 +765,12 @@
                 </ul>
             </nav>
 
-            <div class="admin-sidebar-footer">
-                <a href="javascript:void(0)" onclick="showAdminToast('Logout flow will be added later.');">
-                    <i class="bi bi-box-arrow-left admin-nav-icon"></i>
-                    <span>Log Out</span>
-                </a>
-            </div>
+            <form asp-area="" asp-controller="Account" asp-action="Logout" method="post" style="display:inline;">
+                @Html.AntiForgeryToken()
+                <button type="submit" style="background:none;border:none;padding:0;color:inherit;cursor:pointer;">
+                    Log Out
+                </button>
+            </form>
         </aside>
 
         <div class="admin-main" id="adminMain">

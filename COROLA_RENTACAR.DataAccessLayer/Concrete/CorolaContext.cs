@@ -17,6 +17,7 @@ namespace COROLA_RENTACAR.DataAccessLayer.Concrete
         public DbSet<Location> Locations { get; set; }
         public DbSet<Reservation> Reservations { get; set; }
         public DbSet<CarImage> CarImages { get; set; }
+        public DbSet<ContactMessage> ContactMessages { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -61,6 +62,36 @@ namespace COROLA_RENTACAR.DataAccessLayer.Concrete
                 .WithMany()
                 .HasForeignKey(x => x.ReturnLocationId)
                 .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<ContactMessage>(entity =>
+            {
+                entity.HasKey(x => x.ContactMessageId);
+
+                entity.Property(x => x.FullName)
+                    .IsRequired()
+                    .HasMaxLength(100);
+
+                entity.Property(x => x.Email)
+                    .IsRequired()
+                    .HasMaxLength(150);
+
+                entity.Property(x => x.Phone)
+                    .HasMaxLength(30);
+
+                entity.Property(x => x.Subject)
+                    .IsRequired()
+                    .HasMaxLength(150);
+
+                entity.Property(x => x.Message)
+                    .IsRequired()
+                    .HasMaxLength(2000);
+
+                entity.Property(x => x.CreatedDate)
+                    .HasDefaultValueSql("GETDATE()");
+
+                entity.Property(x => x.IsRead)
+                    .HasDefaultValue(false);
+            });
         }
     }
 }

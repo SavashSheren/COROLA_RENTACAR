@@ -52,6 +52,9 @@ builder.Services.AddScoped<IValidator<Car>, CarValidator>();
 builder.Services.AddScoped<IValidator<CarImage>, CarImageValidator>();
 builder.Services.AddScoped<IValidator<Customer>, CustomerValidator>();
 builder.Services.AddScoped<IValidator<Reservation>, ReservationValidator>();
+builder.Services.AddScoped<IContactMessageService, ContactMessageManager>();
+builder.Services.AddScoped<IContactMessageDal, EfContactMessageDal>();
+builder.Services.AddScoped<IValidator<ContactMessage>, ContactMessageValidator>();
 
 // AI Services
 builder.Services.AddHttpClient<IAiDriverLicenseVerificationService, OpenAiDriverLicenseVerificationService>();

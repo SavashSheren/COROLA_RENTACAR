@@ -1,0 +1,106 @@
+﻿@model List<COROLA_RENTACAR.EntityLayer.Entities.ContactMessage>
+
+@{
+    ViewData["Title"] = "Contact Inbox";
+    Layout = "~/Views/AdminLayout/Index.cshtml";
+}
+
+<div class="container-fluid">
+
+    <div class="card border-0 shadow-sm mb-4" style="border-radius:18px;">
+        <div class="card-body p-4 d-flex justify-content-between align-items-center">
+            <div>
+                <h3 class="mb-1">Contact Inbox</h3>
+                <p class="text-muted mb-0">Messages submitted from the public contact form.</p>
+            </div>
+
+            <div>
+                <span class="badge bg-dark px-3 py-2">
+                    Total: @Model.Count
+                </span>
+
+                <span class="badge bg-warning text-dark px-3 py-2">
+                    Unread: @Model.Count(x => !x.IsRead)
+                </span>
+            </div>
+        </div>
+    </div>
+
+    <div class="card border-0 shadow-sm" style="border-radius:18px;">
+        <div class="card-body p-4">
+
+            @if (Model.Any())
+            {
+                <div class="table-responsive">
+                    <table class="table align-middle">
+                        <thead>
+                            <tr>
+                                <th>Status</th>
+                                <th>Sender</th>
+                                <th>Email</th>
+                                <th>Subject</th>
+                                <th>Date</th>
+                                <th class="text-end">Actions</th>
+                            </tr>
+                        </thead>
+
+                        <tbody>
+                            @foreach (var item in Model)
+                            {
+                                <tr>
+                                    <td>
+                                        @if (item.IsRead)
+                                        {
+                                            <span class="badge bg-success">Read</span>
+                                        }
+                                        else
+                                        {
+                                            <span class="badge bg-danger">Unread</span>
+                                        }
+                                    </td>
+
+                                    <td>@item.FullName</td>
+                                    <td>@item.Email</td>
+                                    <td>@item.Subject</td>
+                                    <td>@item.CreatedDate.ToString("dd MMM yyyy HH:mm")</td>
+
+                                    <td class="text-end">
+                                        <a asp-area="Admin"
+                                           asp-controller="ContactMessage"
+                                           asp-action="Detail"
+                                           asp-route-id="@item.ContactMessageId"
+                                           class="btn btn-sm btn-dark">
+                                            Detail
+                                        </a>
+
+                                        <form asp-area="Admin"
+                                              asp-controller="ContactMessage"
+                                              asp-action="Delete"
+                                              asp-route-id="@item.ContactMessageId"
+                                              method="post"
+                                              class="d-inline"
+                                              onsubmit="return confirm('Are you sure you want to delete this message?');">
+                                            @Html.AntiForgeryToken()
+
+                                            <button type="submit" class="btn btn-sm btn-outline-danger">
+                                                Delete
+                                            </button>
+                                        </form>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            }
+            else
+            {
+                <div class="text-center p-5 bg-light" style="border-radius:16px;">
+                    <h5 class="mb-2">No contact messages yet.</h5>
+                    <p class="text-muted mb-0">New public contact form messages will appear here.</p>
+                </div>
+            }
+
+        </div>
+    </div>
+</div>

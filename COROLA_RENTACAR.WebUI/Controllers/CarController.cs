@@ -1,4 +1,5 @@
 ﻿using COROLA_RENTACAR.BusinessLayer.Abstract;
+using COROLA_RENTACAR.EntityLayer.Entities;
 using Microsoft.AspNetCore.Mvc;
 
 namespace COROLA_RENTACAR.WebUI.Controllers
@@ -9,17 +10,20 @@ namespace COROLA_RENTACAR.WebUI.Controllers
         private readonly IBrandService _brandService;
         private readonly ICategoryService _categoryService;
         private readonly ICarImageService _carImageService;
+        private readonly IReservationService _reservationService;
 
         public CarController(
             ICarService carService,
             IBrandService brandService,
             ICategoryService categoryService,
-            ICarImageService carImageService)
+            ICarImageService carImageService,
+            IReservationService reservationService)
         {
             _carService = carService;
             _brandService = brandService;
             _categoryService = categoryService;
             _carImageService = carImageService;
+            _reservationService = reservationService;
         }
 
         [HttpGet]
@@ -33,11 +37,13 @@ namespace COROLA_RENTACAR.WebUI.Controllers
             decimal? maxPrice,
             int? seatCount,
             int? luggageCapacity,
+            DateTime? pickupDate,
+            DateTime? returnDate,
             bool availableOnly = true)
         {
             var allCars = await _carService.TGetAllCarsWithDetailsAsync();
 
-            var cars = allCars.AsEnumerable();
+            IEnumerable<Car> cars = allCars;
 
             if (availableOnly)
             {
@@ -112,7 +118,45 @@ namespace COROLA_RENTACAR.WebUI.Controllers
                 cars = cars.Where(x => x.LuggageCapacity >= luggageCapacity.Value);
             }
 
-            var filteredCars = cars
+            var filteredCars = cars.ToList();
+
+            var hasValidDateFilter = false;
+            var dateFilterError = string.Empty;
+
+            if (pickupDate.HasValue || returnDate.HasValue)
+            {
+                if (!pickupDate.HasValue || !returnDate.HasValue)
+                {
+                    dateFilterError = "Please select both pickup date and return date.";
+                }
+                else if (returnDate.Value.Date <= pickupDate.Value.Date)
+                {
+                    dateFilterError = "Return date must be later than pickup date.";
+                }
+                else
+                {
+                    hasValidDateFilter = true;
+
+                    var availableCarsForSelectedDates = new List<Car>();
+
+                    foreach (var car in filteredCars)
+                    {
+                        var hasConflict = await _reservationService.THasReservationConflictAsync(
+                            car.CarId,
+                            pickupDate.Value.Date,
+                            returnDate.Value.Date);
+
+                        if (!hasConflict)
+                        {
+                            availableCarsForSelectedDates.Add(car);
+                        }
+                    }
+
+                    filteredCars = availableCarsForSelectedDates;
+                }
+            }
+
+            filteredCars = filteredCars
                 .OrderByDescending(x => x.IsAvailable)
                 .ThenByDescending(x => x.CarId)
                 .ToList();
@@ -152,7 +196,11 @@ namespace COROLA_RENTACAR.WebUI.Controllers
             ViewBag.MaxPrice = maxPrice;
             ViewBag.SeatCount = seatCount;
             ViewBag.LuggageCapacity = luggageCapacity;
+            ViewBag.PickupDate = pickupDate;
+            ViewBag.ReturnDate = returnDate;
             ViewBag.AvailableOnly = availableOnly;
+            ViewBag.HasValidDateFilter = hasValidDateFilter;
+            ViewBag.DateFilterError = dateFilterError;
 
             return View(filteredCars);
         }

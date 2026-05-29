@@ -15,6 +15,11 @@ namespace COROLA_RENTACAR.EntityLayer.Entities
         public string DriverLicenseNumber { get; set; }
         public string DriverLicenseImageUrl { get; set; }
 
+        public DateTime? DriverLicenseIssueDate { get; set; }
+
+        public bool IsDriverLicenseSystemVerified { get; set; }
+        public string DriverLicenseSystemMessage { get; set; }
+
         public DriverLicenseVerificationStatus DriverLicenseVerificationStatus { get; set; }
 
         public DateTime? DriverLicenseVerifiedDate { get; set; }

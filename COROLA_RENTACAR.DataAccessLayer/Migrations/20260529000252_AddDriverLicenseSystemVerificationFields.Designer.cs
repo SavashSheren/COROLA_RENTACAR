@@ -4,6 +4,7 @@ using COROLA_RENTACAR.DataAccessLayer.Concrete;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace COROLA_RENTACAR.DataAccessLayer.Migrations
 {
     [DbContext(typeof(CorolaContext))]
-    partial class CorolaContextModelSnapshot : ModelSnapshot
+    [Migration("20260529000252_AddDriverLicenseSystemVerificationFields")]
+    partial class AddDriverLicenseSystemVerificationFields
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

@@ -1,0 +1,384 @@
+﻿@using COROLA_RENTACAR.EntityLayer.Entities
+@using System.Globalization
+@model COROLA_RENTACAR.WebUI.Models.PublicReservationViewModel
+
+@{
+    ViewData["Title"] = "Create Reservation";
+    Layout = "~/Views/Shared/_UILayout.cshtml";
+
+    var car = ViewBag.Car as Car;
+    var locations = ViewBag.Locations as List<Location> ?? new List<Location>();
+    var dailyPrice = car?.DailyPrice.ToString(CultureInfo.InvariantCulture) ?? "0";
+}
+
+<section class="page-title centred" style="background-image: url(/carola/assets/images/background/page-title.jpg);">
+    <div class="container">
+        <div class="content-box">
+            <h1>Create Reservation</h1>
+            <ul class="bread-crumb clearfix">
+                <li><a href="/">Home</a></li>
+                <li><a href="/Car">Cars</a></li>
+                <li>Reservation</li>
+            </ul>
+        </div>
+    </div>
+</section>
+
+<section class="reservation-public-section pt_120 pb_120">
+    <div class="container">
+        <div class="row">
+
+            <div class="col-xl-8 col-lg-8 col-md-12">
+                <div style="background:#fff;border:1px solid #eee;border-radius:18px;padding:34px;box-shadow:0 15px 35px rgba(0,0,0,.06);">
+
+                    <div style="margin-bottom:28px;">
+                        <span style="color:#ff3131;font-weight:800;font-size:13px;">RESERVATION REQUEST</span>
+                        <h2 style="margin-top:8px;">Complete Your Rental Request</h2>
+                        <p style="color:#777;">
+                            Your reservation will be created as pending. Driver license and reservation approval will be reviewed by admin.
+                        </p>
+                    </div>
+
+                    @if (!ViewData.ModelState.IsValid)
+                    {
+                        <div style="background:#fff3f3;border:1px solid #ffcccc;color:#d93030;border-radius:12px;padding:14px;margin-bottom:22px;font-weight:700;">
+                            <div asp-validation-summary="All"></div>
+                        </div>
+                    }
+
+                    <form id="reservationForm" method="post" action="/Reservation/Create" enctype="multipart/form-data" onsubmit="return validateReservationForm();">
+                        @Html.AntiForgeryToken()
+
+                        <input type="hidden" name="CarId" value="@Model.CarId" />
+
+                        <h4 style="margin-bottom:18px;">Customer Information</h4>
+
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group" style="margin-bottom:16px;">
+                                    <label>First Name *</label>
+                                    <input type="text" name="FirstName" class="form-control" value="@Model.FirstName" required />
+                                </div>
+                            </div>
+
+                            <div class="col-md-6">
+                                <div class="form-group" style="margin-bottom:16px;">
+                                    <label>Last Name *</label>
+                                    <input type="text" name="LastName" class="form-control" value="@Model.LastName" required />
+                                </div>
+                            </div>
+
+                            <div class="col-md-6">
+                                <div class="form-group" style="margin-bottom:16px;">
+                                    <label>Email *</label>
+                                    <input type="email" name="Email" class="form-control" value="@Model.Email" required />
+                                </div>
+                            </div>
+
+                            <div class="col-md-6">
+                                <div class="form-group" style="margin-bottom:16px;">
+                                    <label>Phone *</label>
+                                    <input type="text" name="Phone" class="form-control" value="@Model.Phone" required />
+                                </div>
+                            </div>
+
+                            <div class="col-md-6">
+                                <div class="form-group" style="margin-bottom:16px;">
+                                    <label>Birth Date *</label>
+                                    <input type="date" name="BirthDate" class="form-control" value="@Model.BirthDate.ToString("yyyy-MM-dd")" required />
+                                </div>
+                            </div>
+
+                            <div class="col-md-6">
+                                <div class="form-group" style="margin-bottom:16px;">
+                                    <label>Driver License Number *</label>
+                                    <input type="text" name="DriverLicenseNumber" class="form-control" value="@Model.DriverLicenseNumber" required />
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group" style="margin-bottom:16px;">
+                                    <label>Driver License Issue Date *</label>
+                                    <input type="date"
+                                           id="driverLicenseIssueDate"
+                                           name="DriverLicenseIssueDate"
+                                           class="form-control"
+                                           value="@(Model.DriverLicenseIssueDate.HasValue? Model.DriverLicenseIssueDate.Value.ToString("yyyy-MM-dd") : "")"
+                                           required />
+                                    <small style="color:#777;">
+                                        Driver license must be at least 3 years old.
+                                    </small>
+                                </div>
+                            </div>
+
+                            <div class="col-md-12">
+                                <div class="form-group" style="margin-bottom:22px;">
+                                    <label>Driver License Image File *</label>
+                                    <input type="file"
+                                           id="driverLicenseImage"
+                                           name="DriverLicenseImage"
+                                           class="form-control"
+                                           accept=".jpg,.jpeg,.png,.webp,image/jpeg,image/png,image/webp"
+                                           onchange="previewLicenseImage(this)"
+                                           required />
+
+                                    <small style="color:#777;">
+                                        JPG, JPEG, PNG or WEBP. Maximum file size: 5 MB.
+                                    </small>
+                                </div>
+
+                                <div id="licensePreviewBox" style="display:none;border:1px solid #eee;border-radius:14px;overflow:hidden;margin-bottom:24px;">
+                                    <img id="licensePreviewImage" src="" alt="Driver License Preview" style="width:100%;max-height:260px;object-fit:cover;" />
+                                </div>
+                            </div>
+                        </div>
+
+                        <h4 style="margin:10px 0 18px;">Rental Information</h4>
+
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group" style="margin-bottom:16px;">
+                                    <label>Pickup Date *</label>
+                                    <input type="date" id="pickupDate" name="PickupDate" class="form-control" value="@Model.PickupDate.ToString("yyyy-MM-dd")" onchange="calculateTotalPrice()" required />
+                                </div>
+                            </div>
+
+                            <div class="col-md-6">
+                                <div class="form-group" style="margin-bottom:16px;">
+                                    <label>Return Date *</label>
+                                    <input type="date" id="returnDate" name="ReturnDate" class="form-control" value="@Model.ReturnDate.ToString("yyyy-MM-dd")" onchange="calculateTotalPrice()" required />
+                                </div>
+                            </div>
+
+                            <div class="col-md-6">
+                                <div class="form-group" style="margin-bottom:16px;">
+                                    <label>Pickup Location *</label>
+                                    <select name="PickupLocationId" class="form-control" required>
+                                        <option value="0">Select pickup location</option>
+                                        @foreach (var location in locations)
+                                        {
+                                            if (location.LocationId == Model.PickupLocationId)
+                                            {
+                                                <option value="@location.LocationId" selected>@location.LocationName - @location.City</option>
+                                            }
+                                            else
+                                            {
+                                                <option value="@location.LocationId">@location.LocationName - @location.City</option>
+                                            }
+                                        }
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div class="col-md-6">
+                                <div class="form-group" style="margin-bottom:16px;">
+                                    <label>Return Location *</label>
+                                    <select name="ReturnLocationId" class="form-control" required>
+                                        <option value="0">Select return location</option>
+                                        @foreach (var location in locations)
+                                        {
+                                            if (location.LocationId == Model.ReturnLocationId)
+                                            {
+                                                <option value="@location.LocationId" selected>@location.LocationName - @location.City</option>
+                                            }
+                                            else
+                                            {
+                                                <option value="@location.LocationId">@location.LocationName - @location.City</option>
+                                            }
+                                        }
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div class="col-md-12">
+                                <div class="form-group" style="margin-bottom:16px;">
+                                    <label>Description</label>
+                                    <textarea name="Description" class="form-control" rows="4" maxlength="500" placeholder="Optional note">@Model.Description</textarea>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div style="background:#fff7f7;border:1px solid #ffd7d7;border-radius:14px;padding:20px;margin:22px 0;">
+                            <div style="color:#777;font-size:13px;font-weight:700;">Estimated Total Price</div>
+                            <div id="totalPriceText" style="font-size:30px;font-weight:900;color:#ff3131;">0 ₺</div>
+                        </div>
+
+                        <button type="submit" class="btn-style-one" style="width:100%;">
+                            Submit Reservation Request <i class="icon-13"></i>
+                        </button>
+                    </form>
+                </div>
+            </div>
+
+            <div class="col-xl-4 col-lg-4 col-md-12">
+                <div style="background:#fff;border:1px solid #eee;border-radius:18px;padding:28px;box-shadow:0 15px 35px rgba(0,0,0,.06);position:sticky;top:110px;">
+                    @if (car != null)
+                    {
+                        <img src="@car.ImageUrl"
+                             alt="@car.Brand?.BrandName @car.Model"
+                             style="width:100%;height:220px;object-fit:cover;border-radius:14px;margin-bottom:18px;"
+                             onerror="this.src='/carola/assets/images/popular-car/popular-car-1.jpg';" />
+
+                        <span style="color:#ff3131;font-weight:800;font-size:13px;">SELECTED CAR</span>
+
+                        <h3 style="margin:8px 0 10px;">
+                            @car.Brand?.BrandName @car.Model
+                        </h3>
+
+                        <p style="color:#777;margin-bottom:18px;">
+                            @car.ModelYear model • @car.FuelType • @car.TransmissionType
+                        </p>
+
+                        <ul style="list-style:none;padding:0;margin:0 0 22px;">
+                            <li style="padding:10px 0;border-bottom:1px solid #eee;">
+                                <strong>Daily Price:</strong> @car.DailyPrice.ToString("N0") ₺
+                            </li>
+                            <li style="padding:10px 0;border-bottom:1px solid #eee;">
+                                <strong>Category:</strong> @car.Category?.CategoryName
+                            </li>
+                            <li style="padding:10px 0;border-bottom:1px solid #eee;">
+                                <strong>Seats:</strong> @car.SeatCount
+                            </li>
+                            <li style="padding:10px 0;border-bottom:1px solid #eee;">
+                                <strong>Luggage:</strong> @car.LuggageCapacity
+                            </li>
+                        </ul>
+
+                        <div style="background:#f8f8f8;border-radius:14px;padding:16px;color:#777;font-size:14px;line-height:1.7;">
+                            Your request will be reviewed by admin. Driver license verification must be approved before final rental confirmation.
+                        </div>
+                    }
+                </div>
+            </div>
+
+        </div>
+    </div>
+</section>
+
+@section Scripts {
+    <script>
+        const dailyPrice = Number('@dailyPrice');
+
+        function calculateTotalPrice() {
+            const pickupDateValue = document.getElementById('pickupDate').value;
+            const returnDateValue = document.getElementById('returnDate').value;
+
+            if (!pickupDateValue || !returnDateValue || dailyPrice <= 0) {
+                document.getElementById('totalPriceText').innerText = '0 ₺';
+                return;
+            }
+
+            const pickupDate = new Date(pickupDateValue);
+            const returnDate = new Date(returnDateValue);
+
+            let dayCount = Math.ceil((returnDate - pickupDate) / (1000 * 60 * 60 * 24));
+
+            if (dayCount < 1) {
+                dayCount = 1;
+            }
+
+            const totalPrice = dailyPrice * dayCount;
+
+            document.getElementById('totalPriceText').innerText =
+                totalPrice.toLocaleString('en-US', {
+                    minimumFractionDigits: 0,
+                    maximumFractionDigits: 0
+                }) + ' ₺';
+        }
+
+        function previewLicenseImage(input) {
+            const previewBox = document.getElementById('licensePreviewBox');
+            const previewImage = document.getElementById('licensePreviewImage');
+
+            if (!input.files || input.files.length === 0) {
+                previewBox.style.display = 'none';
+                previewImage.src = '';
+                return;
+            }
+
+            const file = input.files[0];
+            const allowedExtensions = ['jpg', 'jpeg', 'png', 'webp'];
+            const extension = file.name.split('.').pop().toLowerCase();
+
+            if (!allowedExtensions.includes(extension)) {
+                alert("Driver license image must be JPG, JPEG, PNG or WEBP.");
+                input.value = '';
+                previewBox.style.display = 'none';
+                previewImage.src = '';
+                return;
+            }
+
+            if (file.size > 5 * 1024 * 1024) {
+                alert("Driver license image file size can be at most 5 MB.");
+                input.value = '';
+                previewBox.style.display = 'none';
+                previewImage.src = '';
+                return;
+            }
+
+            previewImage.src = URL.createObjectURL(file);
+            previewBox.style.display = 'block';
+        }
+
+        function validateReservationForm() {
+            const form = document.getElementById('reservationForm');
+
+            if (!form.checkValidity()) {
+                form.reportValidity();
+                return false;
+            }
+
+            const birthDateValue = document.querySelector('input[name="BirthDate"]').value;
+            const issueDateValue = document.getElementById('driverLicenseIssueDate').value;
+            const licenseFileInput = document.getElementById('driverLicenseImage');
+
+            const today = new Date();
+
+            const birthDate = new Date(birthDateValue);
+            const minimumBirthDate = new Date();
+            minimumBirthDate.setFullYear(today.getFullYear() - 21);
+
+            if (birthDate > minimumBirthDate) {
+                alert("Reservation cannot be created. Driver must be at least 21 years old.");
+                return false;
+            }
+
+            const issueDate = new Date(issueDateValue);
+            const minimumIssueDate = new Date();
+            minimumIssueDate.setFullYear(today.getFullYear() - 3);
+
+            if (issueDate > today) {
+                alert("Driver license issue date cannot be in the future.");
+                return false;
+            }
+
+            if (issueDate > minimumIssueDate) {
+                alert("Reservation cannot be created. Driver license must be at least 3 years old.");
+                return false;
+            }
+
+            if (!licenseFileInput.files || licenseFileInput.files.length === 0) {
+                alert("Driver license image file is required.");
+                return false;
+            }
+
+            const licenseFile = licenseFileInput.files[0];
+            const allowedExtensions = ['jpg', 'jpeg', 'png', 'webp'];
+            const extension = licenseFile.name.split('.').pop().toLowerCase();
+
+            if (!allowedExtensions.includes(extension)) {
+                alert("Driver license image must be JPG, JPEG, PNG or WEBP.");
+                return false;
+            }
+
+            if (licenseFile.size > 5 * 1024 * 1024) {
+                alert("Driver license image file size can be at most 5 MB.");
+                return false;
+            }
+
+            calculateTotalPrice();
+            return true;
+        }
+
+        calculateTotalPrice();
+    </script>
+}

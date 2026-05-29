@@ -117,6 +117,7 @@ namespace COROLA_RENTACAR.BusinessLayer.Concrete
         {
             customer.DriverLicenseImageUrl ??= string.Empty;
             customer.DriverLicenseRejectionReason ??= string.Empty;
+            customer.DriverLicenseSystemMessage ??= string.Empty;
 
             if (customer.CustomerId == 0)
             {

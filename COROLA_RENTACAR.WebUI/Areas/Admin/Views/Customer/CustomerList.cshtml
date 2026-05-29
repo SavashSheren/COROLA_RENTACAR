@@ -401,7 +401,12 @@
                     <div class="cus-license-img">
                         @if (!string.IsNullOrWhiteSpace(customer.DriverLicenseImageUrl))
                         {
-                            <img src="@customer.DriverLicenseImageUrl" alt="@fullName driver license" onerror="this.style.display='none';" />
+                            <a href="@customer.DriverLicenseImageUrl" target="_blank" style="display:block;width:100%;height:100%;">
+                                <img src="@customer.DriverLicenseImageUrl"
+                                     alt="@fullName driver license"
+                                     style="width:100%;height:100%;object-fit:cover;"
+                                     onerror="this.style.display='none'; this.parentElement.innerHTML='<span style=&quot;color:#7a8499;display:flex;align-items:center;justify-content:center;height:100%;&quot;>License image could not be loaded</span>';" />
+                            </a>
                         }
                         else
                         {
@@ -420,6 +425,15 @@
                             <div><strong>Phone:</strong> @customer.Phone</div>
                             <div><strong>License No:</strong> @customer.DriverLicenseNumber</div>
                             <div><strong>Birth Date:</strong> @customer.BirthDate.ToString("dd MMM yyyy")</div>
+                            <div>
+                                <strong>License Issue Date:</strong>
+                                @(customer.DriverLicenseIssueDate.HasValue? customer.DriverLicenseIssueDate.Value.ToString("dd MMM yyyy") : "Not provided")
+                            </div>
+
+                            <div>
+                                <strong>System Check:</strong>
+                                @(customer.IsDriverLicenseSystemVerified ? "Passed" : "Failed / Not Checked")
+                            </div>
                             @if (customer.DriverLicenseVerifiedDate.HasValue)
                             {
                                 <div><strong>Verified Date:</strong> @customer.DriverLicenseVerifiedDate.Value.ToString("dd MMM yyyy HH:mm")</div>
@@ -442,6 +456,12 @@
                                     @Html.AntiForgeryToken()
                                     <button type="submit" class="btn-success-soft">✅ Approve</button>
                                 </form>
+                            }
+                            @if (!string.IsNullOrWhiteSpace(customer.DriverLicenseSystemMessage))
+                            {
+                                <div style="background:rgba(79,141,255,.08);border:1px solid rgba(79,141,255,.18);color:#9bbcff;border-radius:10px;padding:10px;font-size:12px;margin-bottom:12px;">
+                                    <strong>System Message:</strong> @customer.DriverLicenseSystemMessage
+                                </div>
                             }
 
                             @if (customer.DriverLicenseVerificationStatus != DriverLicenseVerificationStatus.Rejected)

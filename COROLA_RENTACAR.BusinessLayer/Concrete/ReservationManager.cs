@@ -25,6 +25,37 @@ namespace COROLA_RENTACAR.BusinessLayer.Concrete
             _validator = validator;
         }
 
+        public async Task<bool> THasReservationConflictAsync(
+   int carId,
+   DateTime pickupDate,
+   DateTime returnDate,
+   int? ignoredReservationId = null,
+   bool includePending = true)
+        {
+            return await _reservationDal.HasReservationConflictAsync(
+                carId,
+                pickupDate,
+                returnDate,
+                ignoredReservationId,
+                includePending);
+        }
+        private async Task EnsureCarIsAvailableForDateRangeAsync(
+    Reservation reservation,
+    int? ignoredReservationId = null,
+    bool includePending = true)
+        {
+            var hasConflict = await _reservationDal.HasReservationConflictAsync(
+                reservation.CarId,
+                reservation.PickupDate,
+                reservation.ReturnDate,
+                ignoredReservationId,
+                includePending);
+
+            if (hasConflict)
+            {
+                throw new ValidationException("Selected car already has a pending or approved reservation for the selected date range.");
+            }
+        }
         public async Task<List<Reservation>> TGetAllAsync()
         {
             return await _reservationDal.GetAllAsync();
@@ -48,8 +79,8 @@ namespace COROLA_RENTACAR.BusinessLayer.Concrete
         public async Task TInsertAsync(Reservation entity)
         {
             entity.Description ??= string.Empty;
-
             await EnsureCustomerLicenseApprovedAsync(entity.CustomerId);
+            await EnsureCarIsAvailableForDateRangeAsync(entity);
             await CalculateTotalPriceAsync(entity);
 
             var result = await _validator.ValidateAsync(entity);
@@ -62,11 +93,42 @@ namespace COROLA_RENTACAR.BusinessLayer.Concrete
             await _reservationDal.InsertAsync(entity);
         }
 
+        public async Task TCreatePublicReservationRequestAsync(Reservation reservation)
+        {
+            reservation.Description ??= string.Empty;
+            reservation.ReservationStatus = ReservationStatus.Pending;
+
+            var customer = await _customerDal.GetByIdAsync(reservation.CustomerId);
+
+            if (customer == null)
+            {
+                throw new ValidationException("Customer could not be found.");
+            }
+
+            if (!customer.IsDriverLicenseSystemVerified)
+            {
+                throw new ValidationException("Reservation cannot be created because the driver's license did not pass system verification.");
+            }
+
+            await EnsureCarIsAvailableForDateRangeAsync(reservation);
+            await CalculateTotalPriceAsync(reservation);
+
+            var result = await _validator.ValidateAsync(reservation);
+
+            if (!result.IsValid)
+            {
+                throw new ValidationException(result.Errors);
+            }
+
+            await _reservationDal.InsertAsync(reservation);
+        }
+
         public async Task TUpdateAsync(Reservation entity)
         {
             entity.Description ??= string.Empty;
 
             await EnsureCustomerLicenseApprovedAsync(entity.CustomerId);
+            await EnsureCarIsAvailableForDateRangeAsync(entity, entity.ReservationId);
             await CalculateTotalPriceAsync(entity);
 
             var result = await _validator.ValidateAsync(entity);
@@ -86,6 +148,18 @@ namespace COROLA_RENTACAR.BusinessLayer.Concrete
 
         public async Task TApproveReservationAsync(int reservationId)
         {
+            var reservation = await _reservationDal.GetByIdAsync(reservationId);
+
+            if (reservation == null)
+            {
+                return;
+            }
+
+            await EnsureCarIsAvailableForDateRangeAsync(
+                reservation,
+                reservation.ReservationId,
+                includePending: false);
+
             await _reservationDal.UpdateReservationStatusAsync(reservationId, ReservationStatus.Approved);
         }
 

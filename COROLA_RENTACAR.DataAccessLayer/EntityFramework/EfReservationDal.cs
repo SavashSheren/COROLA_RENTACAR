@@ -55,5 +55,40 @@ namespace COROLA_RENTACAR.DataAccessLayer.EntityFramework
             reservation.ReservationStatus = status;
             await _context.SaveChangesAsync();
         }
+
+        public async Task<bool> HasReservationConflictAsync(
+            int carId,
+            DateTime pickupDate,
+            DateTime returnDate,
+            int? ignoredReservationId = null,
+            bool includePending = true)
+        {
+            var pickup = pickupDate.Date;
+            var returnDay = returnDate.Date;
+
+            var query = _context.Reservations
+                .Where(x => x.CarId == carId);
+
+            if (includePending)
+            {
+                query = query.Where(x =>
+                    x.ReservationStatus == ReservationStatus.Pending ||
+                    x.ReservationStatus == ReservationStatus.Approved);
+            }
+            else
+            {
+                query = query.Where(x =>
+                    x.ReservationStatus == ReservationStatus.Approved);
+            }
+
+            if (ignoredReservationId.HasValue)
+            {
+                query = query.Where(x => x.ReservationId != ignoredReservationId.Value);
+            }
+
+            return await query.AnyAsync(x =>
+                pickup <= x.ReturnDate.Date &&
+                returnDay >= x.PickupDate.Date);
+        }
     }
 }

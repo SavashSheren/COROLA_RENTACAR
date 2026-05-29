@@ -8,5 +8,12 @@ namespace COROLA_RENTACAR.DataAccessLayer.Abstract
         Task<List<Reservation>> GetAllReservationsWithDetailsAsync();
         Task<Reservation> GetReservationWithDetailsByIdAsync(int id);
         Task UpdateReservationStatusAsync(int reservationId, ReservationStatus status);
+
+        Task<bool> HasReservationConflictAsync(
+            int carId,
+            DateTime pickupDate,
+            DateTime returnDate,
+            int? ignoredReservationId = null,
+            bool includePending = true);
     }
 }

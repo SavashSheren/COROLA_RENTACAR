@@ -1,3 +1,4 @@
+using COROLA_RENTACAR.WebUI.Services;
 using COROLA_RENTACAR.BusinessLayer.Abstract;
 using COROLA_RENTACAR.BusinessLayer.Concrete;
 using COROLA_RENTACAR.BusinessLayer.Mapping;
@@ -41,6 +42,7 @@ builder.Services.AddScoped<IReservationService, ReservationManager>();
 builder.Services.AddScoped<IReservationDal, EfReservationDal>();
 builder.Services.AddScoped<IValidator<Customer>, CustomerValidator>();
 builder.Services.AddScoped<IValidator<Reservation>, ReservationValidator>();
+builder.Services.AddHttpClient<IAiDriverLicenseVerificationService, OpenAiDriverLicenseVerificationService>();
 
 
 builder.Services.AddControllersWithViews();

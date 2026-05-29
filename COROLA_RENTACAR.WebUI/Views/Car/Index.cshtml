@@ -1,5 +1,5 @@
 ﻿@using COROLA_RENTACAR.EntityLayer.Entities
-@model List<COROLA_RENTACAR.EntityLayer.Entities.Car>
+@model List<Car>
 
 @{
     ViewData["Title"] = "Cars";
@@ -7,193 +7,307 @@
 
     var brands = ViewBag.Brands as List<Brand> ?? new List<Brand>();
     var categories = ViewBag.Categories as List<Category> ?? new List<Category>();
+    var fuelTypes = ViewBag.FuelTypes as List<string> ?? new List<string>();
+    var transmissionTypes = ViewBag.TransmissionTypes as List<string> ?? new List<string>();
 
+    string searchTerm = ViewBag.SearchTerm as string ?? "";
     int? selectedBrandId = ViewBag.SelectedBrandId as int?;
     int? selectedCategoryId = ViewBag.SelectedCategoryId as int?;
     string selectedFuelType = ViewBag.SelectedFuelType as string ?? "";
     string selectedTransmissionType = ViewBag.SelectedTransmissionType as string ?? "";
     decimal? minPrice = ViewBag.MinPrice as decimal?;
     decimal? maxPrice = ViewBag.MaxPrice as decimal?;
+    int? seatCount = ViewBag.SeatCount as int?;
+    int? luggageCapacity = ViewBag.LuggageCapacity as int?;
     bool availableOnly = ViewBag.AvailableOnly == null ? true : (bool)ViewBag.AvailableOnly;
+
+    int totalCarCount = ViewBag.TotalCarCount == null ? 0 : (int)ViewBag.TotalCarCount;
+    int filteredCarCount = ViewBag.FilteredCarCount == null ? Model.Count : (int)ViewBag.FilteredCarCount;
 }
 
-<section class="page-title centred" style="background-image: url(/carola/assets/images/background/page-title.jpg);">
+<section class="cars-page-section" style="padding:70px 0;background:#f6f7fb;">
     <div class="container">
-        <div class="content-box">
-            <h1>Rental Cars</h1>
-            <ul class="bread-crumb clearfix">
-                <li><a href="/">Home</a></li>
-                <li>Cars</li>
-            </ul>
+
+        <div class="mb-4 p-4" style="background:#111827;color:white;border-radius:24px;">
+            <h1 class="mb-2" style="font-weight:800;">Rent A Cars</h1>
+            <p class="mb-0" style="color:#cbd5e1;">
+                Find the right vehicle by brand, category, fuel type, transmission, price, seat count and luggage capacity.
+            </p>
         </div>
-    </div>
-</section>
 
-<section class="car-listing-section pt_120 pb_120">
-    <div class="container">
-        <div class="row">
+        <form method="get" asp-controller="Car" asp-action="Index" class="mb-4 p-4 bg-white shadow-sm" style="border-radius:22px;">
+            <div class="row g-3">
 
-            <div class="col-xl-3 col-lg-4 col-md-12">
-                <div class="car-filter-box" style="background:#fff;border:1px solid #eee;border-radius:16px;padding:24px;box-shadow:0 15px 35px rgba(0,0,0,.06);margin-bottom:30px;">
-                    <h4 style="margin-bottom:20px;">Filter Cars</h4>
-
-                    <form method="get" action="/Car">
-                        <div class="form-group" style="margin-bottom:16px;">
-                            <label>Brand</label>
-                            <select name="brandId" class="form-control">
-                                <option value="">All Brands</option>
-                                @foreach (var brand in brands)
-                                {
-                                    if (selectedBrandId == brand.BrandId)
-                                    {
-                                        <option value="@brand.BrandId" selected>@brand.BrandName</option>
-                                    }
-                                    else
-                                    {
-                                        <option value="@brand.BrandId">@brand.BrandName</option>
-                                    }
-                                }
-                            </select>
-                        </div>
-
-                        <div class="form-group" style="margin-bottom:16px;">
-                            <label>Category</label>
-                            <select name="categoryId" class="form-control">
-                                <option value="">All Categories</option>
-                                @foreach (var category in categories)
-                                {
-                                    if (selectedCategoryId == category.CategoryId)
-                                    {
-                                        <option value="@category.CategoryId" selected>@category.CategoryName</option>
-                                    }
-                                    else
-                                    {
-                                        <option value="@category.CategoryId">@category.CategoryName</option>
-                                    }
-                                }
-                            </select>
-                        </div>
-
-                        <div class="form-group" style="margin-bottom:16px;">
-                            <label>Fuel Type</label>
-                            <select name="fuelType" class="form-control">
-                                <option value="">All Fuel Types</option>
-                                <option value="Gasoline" selected="@(selectedFuelType == "Gasoline")">Gasoline</option>
-                                <option value="Diesel" selected="@(selectedFuelType == "Diesel")">Diesel</option>
-                                <option value="Hybrid" selected="@(selectedFuelType == "Hybrid")">Hybrid</option>
-                                <option value="Electric" selected="@(selectedFuelType == "Electric")">Electric</option>
-                            </select>
-                        </div>
-
-                        <div class="form-group" style="margin-bottom:16px;">
-                            <label>Transmission</label>
-                            <select name="transmissionType" class="form-control">
-                                <option value="">All Transmissions</option>
-                                <option value="Automatic" selected="@(selectedTransmissionType == "Automatic")">Automatic</option>
-                                <option value="Manual" selected="@(selectedTransmissionType == "Manual")">Manual</option>
-                            </select>
-                        </div>
-
-                        <div class="form-group" style="margin-bottom:16px;">
-                            <label>Min Price</label>
-                            <input type="number" name="minPrice" class="form-control" value="@minPrice" placeholder="0" />
-                        </div>
-
-                        <div class="form-group" style="margin-bottom:16px;">
-                            <label>Max Price</label>
-                            <input type="number" name="maxPrice" class="form-control" value="@maxPrice" placeholder="5000" />
-                        </div>
-
-                        <div class="form-group" style="margin-bottom:20px;">
-                            <label style="display:flex;align-items:center;gap:8px;">
-                                <input type="checkbox" name="availableOnly" value="true" @(availableOnly ? "checked" : "") />
-                                Available cars only
-                            </label>
-                        </div>
-
-                        <button type="submit" class="btn-style-one" style="width:100%;">
-                            Apply Filter <i class="icon-13"></i>
-                        </button>
-
-                        <a href="/Car" class="btn-style-three" style="width:100%;text-align:center;margin-top:10px;">
-                            Clear Filter
-                        </a>
-                    </form>
+                <div class="col-lg-4 col-md-6">
+                    <label class="form-label fw-bold">Search</label>
+                    <input type="text"
+                           name="searchTerm"
+                           value="@searchTerm"
+                           class="form-control"
+                           placeholder="Search brand, model, category..." />
                 </div>
+
+                <div class="col-lg-2 col-md-6">
+                    <label class="form-label fw-bold">Brand</label>
+                    <select name="brandId" class="form-control">
+                        <option value="">All Brands</option>
+                        @foreach (var brand in brands)
+                        {
+                            if (selectedBrandId == brand.BrandId)
+                            {
+                                <option value="@brand.BrandId" selected>@brand.BrandName</option>
+                            }
+                            else
+                            {
+                                <option value="@brand.BrandId">@brand.BrandName</option>
+                            }
+                        }
+                    </select>
+                </div>
+
+                <div class="col-lg-2 col-md-6">
+                    <label class="form-label fw-bold">Category</label>
+                    <select name="categoryId" class="form-control">
+                        <option value="">All Categories</option>
+                        @foreach (var category in categories)
+                        {
+                            if (selectedCategoryId == category.CategoryId)
+                            {
+                                <option value="@category.CategoryId" selected>@category.CategoryName</option>
+                            }
+                            else
+                            {
+                                <option value="@category.CategoryId">@category.CategoryName</option>
+                            }
+                        }
+                    </select>
+                </div>
+
+                <div class="col-lg-2 col-md-6">
+                    <label class="form-label fw-bold">Fuel Type</label>
+                    <select name="fuelType" class="form-control">
+                        <option value="">All Fuel Types</option>
+                        @foreach (var item in fuelTypes)
+                        {
+                            if (selectedFuelType == item)
+                            {
+                                <option value="@item" selected>@item</option>
+                            }
+                            else
+                            {
+                                <option value="@item">@item</option>
+                            }
+                        }
+                    </select>
+                </div>
+
+                <div class="col-lg-2 col-md-6">
+                    <label class="form-label fw-bold">Transmission</label>
+                    <select name="transmissionType" class="form-control">
+                        <option value="">All Transmissions</option>
+                        @foreach (var item in transmissionTypes)
+                        {
+                            if (selectedTransmissionType == item)
+                            {
+                                <option value="@item" selected>@item</option>
+                            }
+                            else
+                            {
+                                <option value="@item">@item</option>
+                            }
+                        }
+                    </select>
+                </div>
+
+                <div class="col-lg-2 col-md-6">
+                    <label class="form-label fw-bold">Min Price</label>
+                    <input type="number"
+                           name="minPrice"
+                           value="@minPrice"
+                           class="form-control"
+                           placeholder="Min" />
+                </div>
+
+                <div class="col-lg-2 col-md-6">
+                    <label class="form-label fw-bold">Max Price</label>
+                    <input type="number"
+                           name="maxPrice"
+                           value="@maxPrice"
+                           class="form-control"
+                           placeholder="Max" />
+                </div>
+
+                <div class="col-lg-2 col-md-6">
+                    <label class="form-label fw-bold">Min Seats</label>
+                    <input type="number"
+                           name="seatCount"
+                           value="@seatCount"
+                           class="form-control"
+                           placeholder="Seats" />
+                </div>
+
+                <div class="col-lg-2 col-md-6">
+                    <label class="form-label fw-bold">Min Luggage</label>
+                    <input type="number"
+                           name="luggageCapacity"
+                           value="@luggageCapacity"
+                           class="form-control"
+                           placeholder="Luggage" />
+                </div>
+
+                <div class="col-lg-2 col-md-6 d-flex align-items-end">
+                    <div class="form-check mb-2">
+                        <input type="checkbox"
+                               name="availableOnly"
+                               value="true"
+                               class="form-check-input"
+                               id="availableOnly"
+                               @(availableOnly ? "checked" : "") />
+
+                        <label class="form-check-label fw-bold" for="availableOnly">
+                            Available only
+                        </label>
+                    </div>
+                </div>
+
+                <div class="col-lg-4 col-md-12 d-flex align-items-end gap-2">
+                    <button type="submit" class="btn btn-dark w-100">
+                        Apply Filter
+                    </button>
+
+                    <a asp-controller="Car"
+                       asp-action="Index"
+                       class="btn btn-outline-dark w-100">
+                        Clear Filter
+                    </a>
+                </div>
+
+            </div>
+        </form>
+
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <div>
+                <span class="text-muted">AVAILABLE FLEET</span>
+                <h2 class="mb-0" style="font-weight:800;">Choose Your  Car</h2>
             </div>
 
-            <div class="col-xl-9 col-lg-8 col-md-12">
-                <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:28px;gap:15px;flex-wrap:wrap;">
-                    <div>
-                        <span style="color:#ff3131;font-weight:700;font-size:13px;">AVAILABLE FLEET</span>
-                        <h2 style="margin:5px 0 0;">Choose Your Rental Car</h2>
-                    </div>
+            <div class="badge bg-dark p-3">
+                @filteredCarCount / @totalCarCount car(s) found
+            </div>
+        </div>
 
-                    <div style="font-weight:700;color:#777;">
-                        @Model.Count car(s) found
-                    </div>
-                </div>
+        @if (Model == null || !Model.Any())
+        {
+            <div class="bg-white text-center p-5 shadow-sm" style="border-radius:22px;">
+                <h4>No cars found</h4>
+                <p class="text-muted mb-3">Try changing your filter options.</p>
 
-                <div class="row">
-                    @if (Model == null || !Model.Any())
-                    {
-                        <div class="col-12">
-                            <div style="background:#fff;border:1px solid #eee;border-radius:16px;padding:50px;text-align:center;">
-                                <div style="font-size:42px;margin-bottom:10px;">🚗</div>
-                                <h4>No cars found</h4>
-                                <p style="color:#777;">Try changing your filter options.</p>
-                                <a href="/Car" class="btn-style-one">Clear Filters</a>
+                <a asp-controller="Car"
+                   asp-action="Index"
+                   class="btn btn-dark">
+                    Clear Filters
+                </a>
+            </div>
+        }
+        else
+        {
+            <div class="row">
+                @foreach (var car in Model)
+                {
+                    var imageUrl = string.IsNullOrWhiteSpace(car.ImageUrl)
+                    ? "/images/default-car.jpg"
+                    : car.ImageUrl;
+
+                    <div class="col-lg-4 col-md-6 mb-4">
+                        <div class="bg-white shadow-sm h-100" style="border-radius:22px;overflow:hidden;">
+
+                            <div style="height:230px;position:relative;background:#e5e7eb;">
+                                <img src="@imageUrl"
+                                     alt="@car.Brand?.BrandName @car.Model"
+                                     style="width:100%;height:100%;object-fit:cover;" />
+
+                                <span class="badge bg-dark" style="position:absolute;left:15px;top:15px;padding:10px 14px;border-radius:999px;">
+                                    @car.DailyPrice.ToString("N0") ₺ / Day
+                                </span>
+
+                                @if (car.IsAvailable)
+                                {
+                                    <span class="badge bg-success" style="position:absolute;right:15px;top:15px;padding:10px 14px;border-radius:999px;">
+                                        Available
+                                    </span>
+                                }
+                                else
+                                {
+                                    <span class="badge bg-danger" style="position:absolute;right:15px;top:15px;padding:10px 14px;border-radius:999px;">
+                                        Unavailable
+                                    </span>
+                                }
                             </div>
-                        </div>
-                    }
-                    else
-                    {
-                        foreach (var car in Model)
-                        {
-                            <div class="col-xl-4 col-lg-6 col-md-6 col-sm-12">
-                                <div class="single-popular-car-block" style="margin-bottom:30px;">
-                                    <div class="single-popular-car-image">
-                                        <img src="@car.ImageUrl"
-                                             alt="@car.Brand?.BrandName @car.Model"
-                                             onerror="this.src='/carola/assets/images/popular-car/popular-car-1.jpg';">
 
-                                        <div class="single-popular-car-rent-per-day">
-                                            <span>@car.DailyPrice.ToString("N0") ₺</span>/ Day
+                            <div class="p-4">
+                                <h4 class="mb-2" style="font-weight:800;">
+                                    @car.Brand?.BrandName @car.Model
+                                </h4>
+
+                                <p class="text-muted mb-3">
+                                    @car.ModelYear model, @car.FuelType fuel, @car.TransmissionType transmission.
+                                </p>
+
+                                <div class="row g-2 mb-4">
+                                    <div class="col-6">
+                                        <div class="p-2 bg-light rounded">
+                                            <small class="text-muted d-block">Category</small>
+                                            <strong>@car.Category?.CategoryName</strong>
                                         </div>
                                     </div>
 
-                                    <div class="single-popular-car-content">
-                                        <div class="single-popular-car-rating">
-                                            <i class="icon-9"></i> @(car.IsAvailable ? "Available" : "Unavailable")
+                                    <div class="col-6">
+                                        <div class="p-2 bg-light rounded">
+                                            <small class="text-muted d-block">Seats</small>
+                                            <strong>@car.SeatCount</strong>
                                         </div>
+                                    </div>
 
-                                        <h5 class="single-popular-car-title">
-                                            @car.Brand?.BrandName @car.Model
-                                        </h5>
+                                    <div class="col-6">
+                                        <div class="p-2 bg-light rounded">
+                                            <small class="text-muted d-block">Luggage</small>
+                                            <strong>@car.LuggageCapacity</strong>
+                                        </div>
+                                    </div>
 
-                                        <p class="single-popular-car-text">
-                                            @car.ModelYear model, @car.FuelType fuel, @car.TransmissionType transmission.
-                                        </p>
-
-                                        <div class="border-divider"></div>
-
-                                        <ul class="single-popular-car-info">
-                                            <li><i class="icon-6"></i>Category: @car.Category?.CategoryName</li>
-                                            <li><i class="icon-7"></i>Luggage: @car.LuggageCapacity</li>
-                                            <li><i class="icon-8"></i>Seats: @car.SeatCount</li>
-                                        </ul>
-
-                                        <div class="single-popular-car-book-btn">
-                                            <a href="/Car/Detail/@car.CarId" class="btn-style-three">View Details</a>
+                                    <div class="col-6">
+                                        <div class="p-2 bg-light rounded">
+                                            <small class="text-muted d-block">Mileage</small>
+                                            <strong>@car.Mileage.ToString("N0") km</strong>
                                         </div>
                                     </div>
                                 </div>
-                            </div>
-                        }
-                    }
-                </div>
-            </div>
 
-        </div>
+                                <div class="d-flex gap-2">
+                                    <a asp-controller="Car"
+                                       asp-action="Detail"
+                                       asp-route-id="@car.CarId"
+                                       class="btn btn-outline-dark w-100">
+                                        View Details
+                                    </a>
+
+                                    @if (car.IsAvailable)
+                                    {
+                                        <a asp-controller="Reservation"
+                                           asp-action="Create"
+                                           asp-route-carId="@car.CarId"
+                                           class="btn btn-dark w-100">
+                                            Rent Now
+                                        </a>
+                                    }
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+                }
+            </div>
+        }
+
     </div>
 </section>

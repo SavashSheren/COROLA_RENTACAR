@@ -5,10 +5,10 @@
     ViewData["Title"] = "Reservation List";
     Layout = "~/Views/AdminLayout/Index.cshtml";
 
-    var totalCount = Model?.Count ?? 0;
-    var pendingCount = Model?.Count(x => x.ReservationStatus == ReservationStatus.Pending) ?? 0;
-    var approvedCount = Model?.Count(x => x.ReservationStatus == ReservationStatus.Approved) ?? 0;
-    var rejectedCount = Model?.Count(x => x.ReservationStatus == ReservationStatus.Rejected) ?? 0;
+    var totalCount = Convert.ToInt32(ViewBag.TotalReservations ?? Model?.Count ?? 0);
+    var pendingCount = Convert.ToInt32(ViewBag.PendingReservations ?? 0);
+    var approvedCount = Convert.ToInt32(ViewBag.ApprovedReservations ?? 0);
+    var rejectedCount = Convert.ToInt32(ViewBag.RejectedReservations ?? 0);
 }
 
 <style>
@@ -323,8 +323,8 @@
 
     <div class="res-header">
         <div>
-            <h1 class="res-title">Reservation Management</h1>
-            <p class="res-subtitle">View and manage all vehicle reservation requests.</p>
+            <h1 class="res-title">@(ViewBag.PageTitle ?? "Reservation Management")</h1>
+            <p class="res-subtitle">@(ViewBag.PageDescription ?? "View and manage all vehicle reservation requests.")</p>
         </div>
 
         <a href="/Admin/Reservation/CreateReservation" class="btn-accent">

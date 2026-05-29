@@ -1,0 +1,692 @@
+﻿@using COROLA_RENTACAR.EntityLayer.Entities
+@using COROLA_RENTACAR.EntityLayer.Enums
+@model List<COROLA_RENTACAR.EntityLayer.Entities.Reservation>
+
+@{
+    ViewData["Title"] = "Reservation Calendar";
+    Layout = "~/Views/AdminLayout/Index.cshtml";
+
+    var cars = ViewBag.Cars as List<Car> ?? new List<Car>();
+
+    var monthStart = (DateTime)ViewBag.MonthStart;
+    var monthEnd = (DateTime)ViewBag.MonthEnd;
+    var monthName = ViewBag.MonthName as string ?? "";
+
+    var selectedStatus = ViewBag.SelectedStatus as string ?? "active";
+
+    var previousYear = Convert.ToInt32(ViewBag.PreviousYear);
+    var previousMonth = Convert.ToInt32(ViewBag.PreviousMonth);
+
+    var nextYear = Convert.ToInt32(ViewBag.NextYear);
+    var nextMonth = Convert.ToInt32(ViewBag.NextMonth);
+
+    var totalReservations = Convert.ToInt32(ViewBag.TotalReservations ?? 0);
+    var pendingReservations = Convert.ToInt32(ViewBag.PendingReservations ?? 0);
+    var approvedReservations = Convert.ToInt32(ViewBag.ApprovedReservations ?? 0);
+    var monthRevenue = Convert.ToDecimal(ViewBag.MonthRevenue ?? 0);
+
+    var daysInMonth = DateTime.DaysInMonth(monthStart.Year, monthStart.Month);
+    var days = Enumerable.Range(1, daysInMonth)
+        .Select(day => new DateTime(monthStart.Year, monthStart.Month, day))
+        .ToList();
+
+    string GetStatusClass(ReservationStatus status)
+    {
+        return status.ToString().ToLower();
+    }
+
+    string GetCarName(Car car)
+    {
+        return $"{car.Brand?.BrandName} {car.Model}";
+    }
+
+    bool IsReservationOnDay(Reservation reservation, DateTime day)
+    {
+        return reservation.PickupDate.Date <= day.Date &&
+               reservation.ReturnDate.Date >= day.Date;
+    }
+
+    bool IsToday(DateTime day)
+    {
+        return day.Date == DateTime.Today;
+    }
+}
+
+<style>
+    .calendar-root {
+        padding: 28px;
+        color: #e2e8f0;
+        font-family: 'DM Sans', 'Segoe UI', sans-serif;
+    }
+
+    .calendar-breadcrumb {
+        color: #7a8499;
+        font-size: 12px;
+        margin-bottom: 8px;
+    }
+
+    .calendar-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-end;
+        gap: 16px;
+        flex-wrap: wrap;
+        margin-bottom: 22px;
+    }
+
+    .calendar-title {
+        font-size: 28px;
+        font-weight: 900;
+        margin: 0;
+    }
+
+    .calendar-subtitle {
+        color: #7a8499;
+        margin-top: 6px;
+        font-size: 13px;
+    }
+
+    .calendar-actions {
+        display: flex;
+        gap: 10px;
+        align-items: center;
+        flex-wrap: wrap;
+    }
+
+    .cal-btn {
+        background: #13161e;
+        color: #e2e8f0;
+        border: 1px solid rgba(255,255,255,.08);
+        padding: 10px 14px;
+        border-radius: 12px;
+        text-decoration: none;
+        font-weight: 900;
+        font-size: 13px;
+        transition: .2s;
+    }
+
+        .cal-btn:hover {
+            color: #e8ff47;
+            border-color: rgba(232,255,71,.35);
+            background: rgba(232,255,71,.06);
+        }
+
+    .calendar-stats {
+        display: grid;
+        grid-template-columns: repeat(4, minmax(180px, 1fr));
+        gap: 14px;
+        margin-bottom: 20px;
+    }
+
+    .cal-stat-card {
+        background: #13161e;
+        border: 1px solid rgba(255,255,255,.07);
+        border-radius: 18px;
+        padding: 18px;
+        overflow: hidden;
+        position: relative;
+    }
+
+    .cal-stat-label {
+        color: #7a8499;
+        font-size: 12px;
+        font-weight: 900;
+        margin-bottom: 12px;
+    }
+
+    .cal-stat-value {
+        font-size: 28px;
+        font-weight: 900;
+        line-height: 1;
+    }
+
+    .cal-stat-note {
+        color: #7a8499;
+        font-size: 12px;
+        margin-top: 8px;
+    }
+
+    .filter-card {
+        background: #13161e;
+        border: 1px solid rgba(255,255,255,.07);
+        border-radius: 18px;
+        padding: 16px;
+        margin-bottom: 20px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 14px;
+        flex-wrap: wrap;
+    }
+
+    .month-title {
+        font-size: 18px;
+        font-weight: 900;
+    }
+
+    .status-tabs {
+        display: flex;
+        gap: 8px;
+        flex-wrap: wrap;
+    }
+
+    .status-tab {
+        color: #7a8499;
+        border: 1px solid rgba(255,255,255,.08);
+        background: #1a1e2a;
+        padding: 8px 12px;
+        border-radius: 12px;
+        text-decoration: none;
+        font-size: 12px;
+        font-weight: 900;
+        transition: .2s;
+    }
+
+        .status-tab.active,
+        .status-tab:hover {
+            color: #111;
+            background: #e8ff47;
+            border-color: #e8ff47;
+        }
+
+    .calendar-board {
+        background: #13161e;
+        border: 1px solid rgba(255,255,255,.07);
+        border-radius: 18px;
+        overflow: hidden;
+        margin-bottom: 20px;
+    }
+
+    .calendar-scroll {
+        overflow-x: auto;
+    }
+
+    .calendar-table {
+        min-width: 1180px;
+        width: 100%;
+        border-collapse: collapse;
+    }
+
+        .calendar-table th,
+        .calendar-table td {
+            border-bottom: 1px solid rgba(255,255,255,.06);
+            border-right: 1px solid rgba(255,255,255,.04);
+        }
+
+        .calendar-table th {
+            background: #0f1219;
+            color: #7a8499;
+            font-size: 11px;
+            font-weight: 900;
+            padding: 10px 6px;
+            text-align: center;
+            position: sticky;
+            top: 0;
+            z-index: 2;
+        }
+
+    .car-column {
+        min-width: 230px;
+        width: 230px;
+        text-align: left !important;
+        padding-left: 16px !important;
+        position: sticky;
+        left: 0;
+        background: #0f1219 !important;
+        z-index: 3;
+    }
+
+    .car-cell {
+        min-width: 230px;
+        width: 230px;
+        background: #13161e;
+        position: sticky;
+        left: 0;
+        z-index: 1;
+        padding: 12px 14px;
+    }
+
+    .car-name {
+        font-weight: 900;
+        font-size: 13px;
+        margin-bottom: 4px;
+    }
+
+    .car-meta {
+        color: #7a8499;
+        font-size: 11px;
+        line-height: 1.4;
+    }
+
+    .day-cell {
+        width: 42px;
+        min-width: 42px;
+        height: 58px;
+        padding: 5px;
+        vertical-align: middle;
+        background: #151924;
+        position: relative;
+    }
+
+        .day-cell.today {
+            background: rgba(232,255,71,.07);
+        }
+
+        .day-cell.empty {
+            background: #11141d;
+        }
+
+    .reservation-dot {
+        width: 100%;
+        height: 34px;
+        border-radius: 10px;
+        display: grid;
+        place-items: center;
+        font-size: 11px;
+        font-weight: 900;
+        cursor: pointer;
+        border: 1px solid transparent;
+    }
+
+        .reservation-dot.pending {
+            background: rgba(255,181,71,.18);
+            color: #ffb547;
+            border-color: rgba(255,181,71,.35);
+        }
+
+        .reservation-dot.approved {
+            background: rgba(48,224,161,.18);
+            color: #30e0a1;
+            border-color: rgba(48,224,161,.35);
+        }
+
+        .reservation-dot.rejected {
+            background: rgba(255,82,89,.14);
+            color: #ff5259;
+            border-color: rgba(255,82,89,.30);
+        }
+
+        .reservation-dot.cancelled {
+            background: rgba(122,132,153,.16);
+            color: #9aa4b8;
+            border-color: rgba(122,132,153,.30);
+        }
+
+    .legend {
+        display: flex;
+        gap: 12px;
+        flex-wrap: wrap;
+        padding: 14px 16px;
+        border-top: 1px solid rgba(255,255,255,.07);
+        background: #0f1219;
+    }
+
+    .legend-item {
+        display: flex;
+        align-items: center;
+        gap: 7px;
+        color: #7a8499;
+        font-size: 12px;
+        font-weight: 800;
+    }
+
+    .legend-color {
+        width: 12px;
+        height: 12px;
+        border-radius: 4px;
+    }
+
+        .legend-color.pending {
+            background: #ffb547;
+        }
+
+        .legend-color.approved {
+            background: #30e0a1;
+        }
+
+        .legend-color.rejected {
+            background: #ff5259;
+        }
+
+        .legend-color.cancelled {
+            background: #7a8499;
+        }
+
+    .month-list-grid {
+        display: grid;
+        grid-template-columns: 1fr .7fr;
+        gap: 18px;
+        margin-top: 20px;
+    }
+
+    .cal-card {
+        background: #13161e;
+        border: 1px solid rgba(255,255,255,.07);
+        border-radius: 18px;
+        overflow: hidden;
+    }
+
+    .cal-card-header {
+        padding: 18px;
+        border-bottom: 1px solid rgba(255,255,255,.07);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .cal-card-title {
+        margin: 0;
+        font-size: 16px;
+        font-weight: 900;
+    }
+
+    .cal-card-body {
+        padding: 18px;
+    }
+
+    .reservation-list {
+        display: grid;
+        gap: 12px;
+    }
+
+    .reservation-item {
+        background: #1a1e2a;
+        border: 1px solid rgba(255,255,255,.07);
+        border-radius: 14px;
+        padding: 14px;
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) auto;
+        gap: 12px;
+        align-items: center;
+    }
+
+    .reservation-title {
+        font-size: 14px;
+        font-weight: 900;
+        margin-bottom: 4px;
+    }
+
+    .reservation-meta {
+        color: #7a8499;
+        font-size: 12px;
+        line-height: 1.5;
+    }
+
+    .reservation-price {
+        font-weight: 900;
+        color: #e8ff47;
+        font-size: 13px;
+        margin-top: 4px;
+    }
+
+    .badge-status {
+        border-radius: 8px;
+        padding: 6px 10px;
+        font-size: 11px;
+        font-weight: 900;
+        white-space: nowrap;
+    }
+
+        .badge-status.pending {
+            color: #ffb547;
+            background: rgba(255,181,71,.14);
+            border: 1px solid rgba(255,181,71,.25);
+        }
+
+        .badge-status.approved {
+            color: #30e0a1;
+            background: rgba(48,224,161,.14);
+            border: 1px solid rgba(48,224,161,.25);
+        }
+
+        .badge-status.rejected {
+            color: #ff5259;
+            background: rgba(255,82,89,.14);
+            border: 1px solid rgba(255,82,89,.25);
+        }
+
+        .badge-status.cancelled {
+            color: #9aa4b8;
+            background: rgba(122,132,153,.14);
+            border: 1px solid rgba(122,132,153,.25);
+        }
+
+    .empty-state {
+        text-align: center;
+        padding: 34px;
+        color: #7a8499;
+        font-size: 13px;
+        font-weight: 800;
+    }
+
+    @@media(max-width: 1200px) {
+        .calendar-stats {
+            grid-template-columns: repeat(2, 1fr);
+        }
+
+        .month-list-grid {
+            grid-template-columns: 1fr;
+        }
+    }
+
+    @@media(max-width: 650px) {
+        .calendar-stats {
+            grid-template-columns: 1fr;
+        }
+    }
+</style>
+
+<div class="calendar-root">
+
+    <div class="calendar-breadcrumb">
+        Admin Panel › Reservations › Calendar
+    </div>
+
+    <div class="calendar-header">
+        <div>
+            <h1 class="calendar-title">Reservation Calendar</h1>
+            <p class="calendar-subtitle">Track vehicle bookings, pending requests and approved rentals by month.</p>
+        </div>
+
+        <div class="calendar-actions">
+            <a class="cal-btn" href="/Admin/ReservationCalendar/Index?year=@previousYear&month=@previousMonth&status=@selectedStatus">← Previous</a>
+            <a class="cal-btn" href="/Admin/ReservationCalendar/Index">Today</a>
+            <a class="cal-btn" href="/Admin/ReservationCalendar/Index?year=@nextYear&month=@nextMonth&status=@selectedStatus">Next →</a>
+        </div>
+    </div>
+
+    <div class="calendar-stats">
+        <div class="cal-stat-card">
+            <div class="cal-stat-label">MONTH RESERVATIONS</div>
+            <div class="cal-stat-value">@totalReservations</div>
+            <div class="cal-stat-note">Filtered reservation count</div>
+        </div>
+
+        <div class="cal-stat-card">
+            <div class="cal-stat-label">PENDING</div>
+            <div class="cal-stat-value">@pendingReservations</div>
+            <div class="cal-stat-note">Waiting for admin action</div>
+        </div>
+
+        <div class="cal-stat-card">
+            <div class="cal-stat-label">APPROVED</div>
+            <div class="cal-stat-value">@approvedReservations</div>
+            <div class="cal-stat-note">Confirmed rentals</div>
+        </div>
+
+        <div class="cal-stat-card">
+            <div class="cal-stat-label">MONTH REVENUE</div>
+            <div class="cal-stat-value">@monthRevenue.ToString("N0") ₺</div>
+            <div class="cal-stat-note">Approved reservations only</div>
+        </div>
+    </div>
+
+    <div class="filter-card">
+        <div class="month-title">@monthName</div>
+
+        <div class="status-tabs">
+            <a class="status-tab @(selectedStatus == "active" ? "active" : "")" href="/Admin/ReservationCalendar/Index?year=@monthStart.Year&month=@monthStart.Month&status=active">Active</a>
+            <a class="status-tab @(selectedStatus == "all" ? "active" : "")" href="/Admin/ReservationCalendar/Index?year=@monthStart.Year&month=@monthStart.Month&status=all">All</a>
+            <a class="status-tab @(selectedStatus == "pending" ? "active" : "")" href="/Admin/ReservationCalendar/Index?year=@monthStart.Year&month=@monthStart.Month&status=pending">Pending</a>
+            <a class="status-tab @(selectedStatus == "approved" ? "active" : "")" href="/Admin/ReservationCalendar/Index?year=@monthStart.Year&month=@monthStart.Month&status=approved">Approved</a>
+            <a class="status-tab @(selectedStatus == "rejected" ? "active" : "")" href="/Admin/ReservationCalendar/Index?year=@monthStart.Year&month=@monthStart.Month&status=rejected">Rejected</a>
+            <a class="status-tab @(selectedStatus == "cancelled" ? "active" : "")" href="/Admin/ReservationCalendar/Index?year=@monthStart.Year&month=@monthStart.Month&status=cancelled">Cancelled</a>
+        </div>
+    </div>
+
+    <div class="calendar-board">
+        <div class="calendar-scroll">
+            <table class="calendar-table">
+                <thead>
+                    <tr>
+                        <th class="car-column">Vehicle</th>
+                        @foreach (var day in days)
+                        {
+                            <th class="@(IsToday(day) ? "today-head" : "")">
+                                <div>@day.Day</div>
+                                <div style="font-size:10px;color:#596276;">@day.ToString("ddd", System.Globalization.CultureInfo.GetCultureInfo("en-US"))</div>
+                            </th>
+                        }
+                    </tr>
+                </thead>
+
+                <tbody>
+                    @if (!cars.Any())
+                    {
+                        <tr>
+                            <td colspan="@(days.Count + 1)" class="empty-state">
+                                No cars found.
+                            </td>
+                        </tr>
+                    }
+                    else
+                    {
+                        foreach (var car in cars)
+                        {
+                            <tr>
+                                <td class="car-cell">
+                                    <div class="car-name">@GetCarName(car)</div>
+                                    <div class="car-meta">
+                                        @car.Category?.CategoryName • @car.FuelType • @car.TransmissionType
+                                    </div>
+                                </td>
+
+                                @foreach (var day in days)
+                                {
+                                    var reservation = Model.FirstOrDefault(x =>
+                                    x.CarId == car.CarId &&
+                                    IsReservationOnDay(x, day));
+
+                                    if (reservation == null)
+                                    {
+                                        <td class="day-cell @(IsToday(day) ? "today" : "")"></td>
+                                    }
+                                    else
+                                    {
+                                        var statusClass = GetStatusClass(reservation.ReservationStatus);
+                                        var customerName = $"{reservation.Customer?.FirstName} {reservation.Customer?.LastName}";
+                                        var tooltip = $"{customerName} | {reservation.PickupDate:dd MMM} - {reservation.ReturnDate:dd MMM} | {reservation.TotalPrice:N0} ₺";
+
+                                        <td class="day-cell @(IsToday(day) ? "today" : "")">
+                                            <div class="reservation-dot @statusClass" title="@tooltip">
+                                                @reservation.ReservationStatus.ToString().Substring(0, 1)
+                                            </div>
+                                        </td>
+                                    }
+                                }
+                            </tr>
+                        }
+                    }
+                </tbody>
+            </table>
+        </div>
+
+        <div class="legend">
+            <div class="legend-item">
+                <span class="legend-color pending"></span>
+                Pending
+            </div>
+            <div class="legend-item">
+                <span class="legend-color approved"></span>
+                Approved
+            </div>
+            <div class="legend-item">
+                <span class="legend-color rejected"></span>
+                Rejected
+            </div>
+            <div class="legend-item">
+                <span class="legend-color cancelled"></span>
+                Cancelled
+            </div>
+        </div>
+    </div>
+
+    <div class="month-list-grid">
+        <div class="cal-card">
+            <div class="cal-card-header">
+                <h2 class="cal-card-title">Reservations in @monthName</h2>
+                <a href="/Admin/Reservation/ReservationList" class="cal-btn">Reservation List</a>
+            </div>
+
+            <div class="cal-card-body">
+                @if (Model == null || !Model.Any())
+                {
+                    <div class="empty-state">
+                        No reservations found for this month.
+                    </div>
+                }
+                else
+                {
+                    <div class="reservation-list">
+                        @foreach (var reservation in Model)
+                        {
+                            var carName = $"{reservation.Car?.Brand?.BrandName} {reservation.Car?.Model}";
+                            var customerName = $"{reservation.Customer?.FirstName} {reservation.Customer?.LastName}";
+                            var statusClass = GetStatusClass(reservation.ReservationStatus);
+
+                            <div class="reservation-item">
+                                <div>
+                                    <div class="reservation-title">@carName</div>
+                                    <div class="reservation-meta">
+                                        @customerName<br />
+                                        @reservation.PickupDate.ToString("dd MMM yyyy", System.Globalization.CultureInfo.GetCultureInfo("en-US"))
+                                        -
+                                        @reservation.ReturnDate.ToString("dd MMM yyyy", System.Globalization.CultureInfo.GetCultureInfo("en-US"))
+                                    </div>
+                                    <div class="reservation-price">@reservation.TotalPrice.ToString("N0") ₺</div>
+                                </div>
+
+                                <span class="badge-status @statusClass">
+                                    @reservation.ReservationStatus
+                                </span>
+                            </div>
+                        }
+                    </div>
+                }
+            </div>
+        </div>
+
+        <div class="cal-card">
+            <div class="cal-card-header">
+                <h2 class="cal-card-title">Operational Notes</h2>
+            </div>
+
+            <div class="cal-card-body">
+                <div style="color:#7a8499;font-size:13px;line-height:1.8;">
+                    <p>
+                        <strong style="color:#e2e8f0;">Active mode</strong> shows only Pending and Approved reservations.
+                    </p>
+
+                    <p>
+                        A vehicle cannot receive another reservation if the selected date range conflicts with a Pending or Approved reservation.
+                    </p>
+
+                    <p>
+                        Use this calendar before approving requests to quickly check vehicle availability and booking density.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>

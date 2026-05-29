@@ -1,6 +1,7 @@
 ﻿using COROLA_RENTACAR.BusinessLayer.Abstract;
 using COROLA_RENTACAR.EntityLayer.Enums;
 using Microsoft.AspNetCore.Mvc;
+using System.Globalization;
 
 namespace COROLA_RENTACAR.WebUI.Areas.Admin.Controllers
 {
@@ -28,6 +29,13 @@ namespace COROLA_RENTACAR.WebUI.Areas.Admin.Controllers
             var customers = await _customerService.TGetAllAsync();
             var reservations = await _reservationService.TGetAllReservationsWithDetailsAsync();
 
+            var approvedReservations = reservations
+                .Where(x => x.ReservationStatus == ReservationStatus.Approved)
+                .ToList();
+
+            var today = DateTime.Today;
+            var culture = CultureInfo.GetCultureInfo("en-US");
+
             ViewBag.TotalCars = cars.Count;
             ViewBag.AvailableCars = cars.Count(x => x.IsAvailable);
             ViewBag.UnavailableCars = cars.Count(x => !x.IsAvailable);
@@ -43,24 +51,81 @@ namespace COROLA_RENTACAR.WebUI.Areas.Admin.Controllers
             ViewBag.RejectedReservations = reservations.Count(x => x.ReservationStatus == ReservationStatus.Rejected);
             ViewBag.CancelledReservations = reservations.Count(x => x.ReservationStatus == ReservationStatus.Cancelled);
 
-            ViewBag.TotalRevenue = reservations
-                .Where(x => x.ReservationStatus == ReservationStatus.Approved)
+            ViewBag.TotalRevenue = approvedReservations.Sum(x => x.TotalPrice);
+
+            ViewBag.MonthlyRevenue = approvedReservations
+                .Where(x => x.PickupDate.Month == today.Month && x.PickupDate.Year == today.Year)
                 .Sum(x => x.TotalPrice);
 
-            ViewBag.MonthlyRevenue = reservations
-                .Where(x => x.ReservationStatus == ReservationStatus.Approved
-                            && x.PickupDate.Month == DateTime.Now.Month
-                            && x.PickupDate.Year == DateTime.Now.Year)
-                .Sum(x => x.TotalPrice);
+            ViewBag.TodayReservations = reservations.Count(x => x.PickupDate.Date == today);
+            ViewBag.ActiveReservations = reservations.Count(x =>
+                x.ReservationStatus == ReservationStatus.Approved &&
+                x.PickupDate.Date <= today &&
+                x.ReturnDate.Date >= today);
 
-            ViewBag.LatestCustomers = customers
-                .OrderByDescending(x => x.CustomerId)
-                .Take(5)
+            var lastSixMonths = Enumerable.Range(0, 6)
+                .Select(i => today.AddMonths(-5 + i))
                 .ToList();
+
+            ViewBag.MonthLabels = lastSixMonths
+                .Select(x => x.ToString("MMM yyyy", culture))
+                .ToList();
+
+            ViewBag.MonthlyRevenueData = lastSixMonths
+                .Select(month => approvedReservations
+                    .Where(x => x.PickupDate.Month == month.Month && x.PickupDate.Year == month.Year)
+                    .Sum(x => x.TotalPrice))
+                .ToList();
+
+            ViewBag.MonthlyReservationData = lastSixMonths
+                .Select(month => reservations
+                    .Count(x => x.PickupDate.Month == month.Month && x.PickupDate.Year == month.Year))
+                .ToList();
+
+            ViewBag.ReservationStatusLabels = new List<string>
+            {
+                "Pending",
+                "Approved",
+                "Rejected",
+                "Cancelled"
+            };
+
+            ViewBag.ReservationStatusData = new List<int>
+            {
+                ViewBag.PendingReservations,
+                ViewBag.ApprovedReservations,
+                ViewBag.RejectedReservations,
+                ViewBag.CancelledReservations
+            };
+
+            ViewBag.CarAvailabilityLabels = new List<string>
+            {
+                "Available",
+                "Unavailable"
+            };
+
+            ViewBag.CarAvailabilityData = new List<int>
+            {
+                ViewBag.AvailableCars,
+                ViewBag.UnavailableCars
+            };
+
+            var categoryGroups = cars
+                .GroupBy(x => x.Category != null ? x.Category.CategoryName : "Uncategorized")
+                .OrderByDescending(x => x.Count())
+                .ToList();
+
+            ViewBag.CategoryLabels = categoryGroups.Select(x => x.Key).ToList();
+            ViewBag.CategoryData = categoryGroups.Select(x => x.Count()).ToList();
 
             var latestReservations = reservations
                 .OrderByDescending(x => x.ReservationId)
                 .Take(6)
+                .ToList();
+
+            ViewBag.LatestCustomers = customers
+                .OrderByDescending(x => x.CustomerId)
+                .Take(5)
                 .ToList();
 
             return View(latestReservations);

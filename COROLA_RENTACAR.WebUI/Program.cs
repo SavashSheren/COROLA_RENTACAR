@@ -16,10 +16,10 @@ var builder = WebApplication.CreateBuilder(args);
 
 QuestPDF.Settings.License = LicenseType.Community;
 
-builder.Services.AddScoped<IPdfReportService, PdfReportService>();
-
+// DbContext
 builder.Services.AddDbContext<CorolaContext>();
 
+// Business Services
 builder.Services.AddScoped<IBrandService, BrandManager>();
 builder.Services.AddScoped<IBrandDal, EfBrandDal>();
 
@@ -41,8 +41,10 @@ builder.Services.AddScoped<ICarImageDal, EfCarImageDal>();
 builder.Services.AddScoped<IReservationService, ReservationManager>();
 builder.Services.AddScoped<IReservationDal, EfReservationDal>();
 
+// Mapping
 builder.Services.AddAutoMapper(typeof(GenericMapping));
 
+// Validators
 builder.Services.AddScoped<IValidator<Brand>, BrandValidator>();
 builder.Services.AddScoped<IValidator<Category>, CategoryValidator>();
 builder.Services.AddScoped<IValidator<Location>, LocationValidator>();
@@ -51,11 +53,18 @@ builder.Services.AddScoped<IValidator<CarImage>, CarImageValidator>();
 builder.Services.AddScoped<IValidator<Customer>, CustomerValidator>();
 builder.Services.AddScoped<IValidator<Reservation>, ReservationValidator>();
 
+// AI Services
 builder.Services.AddHttpClient<IAiDriverLicenseVerificationService, OpenAiDriverLicenseVerificationService>();
+builder.Services.AddHttpClient<IAiCarDescriptionService, AiCarDescriptionService>();
 
+// Report Services
+builder.Services.AddScoped<IPdfReportService, PdfReportService>();
+
+// Mail Services
 builder.Services.Configure<MailSettings>(builder.Configuration.GetSection("MailSettings"));
 builder.Services.AddScoped<IEmailNotificationService, MailKitEmailNotificationService>();
 
+// Authentication
 builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
     .AddCookie(options =>
     {

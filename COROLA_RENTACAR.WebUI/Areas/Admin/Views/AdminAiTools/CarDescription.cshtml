@@ -1,0 +1,88 @@
+﻿@model COROLA_RENTACAR.WebUI.Areas.Admin.Models.AiCarDescriptionViewModel
+
+@{
+    ViewData["Title"] = "AI Car Description";
+    Layout = "~/Views/AdminLayout/Index.cshtml";
+}
+
+<div class="container-fluid">
+
+    <div class="card border-0 shadow-sm mb-4" style="border-radius:18px;">
+        <div class="card-body p-4">
+            <h3 class="mb-1">AI Car Description Generator</h3>
+            <p class="text-muted mb-0">
+                Generate premium public website descriptions for rental cars. Demo mode works without OpenAI credits.
+            </p>
+        </div>
+    </div>
+
+    <form asp-area="Admin" asp-controller="AdminAiTools" asp-action="CarDescription" method="post">
+        @Html.AntiForgeryToken()
+
+        <div class="card border-0 shadow-sm" style="border-radius:18px;">
+            <div class="card-body p-4">
+
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label">Brand</label>
+                        <input asp-for="Brand" class="form-control" placeholder="BMW, Mercedes, Toyota..." />
+                    </div>
+
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label">Model</label>
+                        <input asp-for="Model" class="form-control" placeholder="320i, C200, Corolla..." />
+                    </div>
+
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label">Category</label>
+                        <input asp-for="Category" class="form-control" placeholder="Economy, SUV, Luxury, Generic..." />
+                    </div>
+
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label">Fuel Type</label>
+                        <input asp-for="FuelType" class="form-control" placeholder="Gasoline, Diesel, Hybrid..." />
+                    </div>
+
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label">Transmission</label>
+                        <input asp-for="Transmission" class="form-control" placeholder="Automatic, Manual..." />
+                    </div>
+
+                    <div class="col-md-3 mb-3">
+                        <label class="form-label">Seat Count</label>
+                        <input asp-for="SeatCount" type="number" class="form-control" />
+                    </div>
+
+                    <div class="col-md-3 mb-3">
+                        <label class="form-label">Daily Price</label>
+                        <input asp-for="DailyPrice" type="number" step="0.01" class="form-control" />
+                    </div>
+
+                    <div class="col-12 mb-3">
+                        <label class="form-label">Short Features / Prompt</label>
+                        <textarea asp-for="Features"
+                                  class="form-control"
+                                  rows="4"
+                                  placeholder="Example: generic family car, economic city car, luxury airport transfer vehicle..."></textarea>
+                    </div>
+                </div>
+
+                <button type="submit" class="btn btn-dark w-100 py-2">
+                    Generate Description
+                </button>
+
+                @if (!string.IsNullOrWhiteSpace(Model.GeneratedDescription))
+                {
+                    <div class="mt-4">
+                        <h5 class="mb-3">Generated Description</h5>
+
+                        <div class="p-4 bg-light border" style="border-radius:16px; white-space:pre-line; line-height:1.8;">
+                            @Model.GeneratedDescription
+                        </div>
+                    </div>
+                }
+
+            </div>
+        </div>
+    </form>
+</div>

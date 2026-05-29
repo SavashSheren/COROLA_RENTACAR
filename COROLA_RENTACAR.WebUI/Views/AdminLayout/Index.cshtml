@@ -728,22 +728,14 @@
                             </li>
                         </ul>
                     </li>
-
-                    <li class="admin-nav-item has-submenu @aiMenuOpen" id="menuAi">
-                        <a href="javascript:void(0)" class="admin-nav-link">
+                    <li class="admin-nav-item">
+                        <a asp-area="Admin"
+                           asp-controller="AdminAiTools"
+                           asp-action="CarDescription"
+                           class="admin-nav-link">
                             <i class="bi bi-stars admin-nav-icon"></i>
                             <span class="admin-nav-label">AI Tools</span>
-                            <i class="bi bi-chevron-right admin-sub-arrow"></i>
                         </a>
-
-                        <ul class="admin-sub-menu">
-                            <li>
-                                <a href="/Admin/AI/ContentGenerator" class="@isControllerActive("AI")">AI Content Generator</a>
-                            </li>
-                            <li>
-                                <a href="/Admin/AI/CarDescription">Car Description AI</a>
-                            </li>
-                        </ul>
                     </li>
 
                     <div class="admin-section-title">System</div>

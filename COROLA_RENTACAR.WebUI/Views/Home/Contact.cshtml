@@ -1,0 +1,138 @@
+﻿@model COROLA_RENTACAR.WebUI.Models.PublicContactViewModel
+
+@{
+    ViewData["Title"] = "Contact";
+    Layout = "~/Views/Shared/_UILayout.cshtml";
+}
+
+<section style="padding:80px 0;background:#f6f7fb;">
+    <div class="container">
+
+        <div class="mb-4 p-4" style="background:#111827;color:white;border-radius:24px;">
+            <h1 class="mb-2" style="font-weight:900;">Contact Us</h1>
+            <p class="mb-0" style="color:#cbd5e1;max-width:760px;">
+                Send us your questions, rental requests or service feedback. Your message will be reviewed by the admin team.
+            </p>
+        </div>
+
+        <div class="row g-4">
+            <div class="col-lg-5">
+                <div class="bg-white shadow-sm h-100" style="border-radius:24px;padding:32px;">
+                    <h3 style="font-weight:900;">Get in Touch</h3>
+                    <p class="text-muted mb-4">
+                        We are ready to support your car rental needs with fast and reliable service.
+                    </p>
+
+                    <div class="mb-4">
+                        <small class="text-muted d-block mb-1">Address</small>
+                        <strong>Istanbul, Türkiye</strong>
+                    </div>
+
+                    <div class="mb-4">
+                        <small class="text-muted d-block mb-1">Phone</small>
+                        <strong>+90 555 111 22 33</strong>
+                    </div>
+
+                    <div class="mb-4">
+                        <small class="text-muted d-block mb-1">Email</small>
+                        <strong>info@corolarentacar.com</strong>
+                    </div>
+
+                    <div class="p-4" style="background:#f9fafb;border-radius:18px;">
+                        <h5 class="mb-2" style="font-weight:800;">Admin Inbox Enabled</h5>
+                        <p class="text-muted mb-0">
+                            Contact messages are stored directly in the admin panel. No email sending is used for this form.
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-7">
+                <div class="bg-white shadow-sm" style="border-radius:24px;padding:32px;">
+
+                    <h3 class="mb-2" style="font-weight:900;">Send Message</h3>
+                    <p class="text-muted mb-4">
+                        Fill in the form below. Your message will appear in Admin Panel > Contact Messages.
+                    </p>
+
+                    @if (TempData["ContactSuccessMessage"] != null)
+                    {
+                        <div class="alert alert-success" style="border-radius:16px;">
+                            @TempData["ContactSuccessMessage"]
+                        </div>
+                    }
+
+                    @if (!ViewData.ModelState.IsValid)
+                    {
+                        <div class="alert alert-danger" style="border-radius:16px;">
+                            Please check the form fields and try again.
+                        </div>
+                    }
+
+                    <form method="post" action="/Home/Contact">
+                        @Html.AntiForgeryToken()
+
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label class="form-label fw-bold">Full Name</label>
+                                <input type="text"
+                                       name="FullName"
+                                       value="@Model.FullName"
+                                       class="form-control"
+                                       placeholder="John Smith" />
+                                @Html.ValidationMessageFor(x => x.FullName, "", new { @class = "text-danger small" })
+                            </div>
+
+                            <div class="col-md-6">
+                                <label class="form-label fw-bold">Email Address</label>
+                                <input type="email"
+                                       name="Email"
+                                       value="@Model.Email"
+                                       class="form-control"
+                                       placeholder="customer@example.com" />
+                                @Html.ValidationMessageFor(x => x.Email, "", new { @class = "text-danger small" })
+                            </div>
+
+                            <div class="col-md-6">
+                                <label class="form-label fw-bold">Phone</label>
+                                <input type="text"
+                                       name="Phone"
+                                       value="@Model.Phone"
+                                       class="form-control"
+                                       placeholder="+90 555 111 22 33" />
+                                @Html.ValidationMessageFor(x => x.Phone, "", new { @class = "text-danger small" })
+                            </div>
+
+                            <div class="col-md-6">
+                                <label class="form-label fw-bold">Subject</label>
+                                <input type="text"
+                                       name="Subject"
+                                       value="@Model.Subject"
+                                       class="form-control"
+                                       placeholder="Reservation question" />
+                                @Html.ValidationMessageFor(x => x.Subject, "", new { @class = "text-danger small" })
+                            </div>
+
+                            <div class="col-12">
+                                <label class="form-label fw-bold">Message</label>
+                                <textarea name="Message"
+                                          class="form-control"
+                                          rows="7"
+                                          placeholder="Write your message here...">@Model.Message</textarea>
+                                @Html.ValidationMessageFor(x => x.Message, "", new { @class = "text-danger small" })
+                            </div>
+
+                            <div class="col-12">
+                                <button type="submit" class="btn btn-dark w-100 py-3" style="border-radius:14px;font-weight:900;">
+                                    Send Message
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+
+                </div>
+            </div>
+        </div>
+
+    </div>
+</section>

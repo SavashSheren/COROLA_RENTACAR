@@ -62,6 +62,18 @@ namespace COROLA_RENTACAR.DataAccessLayer.Concrete
                 .WithMany()
                 .HasForeignKey(x => x.ReturnLocationId)
                 .OnDelete(DeleteBehavior.Restrict);
+            modelBuilder.Entity<Reservation>(entity =>
+            {
+                entity.Property(x => x.ReservationCode)
+                    .HasMaxLength(30);
+
+                entity.Property(x => x.CreatedDate)
+                    .HasDefaultValueSql("GETDATE()");
+
+                entity.HasIndex(x => x.ReservationCode)
+                    .IsUnique()
+                    .HasFilter("[ReservationCode] IS NOT NULL");
+            });
 
             modelBuilder.Entity<ContactMessage>(entity =>
             {
@@ -90,7 +102,7 @@ namespace COROLA_RENTACAR.DataAccessLayer.Concrete
                     .HasDefaultValueSql("GETDATE()");
 
                 entity.Property(x => x.IsRead)
-                    .HasDefaultValue(false);
+                    .HasDefaultValue(false);           
             });
         }
     }

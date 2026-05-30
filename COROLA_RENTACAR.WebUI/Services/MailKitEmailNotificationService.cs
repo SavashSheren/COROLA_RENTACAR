@@ -47,7 +47,9 @@ namespace COROLA_RENTACAR.WebUI.Services
             var pickupDateText = reservation.PickupDate.ToString("dd MMM yyyy", culture);
             var returnDateText = reservation.ReturnDate.ToString("dd MMM yyyy", culture);
 
-            var reservationCode = $"CRL-{DateTime.Now.Year}-{reservation.ReservationId.ToString("D6")}";
+            var reservationCode = !string.IsNullOrWhiteSpace(reservation.ReservationCode)
+            ? reservation.ReservationCode
+            : $"CRL-{DateTime.Now.Year}-{reservation.ReservationId.ToString("D6")}";
 
             var rentalDays = (reservation.ReturnDate.Date - reservation.PickupDate.Date).Days;
 

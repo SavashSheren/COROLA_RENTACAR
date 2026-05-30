@@ -3,6 +3,7 @@ using COROLA_RENTACAR.DataAccessLayer.Abstract;
 using COROLA_RENTACAR.EntityLayer.Entities;
 using COROLA_RENTACAR.EntityLayer.Enums;
 using FluentValidation;
+using System.Security.Cryptography;
 
 namespace COROLA_RENTACAR.BusinessLayer.Concrete
 {
@@ -26,11 +27,11 @@ namespace COROLA_RENTACAR.BusinessLayer.Concrete
         }
 
         public async Task<bool> THasReservationConflictAsync(
-   int carId,
-   DateTime pickupDate,
-   DateTime returnDate,
-   int? ignoredReservationId = null,
-   bool includePending = true)
+            int carId,
+            DateTime pickupDate,
+            DateTime returnDate,
+            int? ignoredReservationId = null,
+            bool includePending = true)
         {
             return await _reservationDal.HasReservationConflictAsync(
                 carId,
@@ -39,10 +40,21 @@ namespace COROLA_RENTACAR.BusinessLayer.Concrete
                 ignoredReservationId,
                 includePending);
         }
+
+        public async Task<Reservation?> TGetReservationByCodeAndEmailAsync(string reservationCode, string email)
+        {
+            if (string.IsNullOrWhiteSpace(reservationCode) || string.IsNullOrWhiteSpace(email))
+            {
+                return null;
+            }
+
+            return await _reservationDal.GetReservationByCodeAndEmailAsync(reservationCode, email);
+        }
+
         private async Task EnsureCarIsAvailableForDateRangeAsync(
-    Reservation reservation,
-    int? ignoredReservationId = null,
-    bool includePending = true)
+            Reservation reservation,
+            int? ignoredReservationId = null,
+            bool includePending = true)
         {
             var hasConflict = await _reservationDal.HasReservationConflictAsync(
                 reservation.CarId,
@@ -56,6 +68,7 @@ namespace COROLA_RENTACAR.BusinessLayer.Concrete
                 throw new ValidationException("Selected car already has a pending or approved reservation for the selected date range.");
             }
         }
+
         public async Task<List<Reservation>> TGetAllAsync()
         {
             return await _reservationDal.GetAllAsync();
@@ -79,6 +92,9 @@ namespace COROLA_RENTACAR.BusinessLayer.Concrete
         public async Task TInsertAsync(Reservation entity)
         {
             entity.Description ??= string.Empty;
+            entity.CreatedDate = entity.CreatedDate == default ? DateTime.Now : entity.CreatedDate;
+
+            await EnsureReservationCodeAsync(entity);
             await EnsureCustomerLicenseApprovedAsync(entity.CustomerId);
             await EnsureCarIsAvailableForDateRangeAsync(entity);
             await CalculateTotalPriceAsync(entity);
@@ -97,6 +113,9 @@ namespace COROLA_RENTACAR.BusinessLayer.Concrete
         {
             reservation.Description ??= string.Empty;
             reservation.ReservationStatus = ReservationStatus.Pending;
+            reservation.CreatedDate = reservation.CreatedDate == default ? DateTime.Now : reservation.CreatedDate;
+
+            await EnsureReservationCodeAsync(reservation);
 
             var customer = await _customerDal.GetByIdAsync(reservation.CustomerId);
 
@@ -126,7 +145,9 @@ namespace COROLA_RENTACAR.BusinessLayer.Concrete
         public async Task TUpdateAsync(Reservation entity)
         {
             entity.Description ??= string.Empty;
+            entity.CreatedDate = entity.CreatedDate == default ? DateTime.Now : entity.CreatedDate;
 
+            await EnsureReservationCodeAsync(entity);
             await EnsureCustomerLicenseApprovedAsync(entity.CustomerId);
             await EnsureCarIsAvailableForDateRangeAsync(entity, entity.ReservationId);
             await CalculateTotalPriceAsync(entity);
@@ -154,6 +175,15 @@ namespace COROLA_RENTACAR.BusinessLayer.Concrete
             {
                 return;
             }
+
+            await EnsureReservationCodeAsync(reservation);
+
+            if (reservation.CreatedDate == default)
+            {
+                reservation.CreatedDate = DateTime.Now;
+            }
+
+            await _reservationDal.UpdateAsync(reservation);
 
             await EnsureCarIsAvailableForDateRangeAsync(
                 reservation,
@@ -206,6 +236,37 @@ namespace COROLA_RENTACAR.BusinessLayer.Concrete
             }
 
             reservation.TotalPrice = car.DailyPrice * totalDays;
+        }
+
+        private async Task EnsureReservationCodeAsync(Reservation reservation)
+        {
+            if (!string.IsNullOrWhiteSpace(reservation.ReservationCode))
+            {
+                reservation.ReservationCode = reservation.ReservationCode.Trim().ToUpper();
+                return;
+            }
+
+            reservation.ReservationCode = await GenerateUniqueReservationCodeAsync();
+        }
+
+        private async Task<string> GenerateUniqueReservationCodeAsync()
+        {
+            var year = DateTime.Now.Year;
+
+            for (var i = 0; i < 20; i++)
+            {
+                var number = RandomNumberGenerator.GetInt32(100000, 999999);
+                var reservationCode = $"CRL-{year}-{number}";
+
+                var exists = await _reservationDal.ReservationCodeExistsAsync(reservationCode);
+
+                if (!exists)
+                {
+                    return reservationCode;
+                }
+            }
+
+            return $"CRL-{year}-{Guid.NewGuid().ToString("N")[..8].ToUpper()}";
         }
     }
 }

@@ -43,6 +43,35 @@ namespace COROLA_RENTACAR.DataAccessLayer.EntityFramework
                 .FirstOrDefaultAsync(x => x.ReservationId == id);
         }
 
+        public async Task<Reservation?> GetReservationByCodeAndEmailAsync(string reservationCode, string email)
+        {
+            var normalizedCode = reservationCode.Trim().ToUpper();
+            var normalizedEmail = email.Trim().ToLower();
+
+            return await _context.Reservations
+                .Include(x => x.Car)
+                    .ThenInclude(x => x.Brand)
+                .Include(x => x.Car)
+                    .ThenInclude(x => x.Category)
+                .Include(x => x.Customer)
+                .Include(x => x.PickupLocation)
+                .Include(x => x.ReturnLocation)
+                .FirstOrDefaultAsync(x =>
+                    x.ReservationCode != null &&
+                    x.ReservationCode.ToUpper() == normalizedCode &&
+                    x.Customer.Email.ToLower() == normalizedEmail);
+        }
+
+        public async Task<bool> ReservationCodeExistsAsync(string reservationCode)
+        {
+            var normalizedCode = reservationCode.Trim().ToUpper();
+
+            return await _context.Reservations
+                .AnyAsync(x =>
+                    x.ReservationCode != null &&
+                    x.ReservationCode.ToUpper() == normalizedCode);
+        }
+
         public async Task UpdateReservationStatusAsync(int reservationId, ReservationStatus status)
         {
             var reservation = await _context.Reservations.FindAsync(reservationId);
@@ -53,6 +82,7 @@ namespace COROLA_RENTACAR.DataAccessLayer.EntityFramework
             }
 
             reservation.ReservationStatus = status;
+
             await _context.SaveChangesAsync();
         }
 

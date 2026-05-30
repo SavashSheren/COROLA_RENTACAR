@@ -5,7 +5,10 @@ namespace COROLA_RENTACAR.BusinessLayer.Abstract
     public interface IReservationService : IGenericService<Reservation>
     {
         Task<List<Reservation>> TGetAllReservationsWithDetailsAsync();
+
         Task<Reservation> TGetReservationWithDetailsByIdAsync(int id);
+
+        Task<Reservation?> TGetReservationByCodeAndEmailAsync(string reservationCode, string email);
 
         Task<bool> THasReservationConflictAsync(
             int carId,
@@ -17,7 +20,9 @@ namespace COROLA_RENTACAR.BusinessLayer.Abstract
         Task TCreatePublicReservationRequestAsync(Reservation reservation);
 
         Task TApproveReservationAsync(int reservationId);
+
         Task TRejectReservationAsync(int reservationId);
+
         Task TCancelReservationAsync(int reservationId);
     }
 }

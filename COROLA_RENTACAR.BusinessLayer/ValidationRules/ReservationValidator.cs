@@ -34,6 +34,9 @@ namespace COROLA_RENTACAR.BusinessLayer.ValidationRules
 
             RuleFor(x => x.Description)
                 .MaximumLength(500).WithMessage("Description can be at most 500 characters.");
+            RuleFor(x => x.ReservationCode)
+    .MaximumLength(30)
+    .WithMessage("Reservation code can be at most 30 characters.");
         }
     }
 }

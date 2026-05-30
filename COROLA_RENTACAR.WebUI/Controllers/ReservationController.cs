@@ -358,5 +358,36 @@ namespace COROLA_RENTACAR.WebUI.Controllers
             await _customerService.TUpdateAsync(customer);
             return customer;
         }
+        [HttpGet]
+        public IActionResult Track()
+        {
+            return View(new TrackReservationViewModel());
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Track(TrackReservationViewModel model)
+        {
+            model.HasSearched = true;
+
+            if (!ModelState.IsValid)
+            {
+                return View(model);
+            }
+
+            var reservation = await _reservationService.TGetReservationByCodeAndEmailAsync(
+                model.ReservationCode,
+                model.Email);
+
+            if (reservation == null)
+            {
+                model.ErrorMessage = "No reservation was found with the provided reservation code and email address.";
+                return View(model);
+            }
+
+            model.Reservation = reservation;
+
+            return View(model);
+        }
     }
 }

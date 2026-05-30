@@ -1,0 +1,350 @@
+﻿@using COROLA_RENTACAR.EntityLayer.Enums
+@model COROLA_RENTACAR.WebUI.Models.TrackReservationViewModel
+
+@{
+    ViewData["Title"] = "Track Reservation";
+    Layout = "~/Views/Shared/_UILayout.cshtml";
+
+    var reservation = Model.Reservation;
+
+    var statusText = reservation == null ? "" : reservation.ReservationStatus.ToString();
+
+    var statusClass = statusText switch
+    {
+        "Pending" => "status-pending",
+        "Approved" => "status-approved",
+        "Rejected" => "status-rejected",
+        "Cancelled" => "status-cancelled",
+        _ => "status-default"
+    };
+
+    var carImage = reservation?.Car == null || string.IsNullOrWhiteSpace(reservation.Car.ImageUrl)
+        ? "/images/default-car.jpg"
+        : reservation.Car.ImageUrl;
+
+    var rentalDays = reservation == null
+        ? 0
+        : (reservation.ReturnDate.Date - reservation.PickupDate.Date).Days;
+
+    if (rentalDays < 1)
+    {
+        rentalDays = 1;
+    }
+}
+
+<style>
+    .track-page {
+        padding: 80px 0;
+        background: #f6f7fb;
+        min-height: 720px;
+    }
+
+    .track-hero {
+        background: linear-gradient(135deg, #111827, #1f2937);
+        color: #fff;
+        border-radius: 28px;
+        padding: 44px;
+        margin-bottom: 28px;
+    }
+
+        .track-hero h1 {
+            font-weight: 900;
+            margin-bottom: 10px;
+        }
+
+        .track-hero p {
+            color: #cbd5e1;
+            max-width: 760px;
+            margin-bottom: 0;
+        }
+
+    .track-card {
+        background: #fff;
+        border-radius: 24px;
+        padding: 28px;
+        box-shadow: 0 18px 50px rgba(15, 23, 42, 0.08);
+    }
+
+    .track-label {
+        font-size: 13px;
+        font-weight: 800;
+        color: #374151;
+        margin-bottom: 7px;
+    }
+
+    .track-input {
+        width: 100%;
+        border: 1px solid #e5e7eb;
+        border-radius: 14px;
+        padding: 13px 14px;
+        outline: none;
+    }
+
+        .track-input:focus {
+            border-color: #111827;
+            box-shadow: 0 0 0 4px rgba(17, 24, 39, .08);
+        }
+
+    .track-btn {
+        border: none;
+        border-radius: 14px;
+        background: #111827;
+        color: #fff;
+        font-weight: 900;
+        padding: 14px 22px;
+        width: 100%;
+    }
+
+    .result-card {
+        background: #fff;
+        border-radius: 24px;
+        overflow: hidden;
+        box-shadow: 0 18px 50px rgba(15, 23, 42, 0.08);
+    }
+
+    .result-image {
+        height: 270px;
+        background: #e5e7eb;
+    }
+
+        .result-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+    .result-body {
+        padding: 28px;
+    }
+
+    .status-badge {
+        display: inline-block;
+        border-radius: 999px;
+        padding: 9px 15px;
+        font-weight: 900;
+        font-size: 13px;
+        margin-bottom: 14px;
+    }
+
+    .status-pending {
+        background: #fef3c7;
+        color: #92400e;
+    }
+
+    .status-approved {
+        background: #dcfce7;
+        color: #166534;
+    }
+
+    .status-rejected {
+        background: #fee2e2;
+        color: #991b1b;
+    }
+
+    .status-cancelled {
+        background: #f3f4f6;
+        color: #374151;
+    }
+
+    .status-default {
+        background: #e5e7eb;
+        color: #111827;
+    }
+
+    .info-grid {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 14px;
+        margin-top: 22px;
+    }
+
+    .info-box {
+        background: #f9fafb;
+        border-radius: 16px;
+        padding: 15px;
+    }
+
+        .info-box small {
+            display: block;
+            color: #6b7280;
+            font-weight: 700;
+            margin-bottom: 5px;
+        }
+
+        .info-box strong {
+            color: #111827;
+            font-weight: 900;
+        }
+
+    .error-box {
+        background: #fef2f2;
+        color: #991b1b;
+        border: 1px solid #fecaca;
+        border-radius: 16px;
+        padding: 18px;
+        font-weight: 700;
+        margin-top: 22px;
+    }
+
+    .hint-box {
+        background: #eff6ff;
+        color: #1e40af;
+        border: 1px solid #bfdbfe;
+        border-radius: 16px;
+        padding: 18px;
+        margin-top: 22px;
+    }
+
+    @@media(max-width: 768px) {
+        .info-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .track-hero {
+            padding: 30px;
+        }
+    }
+</style>
+
+<section class="track-page">
+    <div class="container">
+
+        <div class="track-hero">
+            <h1>Track Your Reservation</h1>
+            <p>
+                Enter your reservation code and email address to check the latest status of your car rental request.
+            </p>
+        </div>
+
+        <div class="row g-4">
+            <div class="col-lg-5">
+                <div class="track-card">
+                    <h3 class="mb-2" style="font-weight:900;">Reservation Lookup</h3>
+                    <p class="text-muted mb-4">
+                        Use the reservation code sent to your email after creating a rental request.
+                    </p>
+
+                    <form asp-controller="Reservation" asp-action="Track" method="post">
+                        @Html.AntiForgeryToken()
+
+                        <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+
+                        <div class="mb-3">
+                            <label class="track-label">Reservation Code</label>
+                            <input asp-for="ReservationCode"
+                                   class="track-input"
+                                   placeholder="CRL-2026-123456" />
+                            <span asp-validation-for="ReservationCode" class="text-danger small"></span>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="track-label">Email Address</label>
+                            <input asp-for="Email"
+                                   class="track-input"
+                                   placeholder="customer@example.com" />
+                            <span asp-validation-for="Email" class="text-danger small"></span>
+                        </div>
+
+                        <button type="submit" class="track-btn">
+                            Track Reservation
+                        </button>
+                    </form>
+
+                    @if (!string.IsNullOrWhiteSpace(Model.ErrorMessage))
+                    {
+                        <div class="error-box">
+                            @Model.ErrorMessage
+                        </div>
+                    }
+
+                    @if (!Model.HasSearched)
+                    {
+                        <div class="hint-box">
+                            Your reservation code is included in your approval email. Make sure to use the same email address used during reservation.
+                        </div>
+                    }
+                </div>
+            </div>
+
+            <div class="col-lg-7">
+                @if (reservation != null)
+                {
+                    <div class="result-card">
+                        <div class="result-image">
+                            <img src="@carImage" alt="@reservation.Car?.Brand?.BrandName @reservation.Car?.Model" />
+                        </div>
+
+                        <div class="result-body">
+                            <span class="status-badge @statusClass">
+                                @statusText
+                            </span>
+
+                            <h2 style="font-weight:900;">
+                                @reservation.Car?.Brand?.BrandName @reservation.Car?.Model
+                            </h2>
+
+                            <p class="text-muted mb-0">
+                                Reservation Code:
+                                <strong>@reservation.ReservationCode</strong>
+                            </p>
+
+                            <div class="info-grid">
+                                <div class="info-box">
+                                    <small>Customer</small>
+                                    <strong>@reservation.Customer?.DriverLicenseNumber</strong>
+                                </div>
+
+                                <div class="info-box">
+                                    <small>Email</small>
+                                    <strong>@reservation.Customer?.Email</strong>
+                                </div>
+
+                                <div class="info-box">
+                                    <small>Pickup Date</small>
+                                    <strong>@reservation.PickupDate.ToString("dd MMM yyyy")</strong>
+                                </div>
+
+                                <div class="info-box">
+                                    <small>Return Date</small>
+                                    <strong>@reservation.ReturnDate.ToString("dd MMM yyyy")</strong>
+                                </div>
+
+                                <div class="info-box">
+                                    <small>Pickup Location</small>
+                                    <strong>@reservation.PickupLocation?.LocationName</strong>
+                                </div>
+
+                                <div class="info-box">
+                                    <small>Return Location</small>
+                                    <strong>@reservation.ReturnLocation?.LocationName</strong>
+                                </div>
+
+                                <div class="info-box">
+                                    <small>Rental Days</small>
+                                    <strong>@rentalDays day(s)</strong>
+                                </div>
+
+                                <div class="info-box">
+                                    <small>Total Price</small>
+                                    <strong>@reservation.TotalPrice.ToString("N2") ₺</strong>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                }
+                else
+                {
+                    <div class="track-card h-100 d-flex align-items-center justify-content-center text-center">
+                        <div>
+                            <h3 style="font-weight:900;">No reservation selected</h3>
+                            <p class="text-muted mb-0">
+                                Submit the form to display reservation details here.
+                            </p>
+                        </div>
+                    </div>
+                }
+            </div>
+        </div>
+
+    </div>
+</section>

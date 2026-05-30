@@ -1,0 +1,318 @@
+﻿@{
+    ViewData["Title"] = "About";
+    Layout = "~/Views/Shared/_UILayout.cshtml";
+}
+
+<style>
+    .about-hero {
+        background: linear-gradient(135deg, #111827, #1f2937);
+        color: #fff;
+        padding: 90px 0;
+    }
+
+        .about-hero h1 {
+            font-size: 52px;
+            font-weight: 950;
+            letter-spacing: -1.2px;
+            margin-bottom: 18px;
+        }
+
+        .about-hero p {
+            color: #cbd5e1;
+            font-size: 18px;
+            line-height: 1.8;
+            max-width: 760px;
+            margin-bottom: 0;
+        }
+
+    .about-section {
+        padding: 80px 0;
+        background: #f6f7fb;
+    }
+
+    .about-card {
+        background: #fff;
+        border-radius: 24px;
+        padding: 34px;
+        height: 100%;
+        box-shadow: 0 18px 50px rgba(15, 23, 42, .08);
+    }
+
+        .about-card h3 {
+            color: #111827;
+            font-weight: 950;
+            margin-bottom: 14px;
+        }
+
+        .about-card p {
+            color: #6b7280;
+            line-height: 1.8;
+            margin-bottom: 0;
+        }
+
+    .about-label {
+        color: #6b7280;
+        font-weight: 900;
+        letter-spacing: .08em;
+        text-transform: uppercase;
+        font-size: 13px;
+        margin-bottom: 10px;
+        display: block;
+    }
+
+    .about-title {
+        color: #111827;
+        font-weight: 950;
+        font-size: 38px;
+        margin-bottom: 20px;
+    }
+
+    .about-text {
+        color: #6b7280;
+        line-height: 1.9;
+        font-size: 17px;
+    }
+
+    .process-item {
+        display: flex;
+        gap: 18px;
+        margin-bottom: 24px;
+    }
+
+    .process-number {
+        width: 48px;
+        height: 48px;
+        border-radius: 16px;
+        background: #111827;
+        color: #fff;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 950;
+        flex-shrink: 0;
+    }
+
+    .process-item h5 {
+        color: #111827;
+        font-weight: 900;
+        margin-bottom: 5px;
+    }
+
+    .process-item p {
+        color: #6b7280;
+        margin-bottom: 0;
+        line-height: 1.7;
+    }
+
+    .stat-card {
+        background: #111827;
+        color: #fff;
+        border-radius: 24px;
+        padding: 30px;
+        height: 100%;
+    }
+
+        .stat-card strong {
+            font-size: 34px;
+            font-weight: 950;
+            display: block;
+        }
+
+        .stat-card span {
+            color: #cbd5e1;
+        }
+
+    .about-cta {
+        background: #111827;
+        color: #fff;
+        padding: 70px 0;
+    }
+
+        .about-cta h2 {
+            font-weight: 950;
+            font-size: 38px;
+            margin-bottom: 12px;
+        }
+
+        .about-cta p {
+            color: #cbd5e1;
+            margin-bottom: 0;
+            line-height: 1.8;
+        }
+
+    .btn-white {
+        display: inline-block;
+        background: #fff;
+        color: #111827;
+        padding: 15px 24px;
+        border-radius: 14px;
+        font-weight: 900;
+        text-decoration: none;
+    }
+</style>
+
+<section class="about-hero">
+    <div class="container">
+        <h1>About COROLA Rent A Car</h1>
+        <p>
+            COROLA Rent A Car is designed as a modern car rental platform focused on secure reservations, verified customers, operational clarity and a premium rental experience.
+        </p>
+    </div>
+</section>
+
+<section class="about-section">
+    <div class="container">
+        <div class="row align-items-center g-5">
+            <div class="col-lg-6">
+                <span class="about-label">Company Vision</span>
+                <h2 class="about-title">A Rental Experience Built Around Trust And Control</h2>
+
+                <p class="about-text">
+                    Our platform connects customers with available rental cars while keeping the operational side controlled through admin dashboards, reservation calendar, PDF reports, customer verification and approval flows.
+                </p>
+
+                <p class="about-text">
+                    The goal is simple: give customers a fast and clear rental experience while giving the business a reliable system to manage vehicles, reservations, customers and contact messages from one place.
+                </p>
+            </div>
+
+            <div class="col-lg-6">
+                <div class="row g-4">
+                    <div class="col-md-6">
+                        <div class="stat-card">
+                            <strong>24/7</strong>
+                            <span>Online reservation request flow</span>
+                        </div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <div class="stat-card">
+                            <strong>AI</strong>
+                            <span>Driver license verification ready</span>
+                        </div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <div class="stat-card">
+                            <strong>PDF</strong>
+                            <span>Advanced operational reports</span>
+                        </div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <div class="stat-card">
+                            <strong>Code</strong>
+                            <span>Reservation tracking system</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row g-4 mt-5">
+            <div class="col-lg-4">
+                <div class="about-card">
+                    <h3>Secure Reservations</h3>
+                    <p>
+                        Reservation requests are checked against existing pending and approved reservations to help prevent double booking.
+                    </p>
+                </div>
+            </div>
+
+            <div class="col-lg-4">
+                <div class="about-card">
+                    <h3>Verified Customers</h3>
+                    <p>
+                        Driver license upload and verification support a safer and more professional rental workflow.
+                    </p>
+                </div>
+            </div>
+
+            <div class="col-lg-4">
+                <div class="about-card">
+                    <h3>Admin Operations</h3>
+                    <p>
+                        Admin users can manage cars, brands, categories, reservations, reports, calendars and contact messages from a centralized panel.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="about-section" style="padding-top:0;">
+    <div class="container">
+        <div class="row g-5">
+            <div class="col-lg-5">
+                <span class="about-label">How It Works</span>
+                <h2 class="about-title">Simple For Customers, Powerful For Admins</h2>
+                <p class="about-text">
+                    The public side is built for speed. The admin side is built for control. Together, they create a complete rent-a-car workflow.
+                </p>
+            </div>
+
+            <div class="col-lg-7">
+                <div class="about-card">
+                    <div class="process-item">
+                        <div class="process-number">1</div>
+                        <div>
+                            <h5>Customer chooses a car</h5>
+                            <p>
+                                Cars can be filtered by brand, category, price, fuel type, transmission, seat count, luggage capacity and date availability.
+                            </p>
+                        </div>
+                    </div>
+
+                    <div class="process-item">
+                        <div class="process-number">2</div>
+                        <div>
+                            <h5>Reservation request is created</h5>
+                            <p>
+                                The system checks selected dates and creates a pending reservation request with customer and driver license information.
+                            </p>
+                        </div>
+                    </div>
+
+                    <div class="process-item">
+                        <div class="process-number">3</div>
+                        <div>
+                            <h5>Admin reviews and approves</h5>
+                            <p>
+                                Admin reviews the request, approves or rejects it, and the customer receives reservation confirmation by email.
+                            </p>
+                        </div>
+                    </div>
+
+                    <div class="process-item mb-0">
+                        <div class="process-number">4</div>
+                        <div>
+                            <h5>Customer tracks reservation</h5>
+                            <p>
+                                The customer can use the reservation code and email address to track reservation status online.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="about-cta">
+    <div class="container">
+        <div class="row align-items-center g-4">
+            <div class="col-lg-8">
+                <h2>Explore Our Available Fleet</h2>
+                <p>
+                    Choose the right vehicle, select your rental dates and create a secure reservation request.
+                </p>
+            </div>
+
+            <div class="col-lg-4 text-lg-end">
+                <a asp-controller="Car" asp-action="Index" class="btn-white">
+                    Browse Cars
+                </a>
+            </div>
+        </div>
+    </div>
+</section>

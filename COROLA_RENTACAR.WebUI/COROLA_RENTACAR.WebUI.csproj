@@ -7,6 +7,24 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Content Include="Screenshots\admin-contact-inbox.png" />
+    <Content Include="Screenshots\admin-dashboard.png" />
+    <Content Include="Screenshots\admin-login.png" />
+    <Content Include="Screenshots\admin-reports.png" />
+    <Content Include="Screenshots\admin-reservation-calendar.png" />
+    <Content Include="Screenshots\admin-reservation-list.png" />
+    <Content Include="Screenshots\ai-tools.png" />
+    <Content Include="Screenshots\car-detail-gallery.png" />
+    <Content Include="Screenshots\car-list-filter.png" />
+    <Content Include="Screenshots\contact-form.png" />
+    <Content Include="Screenshots\home.png" />
+    <Content Include="Screenshots\mailkit-email.png" />
+    <Content Include="Screenshots\pdf-report.png" />
+    <Content Include="Screenshots\reservation-form.png" />
+    <Content Include="Screenshots\reservation-track.png" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="MailKit" Version="4.17.0" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="9.0.13">
       <PrivateAssets>all</PrivateAssets>
